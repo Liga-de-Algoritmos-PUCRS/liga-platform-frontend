@@ -2,8 +2,9 @@ import { RouterProvider } from "@tanstack/react-router"
 import { AuthProvider } from "./providers/AuthProvider"
 import { router } from "./routes/router"
 import { useAuth } from "./hooks/use-auth"
+import { ColorProvider } from "./providers/ColorProvider"
 
-function InnerApp() { 
+function InnerApp() {
   const { loading } = useAuth()
 
   if (loading) {
@@ -20,9 +21,11 @@ function InnerApp() {
 
 function App() {
   return (
-    <AuthProvider>
-      <InnerApp />
-    </AuthProvider>
+    <ColorProvider>
+      <AuthProvider>
+        <InnerApp />
+      </AuthProvider>
+    </ColorProvider>
   )
 }
 

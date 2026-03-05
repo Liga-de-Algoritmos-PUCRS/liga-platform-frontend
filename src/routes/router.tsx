@@ -1,23 +1,17 @@
 import {
   createRouter,
-  Outlet,
   createRootRouteWithContext,
   createRoute,
 } from "@tanstack/react-router";
 import type { RouterContext } from "./router-context";
 import { HomePage } from "@/pages/HomePage";
+import RootLayout from "@/rootLayout";
 
 // =======================================================
 // Root
 // =======================================================
 const rootRoute = createRootRouteWithContext<RouterContext>()({
-  component: () => (
-    <div className="h-screen w-screen flex flex-col">
-      <main className="flex-1">
-        <Outlet />
-      </main>
-    </div>
-  ),
+  component: RootLayout,
 });
 
 // =======================================================

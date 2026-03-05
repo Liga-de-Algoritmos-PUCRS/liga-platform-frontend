@@ -12,10 +12,13 @@
     "generate:sdk": "openapi-generator-cli generate -i http://localhost:3000/api-json -g typescript-axios -o src/api/sdk"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
+    "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-router": "^1.163.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "heroicons": "^2.2.0",
     "lucide-react": "^0.575.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
