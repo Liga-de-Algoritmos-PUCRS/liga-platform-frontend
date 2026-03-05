@@ -49,7 +49,10 @@ export function Navbar() {
           onClick={() => handleNavigation("/")}
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 transition-all group-hover:scale-105 group-active:scale-95">
-            <Code2 size={24} className="text-primary-foreground" />
+            <img
+            className="w-24"
+              src="/src/assets/liga-de-algoritmos-clean.png"
+            />
           </div>
           <span className="hidden font-bold text-xl tracking-tight sm:inline-block">
             Liga de <span className="text-primary">Algoritmos</span>
