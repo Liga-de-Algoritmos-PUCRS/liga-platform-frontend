@@ -6,11 +6,20 @@ import {
   User,
   LayoutDashboard,
   Terminal,
-  Trophy
+  Trophy,
+  Menu,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useColor } from "@/providers/ColorProvider";
 
@@ -18,10 +27,9 @@ export function Navbar() {
   const { setTheme, resolvedTheme } = useColor();
   const navigate = useNavigate();
   const state = useRouterState();
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Estado local para permitir a seleção visual enquanto você não tem as rotas físicas
-  // Quando você tiver as rotas, o 'activePath' pode ser apenas state.location.pathname
-  const [activeTab, setActiveTab] = useState(state.location.pathname);
+  const activeTab = state.location.pathname;
 
   const navItems = [
     { name: "Início", path: "/", icon: LayoutDashboard },
@@ -30,8 +38,8 @@ export function Navbar() {
   ];
 
   const handleNavigation = (path: string) => {
-    setActiveTab(path); // Atualiza visualmente o botão selecionado
     navigate({ to: path });
+    setIsOpen(false);
   };
 
   const handleThemeChange = (checked: boolean) => {
@@ -40,29 +48,71 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-6">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
 
-        {/* ESQUERDA: Logo */}
-        <div
-          className="flex items-center gap-2.5 group cursor-pointer"
-          onClick={() => handleNavigation("/")}
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 transition-all group-hover:scale-105 group-active:scale-95">
-            <img
-              className="w-24"
-              src="/src/assets/liga-de-algoritmos-clean.png"
-            />
+        {/* ESQUERDA: Logo e Menu Mobile */}
+        <div className="flex items-center gap-4">
+          {/* TRIGGER MOBILE */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              aria-describedby={undefined}
+              side="left" className="w-75 sm:w-87.5">
+              <SheetHeader className="mb-8 text-left">
+                <SheetTitle className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+                    <img className="w-8" src="/src/assets/liga-de-algoritmos-clean.png" alt="Logo" />
+                  </div>
+                  <span className="font-bold tracking-tight">
+                    Liga de <span className="text-primary">Algoritmos</span>
+                  </span>
+                </SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-2">
+                {navItems.map((item) => {
+                  const isActive = activeTab === item.path;
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => handleNavigation(item.path)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                        isActive
+                          ? "bg-primary/10 text-primary shadow-sm"
+                          : "text-muted-foreground hover:bg-secondary/50"
+                      )}
+                    >
+                      <item.icon size={18} />
+                      {item.name}
+                    </button>
+                  );
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          {/* Logo Desktop/Mobile */}
+          <div
+            className="flex items-center gap-2.5 group cursor-pointer"
+            onClick={() => handleNavigation("/")}
+          >
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 transition-all group-hover:scale-105">
+              <img className="w-24" src="/src/assets/liga-de-algoritmos-clean.png" />
+            </div>
+            <span className="hidden sm:inline-block font-bold text-lg sm:text-xl tracking-tight">
+              Liga de <span className="text-primary">Algoritmos</span>
+            </span>
           </div>
-          <span className="hidden font-bold text-xl tracking-tight sm:inline-block">
-            Liga de <span className="text-primary">Algoritmos</span>
-          </span>
         </div>
 
-        {/* MEIO: Navegação TanStack Style */}
+        {/* MEIO: Navegação Desktop */}
         <nav className="hidden md:flex items-center bg-secondary/50 p-1.5 rounded-full border border-border/50 shadow-inner">
           {navItems.map((item) => {
             const isActive = activeTab === item.path;
-
             return (
               <button
                 key={item.name}
@@ -88,36 +138,36 @@ export function Navbar() {
         </nav>
 
         {/* DIREITA: Switch e User */}
-        <div className="flex items-center gap-5">
-
-          {/* Theme Switch Personalizado */}
-          <div className="flex items-center gap-3 bg-secondary/30 px-3 py-1.5 rounded-full border border-border/40">
+        <div className="flex items-center gap-2 sm:gap-5">
+          {/* Theme Switch */}
+          <div className="flex items-center gap-2 sm:gap-3 bg-secondary/30 px-2 sm:px-3 py-1.5 rounded-full border border-border/40">
             <Sun className={cn(
-              "h-4 w-4 transition-all duration-500",
-              resolvedTheme === 'light' ? "text-orange-500 rotate-0 scale-110" : "text-muted-foreground opacity-40 -rotate-90 scale-90"
+              "h-3.5 w-3.5 sm:h-4 transition-all duration-500",
+              resolvedTheme === 'light' ? "text-orange-500 scale-110" : "text-muted-foreground opacity-40"
             )} />
             <Switch
               checked={resolvedTheme === "dark"}
               onCheckedChange={handleThemeChange}
+              className="scale-75 sm:scale-100"
             />
             <Moon className={cn(
-              "h-4 w-4 transition-all duration-500",
-              resolvedTheme === 'dark' ? "text-primary rotate-0 scale-110" : "text-muted-foreground opacity-40 rotate-90 scale-90"
+              "h-3.5 w-3.5 sm:h-4 transition-all duration-500",
+              resolvedTheme === 'dark' ? "text-primary scale-110" : "text-muted-foreground opacity-40"
             )} />
           </div>
 
-          <div className="h-8 w-[px] bg-border/60" />
+          <div className="hidden xs:block h-8 w-px bg-border/60" />
 
+          {/* Avatar com efeito Glow */}
           <div className="relative group cursor-pointer">
-            <div className="absolute -inset-0.5 rounded-full bg-linear-to-tr from-primary to-primary opacity-0 group-hover:opacity-70 transition duration-500 blur-md" />
-            <Avatar className="relative h-10 w-10 border-2 border-background ring-1 ring-border transition-transform group-active:scale-90">
+            <div className="absolute -inset-0.5 rounded-full bg-primary opacity-0 group-hover:opacity-50 transition duration-500 blur-md" />
+            <Avatar className="relative h-9 w-9 sm:h-10 sm:w-10 border-2 border-background ring-1 ring-border transition-transform group-active:scale-90">
               <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback className="bg-muted">
-                <User size={20} />
+                <User size={18} />
               </AvatarFallback>
             </Avatar>
           </div>
-
         </div>
       </div>
     </header>
