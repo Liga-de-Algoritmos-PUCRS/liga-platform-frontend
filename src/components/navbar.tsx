@@ -119,7 +119,7 @@ export function Navbar() {
           </div>
         </div>
 
-        <div className="hidden md:flex flex-none items-center bg-secondary/20 p-1.5 rounded-full border border-white/10 backdrop-blur-md">
+        <div className="hidden md:flex flex-none items-center bg-secondary/20 p-1.5 rounded-full border border-white/10 backdrop-blur-md gap-1">
           {navItems.map((item) => {
             const isActive = activeTab === item.path;
             return (

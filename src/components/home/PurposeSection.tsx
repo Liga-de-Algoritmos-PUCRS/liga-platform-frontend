@@ -40,7 +40,7 @@ export function PurposeSection() {
           <h2 className="text-sm font-bold tracking-[0.2em] text-white uppercase mb-4 opacity-70">
             O que nos move
           </h2>
-          <h3 className="text-4xl md:text-6xl font-black tracking-tighter text-white leading-tight">
+          <h3 className="text-4xl md:text-6xl font-black tracking-tighter text-white leading-tight tex">
             Transformamos lógica em <span className="text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]">impacto tecnológico</span>.
           </h3>
           <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl">
