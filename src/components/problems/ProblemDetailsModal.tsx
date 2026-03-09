@@ -139,7 +139,7 @@ export function ProblemDetailsModal({ problem, isOpen, onClose }: ProblemDetails
                     <Download size={22} />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white uppercase tracking-wider">Dataset</p>
+                    <p className="text-xs font-bold text-white uppercase tracking-wider">Input</p>
                     <p className="text-[10px] text-gray-500 font-mono">input.txt</p>
                   </div>
                 </div>
