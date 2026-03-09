@@ -58,10 +58,8 @@ export default function SignupPage() {
             </div>
         </div>
 
-        {/* Lado Direito */}
         <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 bg-background lg:bg-muted/30 relative">
             
-            {/* Background mobile: mesma lógica de iluminação e sombra do desktop */}
             <div className="absolute inset-0 lg:hidden z-0 overflow-hidden">
                 <div className="absolute inset-0 bg-primary" />
                 <div className="absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/60" />

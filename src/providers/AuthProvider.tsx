@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import client, { setAccessToken } from "@/api/client"
 import { LoginRequestDTO } from "@/api/sdk"
-import { UserWithAccount } from "@/types/user.types"
+import UserWithAccount from "@/types/user.types"
 
 export type AuthContextType = {
   user: UserWithAccount | null
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               await fetchUserWithAccount()
             } catch (error) {
                console.error("Erro ao validar sessão:", error)
-               await logout() // Aguarda o logout se falhar validação
+               await logout()
             }
         }
       } else {

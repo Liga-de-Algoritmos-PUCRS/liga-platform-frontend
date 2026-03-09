@@ -64,7 +64,6 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] sm:max-w-[500px] p-0 overflow-hidden border-white/10 bg-[#0a0a0b]/95 backdrop-blur-3xl text-white shadow-2xl shadow-primary/20 outline-none rounded-3xl">
         
-        {/* Banner mais baixo para achatar o card */}
         <div className="relative h-24 sm:h-28 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/60 via-purple-600/40 to-blue-900/60" />
           {user.bannerUrl && (
@@ -73,7 +72,6 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] to-transparent" />
         </div>
 
-        {/* Avatar e Tags Responsivas */}
         <div className="relative px-4 sm:px-8 -mt-10 sm:-mt-12 flex flex-row items-end justify-between gap-2">
           <div className="relative group shrink-0">
             <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-blue-500 rounded-full blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
@@ -101,7 +99,6 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
           </div>
         </div>
 
-        {/* Nome e Infos Centralizadas/Alinhadas */}
         <div className="px-5 sm:px-8 pt-4 pb-5">
           <h2 className="text-xl sm:text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 truncate">
             {user.name}
@@ -124,7 +121,6 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
           </div>
         </div>
 
-        {/* Stats Grid em 2 colunas fixas */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 px-5 sm:px-8 pb-6">
           {stats.map((stat) => (
             <div 
@@ -142,7 +138,6 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
           ))}
         </div>
 
-        {/* Footer Minimalista */}
         <div className="py-3 bg-white/[0.02] text-center border-t border-white/5">
           <p className="text-[8px] text-gray-600 font-mono uppercase tracking-[0.3em] font-bold">
             Liga de Algoritmos • PUCRS

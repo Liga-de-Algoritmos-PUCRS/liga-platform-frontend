@@ -27,15 +27,11 @@ export function PurposeSection() {
   return (
     <section className="relative w-full py-24 md:py-32 bg-background overflow-hidden">
       
-      {/* 1. Máscara de Transição (O segredo da suavidade) */}
-      {/* Criamos um gradiente que vem do fundo (Hero) e desvanece suavemente para o conteúdo desta seção */}
+     
       <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
       
-      {/* 2. Glow de Conexão Difuso */}
-      {/* Um brilho muito largo e com baixa opacidade que "vaza" da seção de cima */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100%] h-80 bg-primary/5 blur-[120px] rounded-full -translate-y-1/2 z-0" />
 
-      {/* --- Sombras Ambientais (Menos 'manchas', mais 'atmosfera') --- */}
       <div className="absolute top-20 left-0 w-[70%] h-[70%] bg-primary/10 blur-[180px] md:blur-[280px] rounded-full -translate-x-1/4 -translate-y-1/4 z-0" />
       <div className="absolute bottom-0 right-0 w-[60%] h-[60%] bg-primary/10 blur-[150px] md:blur-[220px] rounded-full translate-x-1/4 translate-y-1/4 z-0" />
 
@@ -52,21 +48,18 @@ export function PurposeSection() {
           </p>
         </div>
 
-        {/* Grelha de Cartões com Hover 'Cinematográfico' (Lento e Suave) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {purposes.map((item, index) => (
             <div 
               key={index}
               className="group relative p-8 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm transition-all duration-1000 ease-out hover:border-primary/30 hover:bg-primary/[0.05] overflow-hidden"
             >
-              {/* Overlay de gradiente no hover que aparece lentamente */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-0" />
               
               <div className="relative z-10">
                 <div className="mb-8 p-3 w-fit rounded-2xl bg-primary shadow-[0_0_20px_rgba(var(--primary),0.3)] transition-transform duration-700 group-hover:scale-105">
                   {item.icon}
                 </div>
-                {/* Título fixo em branco conforme pedido */}
                 <h4 className="text-xl font-bold text-white mb-4">
                   {item.title}
                 </h4>
@@ -79,7 +72,6 @@ export function PurposeSection() {
         </div>
       </div>
 
-      {/* Grelha de Pontos quase invisível para textura */}
       <div className="absolute inset-0 z-[-1] opacity-[0.015]" style={{
         backgroundImage: "radial-gradient(rgb(var(--foreground)) 1px, transparent 1px)",
         backgroundSize: "48px 48px",

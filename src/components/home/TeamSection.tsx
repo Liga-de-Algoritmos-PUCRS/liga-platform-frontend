@@ -38,17 +38,15 @@ export function TeamSection() {
   return (
     <section className="min-h-svh flex flex-col items-center justify-center p-8 bg-muted/30 py-24 border-t border-border/50">
       <div className="container mx-auto max-w-6xl w-full text-center">
-        {/* Título Estilizado como o Hero */}
         <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12 text-primary">
-          GESTÃO
+          INTEGRANTES 2026/01
         </h2>
         
-        {/* Foto Única do Time */}
         <div className="relative mb-20 group">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
           <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
             <img 
-              src="/team-photo.jpg" // Substitua pelo caminho da sua foto real da equipe
+              src="/team-photo.jpg" 
               alt="Equipe da Liga de Algoritmos" 
               className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
             />
@@ -56,12 +54,15 @@ export function TeamSection() {
           </div>
         </div>
 
-        {/* Diretoria com os 3 Points */}
+        <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12 text-primary">
+          GESTÃO
+        </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {team.map((membro) => (
             <Card 
               key={membro.name} 
-              className={`flex flex-col bg-background/40 backdrop-blur-sm border-white/10 transition-all duration-300 hover:-translate-y-2 ${
+              className={`flex flex-col bg-background/40 backdrop-blur-sm border-white/10 transition-all duration-300 hover:-translate-y-2 py-8 ${
                 membro.highlight ? 'md:scale-105 border-primary/50 shadow-xl' : 'hover:shadow-md'
               }`}
             >

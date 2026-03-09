@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Terminal, Star, CheckCircle2 } from "lucide-react";
+import { Terminal, Star, CheckCircle2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ProblemCardProps {
@@ -18,36 +18,60 @@ export function ProblemCard({ problem, onClick }: ProblemCardProps) {
   return (
     <Card 
       onClick={() => onClick(problem)}
-      className="group relative aspect-square flex flex-col cursor-pointer overflow-hidden border-white/10 bg-background/40 backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20"
+      className="group relative aspect-square flex flex-col cursor-pointer overflow-hidden border-white/10 bg-[#0a0a0b]/40 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 rounded-[32px]"
     >
-      <CardHeader className="p-5 pb-2">
-        <div className="flex items-center justify-between mb-4">
-          <Badge variant="outline" className={cn("text-[9px] font-bold uppercase tracking-tighter", difficultyStyles)}>
+      <div className="relative h-1/2 w-full overflow-hidden shrink-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-purple-900/20 to-transparent z-0" />
+        {problem.bannerUrl ? (
+          <img 
+            src={problem.bannerUrl} 
+            alt={problem.title} 
+            className="h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-110"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center opacity-10">
+            <Terminal size={64} />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/40 to-transparent z-10" />
+        
+        <div className="absolute top-5 left-6 right-6 flex items-center justify-between z-20">
+          <Badge className={cn("px-2.5 py-0.5 font-bold text-[9px] tracking-widest uppercase rounded-lg border shadow-lg", difficultyStyles)}>
             {problem.difficulty}
           </Badge>
-          <div className="flex items-center gap-1 text-[10px] font-bold text-primary">
-            <Star size={12} fill="currentColor" />
-            {problem.points}
+          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-black/60 border border-white/10 text-[10px] font-bold text-primary backdrop-blur-md shadow-lg">
+            <Star size={10} fill="currentColor" />
+            {problem.points} <span className="text-[8px] opacity-50">PTS</span>
           </div>
         </div>
-        <CardTitle className="text-lg sm:text-xl font-black tracking-tight text-white group-hover:text-primary transition-colors line-clamp-2">
-          {problem.title}
-        </CardTitle>
-      </CardHeader>
+      </div>
 
-      <CardContent className="flex-1 p-5 pt-2 flex flex-col justify-between">
-        <p className="text-xs sm:text-sm text-gray-400 line-clamp-3 leading-relaxed">
-          {problem.description}
-        </p>
-        
-        <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-500">
-          <div className="flex items-center gap-1.5">
-            <CheckCircle2 size={12} className="text-emerald-500/60" />
-            <span>{problem.resolved} resoluções</span>
-          </div>
-          <Terminal size={14} className="opacity-20 group-hover:opacity-100 group-hover:text-primary transition-all" />
+      <div className="relative z-20 flex-1 flex flex-col px-6 -mt-8 pb-6">
+        <div className="space-y-1.5"> 
+          <h3 className="text-lg sm:text-xl font-black tracking-tighter text-white group-hover:text-primary transition-colors line-clamp-1 leading-none drop-shadow-md">
+            {problem.title}
+          </h3>
+          <p className="text-xs sm:text-sm text-gray-400 line-clamp-3 leading-tight font-medium opacity-90">
+            {problem.description}
+          </p>
         </div>
-      </CardContent>
+
+        <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-500/80 font-bold">
+              <CheckCircle2 size={12} />
+              <span>{problem.resolved} resolvidos</span>
+            </div>
+            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-gray-500 font-bold">
+              <Users size={12} />
+              <span>{problem.submissions} envios</span>
+            </div>
+          </div>
+          <div className="p-1.5 rounded-lg bg-white/5 border border-white/5 group-hover:border-primary/30 transition-all">
+            <Terminal size={12} className="text-gray-600 group-hover:text-primary" />
+          </div>
+        </div>
+      </div>
     </Card>
   );
 }

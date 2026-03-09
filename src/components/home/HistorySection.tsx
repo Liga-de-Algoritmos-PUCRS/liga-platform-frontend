@@ -34,17 +34,13 @@ export function HistorySection() {
   ];
 
   return (
-    // mt-16 compensa a altura da Navbar (h-16)
-    // pt-10 deixa o título próximo da Navbar como na foto
     <section className="relative w-full mt-16 pt-10 pb-24 md:pb-40 bg-background overflow-hidden">
       
-      {/* --- Efeitos de Fundo --- */}
       <div className="absolute top-1/2 left-0 w-[50%] h-[50%] bg-primary/15 blur-[150px] md:blur-[250px] rounded-full -translate-x-1/2 -translate-y-1/2 z-0" />
       <div className="absolute bottom-0 right-0 w-[40%] h-[40%] bg-primary/10 blur-[120px] md:blur-[200px] rounded-full translate-x-1/2 translate-y-1/2 z-0" />
 
       <div className="container relative z-10 mx-auto px-6">
         
-        {/* Cabeçalho - Espaço mb-12 reduzido para puxar a timeline para cima */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -57,9 +53,7 @@ export function HistorySection() {
           </h3>
         </motion.div>
 
-        {/* Timeline */}
         <div className="relative">
-          {/* Linha vertical */}
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/20 to-primary/50 hidden md:block" />
 
           <div className="space-y-12 md:space-y-20">
@@ -76,7 +70,6 @@ export function HistorySection() {
               >
                 <div className="hidden md:block w-[42%]" />
 
-                {/* Marcador Central */}
                 <div className="relative z-10 flex flex-col items-center mb-6 md:mb-0">
                   <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-[0_0_25px_rgba(var(--primary),0.6)] border-4 border-background transition-transform duration-300 group-hover:scale-110">
                     {event.icon}
@@ -86,7 +79,6 @@ export function HistorySection() {
                   </span>
                 </div>
 
-                {/* Card com Foto Fixa */}
                 <div className="w-full md:w-[42%] rounded-[2rem] border border-white/5 bg-white/[0.03] backdrop-blur-xl overflow-hidden shadow-2xl transition-all hover:border-primary/20">
                   <div className="h-40 sm:h-48 w-full overflow-hidden border-b border-white/5">
                     <img 
@@ -110,7 +102,6 @@ export function HistorySection() {
         </div>
       </div>
 
-      {/* Background Decor */}
       <div className="absolute inset-0 z-[-1] opacity-[0.02]" style={{
         backgroundImage: "radial-gradient(rgb(var(--foreground)) 1px, transparent 1px)",
         backgroundSize: "50px 50px",

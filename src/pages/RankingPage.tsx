@@ -3,6 +3,7 @@ import { RankingTable } from "@/components/ranking/RankingTable";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import { Button } from "@/components/ui/button";
 import { Calendar, Globe2, Trophy, Sparkles } from "lucide-react";
+import UserWithAccount from "@/types/user.types";
 
 interface RankingUser {
   name: string;
@@ -20,7 +21,7 @@ interface RankingUser {
 
 export function RankingPage() {
   const [view, setView] = useState<"monthly" | "alltime">("monthly");
-  const [selectedUser, setSelectedUser] = useState<RankingUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserWithAccount | null>(null);
 
   const mockMonthly: RankingUser[] = Array.from({ length: 10 }).map((_, i) => ({
     name: i === 1 ? "Bernardo Kirsch" : `Competidor ${i + 1}`,
@@ -46,14 +47,13 @@ export function RankingPage() {
     avatarUrl: i === 0 ? "https://github.com/bernardokirsch.png" : null,
   }));
 
-  const handleUserClick = (user: RankingUser) => {
+  const handleUserClick = (user: UserWithAccount) => {
     setSelectedUser(user);
   };
 
   return (
     <div className="relative min-h-screen bg-background pt-24 pb-20 px-4 md:px-6 overflow-hidden">
       
-      {/* Sombra Roxa de Fundo */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] md:w-[95%] md:h-[95%] bg-primary/15 blur-[100px] md:blur-[200px] rounded-full animate-pulse z-0 pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center">
@@ -74,7 +74,6 @@ export function RankingPage() {
           </p>
         </div>
 
-        {/* Tabs Responsivas */}
         <div className="flex p-1.5 bg-secondary/20 rounded-full border border-white/10 backdrop-blur-md mb-10 w-full max-w-xs sm:max-w-md shadow-2xl">
           <button
             onClick={() => setView("monthly")}

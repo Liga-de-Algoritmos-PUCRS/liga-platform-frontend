@@ -17,4 +17,6 @@ export default interface UserWithAccount {
   accountTier: AccountTier
   avatarUrl?: string | null
   bannerUrl?: string | null 
+  allTimePoints: number,
+  monthlyPoints: number,
 }

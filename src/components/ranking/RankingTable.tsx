@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy, Medal, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
-import UserInterface from "@/types/user.types";
+import UserWithAccount from "@/types/user.types";
 
 interface RankingTableProps {
-  data: Partial<UserInterface>[]; // Usamos Partial porque o ranking pode não ter todos os dados
-  onUserClick: (user: UserInterface) => void;
+  data: Partial<UserWithAccount>[]; 
+  onUserClick: (user: UserWithAccount) => void;
 }
 
 export function RankingTable({ data, onUserClick }: RankingTableProps) {
@@ -47,7 +47,7 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
                   </td>
                   <td 
                     className="px-6 py-4 cursor-pointer"
-                    onClick={() => onUserClick(user)}
+                    onClick={() => onUserClick(user as UserWithAccount)}
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 border border-white/10 group-hover:border-primary/50 transition-colors">

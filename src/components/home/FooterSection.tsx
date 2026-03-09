@@ -35,7 +35,6 @@ export function FooterSection() {
     <footer className="w-full border-t border-white/10 bg-background/50 backdrop-blur-md py-10">
       <div className="container mx-auto px-4 flex flex-col items-center gap-8">
         
-        {/* Branding Compacto */}
         <div className="flex items-center gap-3 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary p-1 shadow-lg shadow-primary/20">
             <img 
@@ -49,7 +48,6 @@ export function FooterSection() {
           </span>
         </div>
 
-        {/* Redes Sociais Centralizadas */}
         <div className="flex gap-4">
           {socialLinks.map((social) => (
             <a
@@ -65,7 +63,6 @@ export function FooterSection() {
           ))}
         </div>
 
-        {/* Copyright e Assinatura */}
         <div className="flex flex-col items-center gap-2 text-[10px] md:text-xs text-muted-foreground font-mono opacity-60">
           <p>© {currentYear} Liga de Algoritmos PUCRS.</p>
           <span className="hover:text-primary transition-colors cursor-default">
