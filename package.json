@@ -12,6 +12,7 @@
     "generate:sdk": "openapi-generator-cli generate -i http://localhost:3000/api-json -g typescript-axios -o src/api/sdk"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
     "@openapitools/openapi-generator-cli": "^2.25.2",
     "@tailwindcss/vite": "^4.1.7",
@@ -24,6 +25,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
+    "gsap": "^3.14.2",
     "input-otp": "^1.4.2",
     "isomorphic-dompurify": "^3.0.0-rc.2",
     "jwt-decode": "^4.0.0",
