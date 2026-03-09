@@ -21,10 +21,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { useColor } from "@/providers/ColorProvider";
+import { useTheme } from "@/providers/ThemeProvider"; // Importação do hook de tema
 
 export function Navbar() {
-  const { setTheme, resolvedTheme } = useColor();
+  const { setTheme, theme } = useTheme(); // Utilizando o contexto do ThemeProvider
   const navigate = useNavigate();
   const state = useRouterState();
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +43,7 @@ export function Navbar() {
   };
 
   const handleThemeChange = (checked: boolean) => {
-    setTheme(checked ? "dark" : "light");
+    setTheme(checked ? "dark" : "light"); // Atualiza o tema via provider
   };
 
   return (
@@ -52,16 +52,13 @@ export function Navbar() {
 
         {/* ESQUERDA: Logo e Menu Mobile */}
         <div className="flex items-center gap-4">
-          {/* TRIGGER MOBILE */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent
-              aria-describedby={undefined}
-              side="left" className="w-75 sm:w-87.5">
+            <SheetContent side="left" className="w-75 sm:w-87.5">
               <SheetHeader className="mb-8 text-left">
                 <SheetTitle className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg">
@@ -95,7 +92,6 @@ export function Navbar() {
             </SheetContent>
           </Sheet>
 
-          {/* Logo Desktop/Mobile */}
           <div
             className="flex items-center gap-2.5 group cursor-pointer"
             onClick={() => handleNavigation("/")}
@@ -137,28 +133,26 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* DIREITA: Switch e User */}
+        {/* DIREITA: Switch de Tema e Perfil */}
         <div className="flex items-center gap-2 sm:gap-5">
-          {/* Theme Switch */}
           <div className="flex items-center gap-2 sm:gap-3 bg-secondary/30 px-2 sm:px-3 py-1.5 rounded-full border border-border/40">
             <Sun className={cn(
               "h-3.5 w-3.5 sm:h-4 transition-all duration-500",
-              resolvedTheme === 'light' ? "text-orange-500 scale-110" : "text-muted-foreground opacity-40"
+              theme === 'light' ? "text-orange-500 scale-110" : "text-muted-foreground opacity-40"
             )} />
             <Switch
-              checked={resolvedTheme === "dark"}
+              checked={theme === "dark"}
               onCheckedChange={handleThemeChange}
               className="scale-75 sm:scale-100"
             />
             <Moon className={cn(
               "h-3.5 w-3.5 sm:h-4 transition-all duration-500",
-              resolvedTheme === 'dark' ? "text-primary scale-110" : "text-muted-foreground opacity-40"
+              theme === 'dark' ? "text-primary scale-110" : "text-muted-foreground opacity-40"
             )} />
           </div>
 
           <div className="hidden xs:block h-8 w-px bg-border/60" />
 
-          {/* Avatar com efeito Glow */}
           <div className="relative group cursor-pointer">
             <div className="absolute -inset-0.5 rounded-full bg-primary opacity-0 group-hover:opacity-50 transition duration-500 blur-md" />
             <Avatar className="relative h-9 w-9 sm:h-10 sm:w-10 border-2 border-background ring-1 ring-border transition-transform group-active:scale-90">

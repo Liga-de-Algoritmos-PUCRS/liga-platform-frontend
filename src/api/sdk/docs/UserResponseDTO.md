@@ -1,0 +1,32 @@
+# UserResponseDTO
+
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**id** | **string** | User ID | [optional] [default to undefined]
+**name** | **string** | User name | [default to undefined]
+**email** | **string** | User email | [default to undefined]
+**cpf** | **string** | User CPF | [optional] [default to undefined]
+**createdAt** | **string** | User creation date | [default to undefined]
+**phone** | **string** | User phone | [optional] [default to undefined]
+**role** | **string** | User role | [default to undefined]
+
+## Example
+
+```typescript
+import { UserResponseDTO } from './api';
+
+const instance: UserResponseDTO = {
+    id,
+    name,
+    email,
+    cpf,
+    createdAt,
+    phone,
+    role,
+};
+```
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
