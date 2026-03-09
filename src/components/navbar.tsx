@@ -8,6 +8,7 @@ import {
   Menu,
   Settings,
   LogOut,
+  History, // Importando o ícone de História
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -42,8 +43,10 @@ export function Navbar() {
 
   const activeTab = state.location.pathname;
 
+  // Atualizado para incluir a rota de História
   const navItems = [
     { name: "Início", path: "/", icon: LayoutDashboard },
+    { name: "História", path: "/historia", icon: History }, // Nova Rota
     { name: "Problemas", path: "/problemas", icon: Terminal },
     { name: "Ranking", path: "/ranking", icon: Trophy },
   ];
@@ -117,7 +120,7 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* MEIO: Navegação Desktop */}
+        {/* MEIO: Navegação Desktop - Agora com História inclusa */}
         <div className="hidden md:flex flex-none items-center bg-secondary/20 p-1.5 rounded-full border border-white/10 backdrop-blur-md">
           {navItems.map((item) => {
             const isActive = activeTab === item.path;

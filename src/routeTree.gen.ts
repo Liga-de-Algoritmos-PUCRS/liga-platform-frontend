@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/authenticated'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as HistoriaIndexRouteImport } from './routes/historia/index'
 import { Route as HomeIndexRouteImport } from './routes/_home/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -29,6 +30,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoriaIndexRoute = HistoriaIndexRouteImport.update({
+  id: '/historia/',
+  path: '/historia/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomeIndexRoute = HomeIndexRouteImport.update({
   id: '/_home/',
   path: '/',
@@ -38,12 +44,14 @@ const HomeIndexRoute = HomeIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/authenticated': typeof AuthenticatedRoute
   '/': typeof HomeIndexRoute
+  '/historia/': typeof HistoriaIndexRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
 }
 export interface FileRoutesByTo {
   '/authenticated': typeof AuthenticatedRoute
   '/': typeof HomeIndexRoute
+  '/historia': typeof HistoriaIndexRoute
   '/login': typeof LoginIndexRoute
   '/signup': typeof SignupIndexRoute
 }
@@ -51,20 +59,28 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/authenticated': typeof AuthenticatedRoute
   '/_home/': typeof HomeIndexRoute
+  '/historia/': typeof HistoriaIndexRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/authenticated' | '/' | '/login/' | '/signup/'
+  fullPaths: '/authenticated' | '/' | '/historia/' | '/login/' | '/signup/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/authenticated' | '/' | '/login' | '/signup'
-  id: '__root__' | '/authenticated' | '/_home/' | '/login/' | '/signup/'
+  to: '/authenticated' | '/' | '/historia' | '/login' | '/signup'
+  id:
+    | '__root__'
+    | '/authenticated'
+    | '/_home/'
+    | '/historia/'
+    | '/login/'
+    | '/signup/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRoute
   HomeIndexRoute: typeof HomeIndexRoute
+  HistoriaIndexRoute: typeof HistoriaIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   SignupIndexRoute: typeof SignupIndexRoute
 }
@@ -92,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/historia/': {
+      id: '/historia/'
+      path: '/historia'
+      fullPath: '/historia/'
+      preLoaderRoute: typeof HistoriaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_home/': {
       id: '/_home/'
       path: '/'
@@ -105,6 +128,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRoute,
   HomeIndexRoute: HomeIndexRoute,
+  HistoriaIndexRoute: HistoriaIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   SignupIndexRoute: SignupIndexRoute,
 }
