@@ -1,47 +1,63 @@
 import { useState } from "react";
 import { RankingTable } from "@/components/ranking/RankingTable";
+import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import { Button } from "@/components/ui/button";
 import { Calendar, Globe2, Trophy, Sparkles } from "lucide-react";
 
+interface RankingUser {
+  name: string;
+  email: string;
+  createdAt: string;
+  course: 'SOFTWARE_ENGINEERING' | 'DATA_SCIENCE' | 'COMPUTING_SCIENCE' | 'INFORMATION_SYSTEMS' | 'COMPUTING_ENGINEERING';
+  semester: 'FIRST' | 'SECOND' | 'THIRD' | 'FOURTH' | 'FIFTH' | 'SIXTH' | 'SEVENTH' | 'EIGHTH' | 'NINTH' | 'TENTH' | 'GRADUATED';
+  avatarUrl: string | null;
+  bannerUrl?: string | null;
+  monthlyPoints?: number;
+  allTimePoints?: number;
+  submissions: number;
+  problemsResolved: number;
+}
+
 export function RankingPage() {
   const [view, setView] = useState<"monthly" | "alltime">("monthly");
+  const [selectedUser, setSelectedUser] = useState<RankingUser | null>(null);
 
-  // Dados Mockados para os 10 usuários
-  const monthlyData = [
-    { rank: 1, name: "Guilherme Cassol", score: 2450 },
-    { rank: 2, name: "Bernardo Kirsch", score: 2320 },
-    { rank: 3, name: "Eduardo Paz", score: 2100 },
-    { rank: 4, name: "Alice Silva", score: 1950 },
-    { rank: 5, name: "Bruno Souza", score: 1800 },
-    { rank: 6, name: "Carla Dias", score: 1750 },
-    { rank: 7, name: "Daniel Ohms", score: 1600 },
-    { rank: 8, name: "Elena Ramos", score: 1450 },
-    { rank: 9, name: "Fabio Lima", score: 1300 },
-    { rank: 10, name: "Gisele Voss", score: 1150 },
-  ];
+  const mockMonthly: RankingUser[] = Array.from({ length: 10 }).map((_, i) => ({
+    name: i === 1 ? "Bernardo Kirsch" : `Competidor ${i + 1}`,
+    email: i === 1 ? "bernardo.kirsch@edu.pucrs.br" : `user${i}@pucrs.br`,
+    createdAt: i === 1 ? "2024-03-01T00:00:00Z" : "2025-01-15T00:00:00Z",
+    course: i === 1 ? 'SOFTWARE_ENGINEERING' : 'COMPUTING_SCIENCE',
+    semester: i === 1 ? 'FOURTH' : 'SECOND',
+    monthlyPoints: 2500 - (i * 150),
+    problemsResolved: 45 - i,
+    submissions: 120 - i,
+    avatarUrl: i === 1 ? "https://github.com/bernardokirsch.png" : null,
+  }));
 
-  const allTimeData = [
-    { rank: 1, name: "Bernardo Kirsch", score: 15400 },
-    { rank: 2, name: "Guilherme Cassol", score: 14200 },
-    { rank: 3, name: "Eduardo Paz", score: 12800 },
-    { rank: 4, name: "Daniel Ohms", score: 11500 },
-    { rank: 5, name: "Alice Silva", score: 10200 },
-    { rank: 6, name: "Bruno Souza", score: 9800 },
-    { rank: 7, name: "Gisele Voss", score: 8700 },
-    { rank: 8, name: "Carla Dias", score: 7500 },
-    { rank: 9, name: "Fabio Lima", score: 6200 },
-    { rank: 10, name: "Elena Ramos", score: 5400 },
-  ];
+  const mockAllTime: RankingUser[] = Array.from({ length: 10 }).map((_, i) => ({
+    name: i === 0 ? "Bernardo Kirsch" : `Lenda ${i + 1}`,
+    email: i === 0 ? "bernardo.kirsch@edu.pucrs.br" : `legend${i}@pucrs.br`,
+    createdAt: "2023-08-10T00:00:00Z",
+    course: 'SOFTWARE_ENGINEERING',
+    semester: i === 0 ? 'FOURTH' : 'GRADUATED',
+    allTimePoints: 15000 - (i * 1000),
+    problemsResolved: 300 - (i * 10),
+    submissions: 800 - (i * 20),
+    avatarUrl: i === 0 ? "https://github.com/bernardokirsch.png" : null,
+  }));
+
+  const handleUserClick = (user: RankingUser) => {
+    setSelectedUser(user);
+  };
 
   return (
     <div className="relative min-h-screen bg-background pt-24 pb-20 px-4 md:px-6 overflow-hidden">
       
-      {/* Brilho Roxo de Fundo (Shadow) - Seguindo o estilo da Hero */}
+      {/* Sombra Roxa de Fundo */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] md:w-[95%] md:h-[95%] bg-primary/15 blur-[100px] md:blur-[200px] rounded-full animate-pulse z-0 pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center">
         
-        {/* Badge Superior */}
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-primary tracking-widest uppercase shadow-xl">
           <Sparkles size={12} className="animate-spin-slow" />
           <span>Competição</span>
@@ -49,24 +65,21 @@ export function RankingPage() {
           <span className="opacity-70">Temporada 2026</span>
         </div>
 
-        {/* Título Estilizado */}
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-primary leading-none">
             RANKING
           </h1>
           <p className="text-muted-foreground mt-6 text-base md:text-xl font-medium max-w-2xl mx-auto">
-            Os mestre da lógica. Acompanhe a evolução dos competidores da Liga.
+            Os mestres da lógica. Acompanhe a evolução dos competidores da Liga.
           </p>
         </div>
 
-        {/* Seleção de Ranking (Tabs) */}
-        <div className="flex p-1.5 bg-secondary/20 rounded-full border border-white/10 backdrop-blur-md mb-10 w-full max-w-md shadow-2xl">
+        {/* Tabs Responsivas */}
+        <div className="flex p-1.5 bg-secondary/20 rounded-full border border-white/10 backdrop-blur-md mb-10 w-full max-w-xs sm:max-w-md shadow-2xl">
           <button
             onClick={() => setView("monthly")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold transition-all duration-300 ${
-              view === "monthly" 
-                ? "bg-primary text-white shadow-lg shadow-primary/30 scale-100" 
-                : "text-gray-400 hover:text-white hover:bg-white/5"
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ${
+              view === "monthly" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"
             }`}
           >
             <Calendar size={16} />
@@ -74,10 +87,8 @@ export function RankingPage() {
           </button>
           <button
             onClick={() => setView("alltime")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold transition-all duration-300 ${
-              view === "alltime" 
-                ? "bg-primary text-white shadow-lg shadow-primary/30 scale-100" 
-                : "text-gray-400 hover:text-white hover:bg-white/5"
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ${
+              view === "alltime" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"
             }`}
           >
             <Globe2 size={16} />
@@ -85,33 +96,35 @@ export function RankingPage() {
           </button>
         </div>
 
-        {/* Tabela de Resultados */}
         <div className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <RankingTable data={view === "monthly" ? monthlyData : allTimeData} />
+          <RankingTable 
+            data={view === "monthly" ? mockMonthly : mockAllTime} 
+            onUserClick={handleUserClick}
+          />
         </div>
 
-        {/* Rodapé da Página / CTA */}
-        <div className="mt-16 w-full max-w-3xl p-8 rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 to-transparent backdrop-blur-sm flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-          <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/20">
-            <Trophy size={32} />
+        <UserInfoModal 
+          user={selectedUser as any}
+          isOpen={!!selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
+
+        <div className="mt-16 w-full max-w-3xl p-6 sm:p-8 rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 to-transparent backdrop-blur-sm flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+          <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/20">
+            <Trophy size={28} />
           </div>
           <div className="flex-1">
-            <h4 className="text-xl font-bold text-white">Quer aparecer aqui?</h4>
-            <p className="text-muted-foreground">
-              Resolva os problemas semanais e suba no ranking através de submissões eficientes.
+            <h4 className="text-lg sm:text-xl font-bold text-white">Quer aparecer aqui?</h4>
+            <p className="text-muted-foreground text-xs sm:text-sm">
+              Resolva os problemas semanais e suba no ranking. Clique nos nomes para ver o perfil.
             </p>
           </div>
-          <Button 
-            size="lg"
-            className="rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-bold"
-          >
-            Ver Problemas
+          <Button size="lg" className="w-full sm:w-auto rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-bold">
+            Treinar Agora
           </Button>
         </div>
-
       </div>
 
-      {/* Grelha de Decoração (Opcional, para manter o padrão da Hero) */}
       <div className="absolute inset-0 z-[-1] opacity-[0.03] pointer-events-none" style={{
         backgroundImage: "radial-gradient(rgb(var(--foreground)) 1px, transparent 1px)",
         backgroundSize: "40px 40px",

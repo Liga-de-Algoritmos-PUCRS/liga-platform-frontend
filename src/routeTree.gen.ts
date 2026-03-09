@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/authenticated'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as RankingIndexRouteImport } from './routes/ranking/index'
+import { Route as ProblemasIndexRouteImport } from './routes/problemas/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as HistoriaIndexRouteImport } from './routes/historia/index'
 import { Route as HomeIndexRouteImport } from './routes/_home/index'
@@ -29,6 +30,11 @@ const SignupIndexRoute = SignupIndexRouteImport.update({
 const RankingIndexRoute = RankingIndexRouteImport.update({
   id: '/ranking/',
   path: '/ranking/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProblemasIndexRoute = ProblemasIndexRouteImport.update({
+  id: '/problemas/',
+  path: '/problemas/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/': typeof HomeIndexRoute
   '/historia/': typeof HistoriaIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/problemas/': typeof ProblemasIndexRoute
   '/ranking/': typeof RankingIndexRoute
   '/signup/': typeof SignupIndexRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/': typeof HomeIndexRoute
   '/historia': typeof HistoriaIndexRoute
   '/login': typeof LoginIndexRoute
+  '/problemas': typeof ProblemasIndexRoute
   '/ranking': typeof RankingIndexRoute
   '/signup': typeof SignupIndexRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/_home/': typeof HomeIndexRoute
   '/historia/': typeof HistoriaIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/problemas/': typeof ProblemasIndexRoute
   '/ranking/': typeof RankingIndexRoute
   '/signup/': typeof SignupIndexRoute
 }
@@ -79,16 +88,25 @@ export interface FileRouteTypes {
     | '/'
     | '/historia/'
     | '/login/'
+    | '/problemas/'
     | '/ranking/'
     | '/signup/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/authenticated' | '/' | '/historia' | '/login' | '/ranking' | '/signup'
+  to:
+    | '/authenticated'
+    | '/'
+    | '/historia'
+    | '/login'
+    | '/problemas'
+    | '/ranking'
+    | '/signup'
   id:
     | '__root__'
     | '/authenticated'
     | '/_home/'
     | '/historia/'
     | '/login/'
+    | '/problemas/'
     | '/ranking/'
     | '/signup/'
   fileRoutesById: FileRoutesById
@@ -98,6 +116,7 @@ export interface RootRouteChildren {
   HomeIndexRoute: typeof HomeIndexRoute
   HistoriaIndexRoute: typeof HistoriaIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
+  ProblemasIndexRoute: typeof ProblemasIndexRoute
   RankingIndexRoute: typeof RankingIndexRoute
   SignupIndexRoute: typeof SignupIndexRoute
 }
@@ -123,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/ranking'
       fullPath: '/ranking/'
       preLoaderRoute: typeof RankingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/problemas/': {
+      id: '/problemas/'
+      path: '/problemas'
+      fullPath: '/problemas/'
+      preLoaderRoute: typeof ProblemasIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login/': {
@@ -154,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomeIndexRoute: HomeIndexRoute,
   HistoriaIndexRoute: HistoriaIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
+  ProblemasIndexRoute: ProblemasIndexRoute,
   RankingIndexRoute: RankingIndexRoute,
   SignupIndexRoute: SignupIndexRoute,
 }

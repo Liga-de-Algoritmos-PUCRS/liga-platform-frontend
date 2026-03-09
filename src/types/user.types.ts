@@ -4,7 +4,7 @@ export type AccountStatus = 'ACTIVE' | 'EXPIRED' | 'INACTIVE' | 'REVOKED';
 
 export type AccountTier = 'FREE' | 'PAYMENT';
 
-export interface UserWithAccount {
+export default interface UserWithAccount {
   id: string
   name: string
   email: string
