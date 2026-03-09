@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Template - Backend
- * Essa API descreve as operações do sistema do Bee CRM.
+ * Essa API descreve as operações do sistema do Liga de Algoritmos.
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -26,170 +26,71 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
- * @interface AccountResponseDTO
+ * @interface CreateProblemDTO
  */
-export interface AccountResponseDTO {
+export interface CreateProblemDTO {
     /**
-     * Unique identifier for the account
+     * Problem title
      * @type {string}
-     * @memberof AccountResponseDTO
+     * @memberof CreateProblemDTO
      */
-    'id': string;
+    'title': string;
     /**
-     * Current status of the account
+     * Problem description
      * @type {string}
-     * @memberof AccountResponseDTO
+     * @memberof CreateProblemDTO
      */
-    'status': AccountResponseDTOStatusEnum;
+    'description': string;
     /**
-     * Tier of the account
+     * Problem difficulty
      * @type {string}
-     * @memberof AccountResponseDTO
+     * @memberof CreateProblemDTO
      */
-    'accountTier': AccountResponseDTOAccountTierEnum;
-}
-
-export const AccountResponseDTOStatusEnum = {
-    Active: 'ACTIVE',
-    Expired: 'EXPIRED',
-    Inactive: 'INACTIVE',
-    Revoked: 'REVOKED'
-} as const;
-
-export type AccountResponseDTOStatusEnum = typeof AccountResponseDTOStatusEnum[keyof typeof AccountResponseDTOStatusEnum];
-export const AccountResponseDTOAccountTierEnum = {
-    Free: 'FREE',
-    Payment: 'PAYMENT'
-} as const;
-
-export type AccountResponseDTOAccountTierEnum = typeof AccountResponseDTOAccountTierEnum[keyof typeof AccountResponseDTOAccountTierEnum];
-
-/**
- * 
- * @export
- * @interface CreateUserDTO
- */
-export interface CreateUserDTO {
+    'difficulty': string;
     /**
-     * User name
+     * Problem answer
      * @type {string}
-     * @memberof CreateUserDTO
+     * @memberof CreateProblemDTO
      */
-    'name': string;
+    'answer': string;
     /**
-     * User email
+     * Problem input
      * @type {string}
-     * @memberof CreateUserDTO
+     * @memberof CreateProblemDTO
      */
-    'email': string;
+    'input': string;
     /**
-     * User password
-     * @type {string}
-     * @memberof CreateUserDTO
+     * Problem points
+     * @type {number}
+     * @memberof CreateProblemDTO
      */
-    'password': string;
+    'points': number;
     /**
-     * User CPF
+     * Problem banner URL
      * @type {string}
-     * @memberof CreateUserDTO
+     * @memberof CreateProblemDTO
      */
-    'cpf': string;
-    /**
-     * User phone
-     * @type {string}
-     * @memberof CreateUserDTO
-     */
-    'phone': string;
-    /**
-     * User role
-     * @type {string}
-     * @memberof CreateUserDTO
-     */
-    'role': string;
+    'bannerUrl': string;
 }
 /**
  * 
  * @export
- * @interface CreateUserWithAccountResponseDTO
+ * @interface CreateSubmitDTO
  */
-export interface CreateUserWithAccountResponseDTO {
+export interface CreateSubmitDTO {
     /**
-     * User ID
+     * Problem id
      * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
+     * @memberof CreateSubmitDTO
      */
-    'id'?: string;
+    'problemId': string;
     /**
-     * User name
+     * Answer
      * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
+     * @memberof CreateSubmitDTO
      */
-    'name': string;
-    /**
-     * User email
-     * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
-     */
-    'email': string;
-    /**
-     * User CPF
-     * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
-     */
-    'cpf'?: string | null;
-    /**
-     * User creation date
-     * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
-     */
-    'createdAt': string;
-    /**
-     * User phone
-     * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
-     */
-    'phone'?: string | null;
-    /**
-     * User role
-     * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
-     */
-    'role': CreateUserWithAccountResponseDTORoleEnum;
-    /**
-     * Account status
-     * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
-     */
-    'accountStatus': CreateUserWithAccountResponseDTOAccountStatusEnum;
-    /**
-     * Account tier
-     * @type {string}
-     * @memberof CreateUserWithAccountResponseDTO
-     */
-    'accountTier': CreateUserWithAccountResponseDTOAccountTierEnum;
+    'answer': string;
 }
-
-export const CreateUserWithAccountResponseDTORoleEnum = {
-    Admin: 'ADMIN',
-    User: 'USER'
-} as const;
-
-export type CreateUserWithAccountResponseDTORoleEnum = typeof CreateUserWithAccountResponseDTORoleEnum[keyof typeof CreateUserWithAccountResponseDTORoleEnum];
-export const CreateUserWithAccountResponseDTOAccountStatusEnum = {
-    Active: 'ACTIVE',
-    Expired: 'EXPIRED',
-    Inactive: 'INACTIVE',
-    Revoked: 'REVOKED'
-} as const;
-
-export type CreateUserWithAccountResponseDTOAccountStatusEnum = typeof CreateUserWithAccountResponseDTOAccountStatusEnum[keyof typeof CreateUserWithAccountResponseDTOAccountStatusEnum];
-export const CreateUserWithAccountResponseDTOAccountTierEnum = {
-    Free: 'FREE',
-    Payment: 'PAYMENT'
-} as const;
-
-export type CreateUserWithAccountResponseDTOAccountTierEnum = typeof CreateUserWithAccountResponseDTOAccountTierEnum[keyof typeof CreateUserWithAccountResponseDTOAccountTierEnum];
-
 /**
  * 
  * @export
@@ -295,6 +196,73 @@ export interface LoginResponseDTO {
      * @memberof LoginResponseDTO
      */
     'accessToken': string;
+}
+/**
+ * 
+ * @export
+ * @interface ProblemResponseDTO
+ */
+export interface ProblemResponseDTO {
+    /**
+     * Problem ID
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'id': string;
+    /**
+     * Problem title
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'title': string;
+    /**
+     * Problem description
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'description': string;
+    /**
+     * Problem difficulty
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'difficulty': string;
+    /**
+     * Problem answer
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'answer': string;
+    /**
+     * Problem input
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'input': string;
+    /**
+     * Problem points
+     * @type {number}
+     * @memberof ProblemResponseDTO
+     */
+    'points': number;
+    /**
+     * Problem banner URL
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'bannerUrl'?: string;
+    /**
+     * Problem creation date
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'updatedAt': string;
+    /**
+     * Problem creation date
+     * @type {string}
+     * @memberof ProblemResponseDTO
+     */
+    'createdAt': string;
 }
 /**
  * 
@@ -412,6 +380,67 @@ export interface SignupRequestResponseDTO {
 /**
  * 
  * @export
+ * @interface SubmitResponseDTO
+ */
+export interface SubmitResponseDTO {
+    /**
+     * Submit ID
+     * @type {string}
+     * @memberof SubmitResponseDTO
+     */
+    'id': string;
+    /**
+     * Problem ID
+     * @type {string}
+     * @memberof SubmitResponseDTO
+     */
+    'problemId': string;
+    /**
+     * User ID
+     * @type {string}
+     * @memberof SubmitResponseDTO
+     */
+    'userId': string;
+    /**
+     * Points Earned
+     * @type {number}
+     * @memberof SubmitResponseDTO
+     */
+    'pointsEarned': number;
+    /**
+     * Attempts
+     * @type {number}
+     * @memberof SubmitResponseDTO
+     */
+    'attempts': number;
+    /**
+     * Is Finished
+     * @type {boolean}
+     * @memberof SubmitResponseDTO
+     */
+    'isFinished': boolean;
+    /**
+     * Updated At
+     * @type {string}
+     * @memberof SubmitResponseDTO
+     */
+    'updatedAt'?: string;
+    /**
+     * Finished At
+     * @type {string}
+     * @memberof SubmitResponseDTO
+     */
+    'finishedAt'?: string;
+    /**
+     * Created At
+     * @type {string}
+     * @memberof SubmitResponseDTO
+     */
+    'createdAt': string;
+}
+/**
+ * 
+ * @export
  * @interface UpdateFileDTO
  */
 export interface UpdateFileDTO {
@@ -443,6 +472,55 @@ export interface UpdateFileDTO {
 /**
  * 
  * @export
+ * @interface UpdateProblemDTO
+ */
+export interface UpdateProblemDTO {
+    /**
+     * Problem title
+     * @type {string}
+     * @memberof UpdateProblemDTO
+     */
+    'title'?: string;
+    /**
+     * Problem description
+     * @type {string}
+     * @memberof UpdateProblemDTO
+     */
+    'description'?: string;
+    /**
+     * Problem difficulty
+     * @type {string}
+     * @memberof UpdateProblemDTO
+     */
+    'difficulty'?: string;
+    /**
+     * Problem answer
+     * @type {string}
+     * @memberof UpdateProblemDTO
+     */
+    'answer'?: string;
+    /**
+     * Problem input
+     * @type {string}
+     * @memberof UpdateProblemDTO
+     */
+    'input'?: string;
+    /**
+     * Problem points
+     * @type {number}
+     * @memberof UpdateProblemDTO
+     */
+    'points'?: number;
+    /**
+     * Problem banner URL
+     * @type {string}
+     * @memberof UpdateProblemDTO
+     */
+    'bannerUrl'?: string;
+}
+/**
+ * 
+ * @export
  * @interface UpdateUserDTO
  */
 export interface UpdateUserDTO {
@@ -453,23 +531,29 @@ export interface UpdateUserDTO {
      */
     'name'?: string;
     /**
-     * User CPF
+     * User banner URL
      * @type {string}
      * @memberof UpdateUserDTO
      */
-    'cpf'?: string;
+    'bannerUrl'?: string;
     /**
-     * User phone
+     * User avatar URL
      * @type {string}
      * @memberof UpdateUserDTO
      */
-    'phone'?: string;
+    'avatarUrl'?: string;
     /**
-     * User role
+     * Course the user is enrolled in
      * @type {string}
      * @memberof UpdateUserDTO
      */
-    'role'?: string;
+    'course'?: string;
+    /**
+     * Current semester of the user
+     * @type {string}
+     * @memberof UpdateUserDTO
+     */
+    'semester'?: string;
 }
 /**
  * 
@@ -482,7 +566,7 @@ export interface UserResponseDTO {
      * @type {string}
      * @memberof UserResponseDTO
      */
-    'id'?: string;
+    'id': string;
     /**
      * User name
      * @type {string}
@@ -496,37 +580,91 @@ export interface UserResponseDTO {
      */
     'email': string;
     /**
-     * User CPF
-     * @type {string}
-     * @memberof UserResponseDTO
-     */
-    'cpf'?: string | null;
-    /**
      * User creation date
      * @type {string}
      * @memberof UserResponseDTO
      */
     'createdAt': string;
     /**
-     * User phone
-     * @type {string}
-     * @memberof UserResponseDTO
-     */
-    'phone'?: string | null;
-    /**
      * User role
      * @type {string}
      * @memberof UserResponseDTO
      */
     'role': UserResponseDTORoleEnum;
+    /**
+     * User avatar URL
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'avatarUrl'?: string | null;
+    /**
+     * User banner URL
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'bannerUrl'?: string | null;
+    /**
+     * User course
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'course'?: UserResponseDTOCourseEnum;
+    /**
+     * User semester
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'semester'?: UserResponseDTOSemesterEnum;
+    /**
+     * User\'s historical submissions
+     * @type {number}
+     * @memberof UserResponseDTO
+     */
+    'historycalSubmissions'?: number;
+    /**
+     * User\'s monthly points
+     * @type {number}
+     * @memberof UserResponseDTO
+     */
+    'monthlyPoints'?: number;
+    /**
+     * User\'s all-time points
+     * @type {number}
+     * @memberof UserResponseDTO
+     */
+    'allTimePoints'?: number;
 }
 
 export const UserResponseDTORoleEnum = {
-    Admin: 'ADMIN',
-    User: 'USER'
+    User: 'USER',
+    Admin: 'ADMIN'
 } as const;
 
 export type UserResponseDTORoleEnum = typeof UserResponseDTORoleEnum[keyof typeof UserResponseDTORoleEnum];
+export const UserResponseDTOCourseEnum = {
+    SoftwareEngineering: 'SOFTWARE_ENGINEERING',
+    DataScience: 'DATA_SCIENCE',
+    ComputingScience: 'COMPUTING_SCIENCE',
+    InformationSystems: 'INFORMATION_SYSTEMS',
+    ComputingEngineering: 'COMPUTING_ENGINEERING'
+} as const;
+
+export type UserResponseDTOCourseEnum = typeof UserResponseDTOCourseEnum[keyof typeof UserResponseDTOCourseEnum];
+export const UserResponseDTOSemesterEnum = {
+    First: 'FIRST',
+    Second: 'SECOND',
+    Third: 'THIRD',
+    Fourth: 'FOURTH',
+    Fifth: 'FIFTH',
+    Sixth: 'SIXTH',
+    Seventh: 'SEVENTH',
+    Eighth: 'EIGHTH',
+    Ninth: 'NINTH',
+    Tenth: 'TENTH',
+    Graduated: 'GRADUATED'
+} as const;
+
+export type UserResponseDTOSemesterEnum = typeof UserResponseDTOSemesterEnum[keyof typeof UserResponseDTOSemesterEnum];
 
 /**
  * 
@@ -591,574 +729,12 @@ export interface ValidateSignupResponse {
      */
     'email': string;
     /**
-     * User CPF
-     * @type {string}
-     * @memberof ValidateSignupResponse
-     */
-    'cpf': string | null;
-    /**
      * User creation date
      * @type {string}
      * @memberof ValidateSignupResponse
      */
     'createdAt': string;
-    /**
-     * User phone number
-     * @type {string}
-     * @memberof ValidateSignupResponse
-     */
-    'phone': string | null;
-    /**
-     * User role
-     * @type {string}
-     * @memberof ValidateSignupResponse
-     */
-    'role': ValidateSignupResponseRoleEnum;
 }
-
-export const ValidateSignupResponseRoleEnum = {
-    Admin: 'ADMIN',
-    User: 'USER'
-} as const;
-
-export type ValidateSignupResponseRoleEnum = typeof ValidateSignupResponseRoleEnum[keyof typeof ValidateSignupResponseRoleEnum];
-
-/**
- * 
- * @export
- * @interface ValidateVerifyPhoneDTO
- */
-export interface ValidateVerifyPhoneDTO {
-    /**
-     * Token id
-     * @type {string}
-     * @memberof ValidateVerifyPhoneDTO
-     */
-    'tokenId': string;
-    /**
-     * Indicates if the token has 4 digits
-     * @type {string}
-     * @memberof ValidateVerifyPhoneDTO
-     */
-    'token': string;
-}
-/**
- * 
- * @export
- * @interface ValidateVerifyPhoneResponseDTO
- */
-export interface ValidateVerifyPhoneResponseDTO {
-    /**
-     * Token id
-     * @type {string}
-     * @memberof ValidateVerifyPhoneResponseDTO
-     */
-    'id': string;
-    /**
-     * Indicates phone number to verify
-     * @type {string}
-     * @memberof ValidateVerifyPhoneResponseDTO
-     */
-    'phone': string;
-    /**
-     * Verification date
-     * @type {string}
-     * @memberof ValidateVerifyPhoneResponseDTO
-     */
-    'expiresAt': string;
-    /**
-     * Indicates if the token is revoked
-     * @type {boolean}
-     * @memberof ValidateVerifyPhoneResponseDTO
-     */
-    'isRevoked': boolean;
-}
-/**
- * 
- * @export
- * @interface VerifyPhoneRequestDTO
- */
-export interface VerifyPhoneRequestDTO {
-    /**
-     * User phone number
-     * @type {string}
-     * @memberof VerifyPhoneRequestDTO
-     */
-    'phone': string;
-}
-
-/**
- * AccountApi - axios parameter creator
- * @export
- */
-export const AccountApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * This endpoint deletes an account by its ID.
-         * @summary Delete account by ID
-         * @param {string} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        accountControllerDeleteAccount: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('accountControllerDeleteAccount', 'id', id)
-            const localVarPath = `/account/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * This endpoint retrieves account details by its ID.
-         * @summary Get account by ID
-         * @param {string} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        accountControllerGetAccountById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('accountControllerGetAccountById', 'id', id)
-            const localVarPath = `/account/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * This endpoint retrieves a list of all accounts in the system.
-         * @summary List all accounts
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        accountControllerGetAllAccounts: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/account`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * AccountApi - functional programming interface
- * @export
- */
-export const AccountApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = AccountApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * This endpoint deletes an account by its ID.
-         * @summary Delete account by ID
-         * @param {string} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async accountControllerDeleteAccount(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.accountControllerDeleteAccount(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AccountApi.accountControllerDeleteAccount']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * This endpoint retrieves account details by its ID.
-         * @summary Get account by ID
-         * @param {string} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async accountControllerGetAccountById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AccountResponseDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.accountControllerGetAccountById(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AccountApi.accountControllerGetAccountById']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * This endpoint retrieves a list of all accounts in the system.
-         * @summary List all accounts
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async accountControllerGetAllAccounts(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AccountResponseDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.accountControllerGetAllAccounts(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AccountApi.accountControllerGetAllAccounts']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-    }
-};
-
-/**
- * AccountApi - factory interface
- * @export
- */
-export const AccountApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = AccountApiFp(configuration)
-    return {
-        /**
-         * This endpoint deletes an account by its ID.
-         * @summary Delete account by ID
-         * @param {string} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        accountControllerDeleteAccount(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.accountControllerDeleteAccount(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This endpoint retrieves account details by its ID.
-         * @summary Get account by ID
-         * @param {string} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        accountControllerGetAccountById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<AccountResponseDTO> {
-            return localVarFp.accountControllerGetAccountById(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This endpoint retrieves a list of all accounts in the system.
-         * @summary List all accounts
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        accountControllerGetAllAccounts(options?: RawAxiosRequestConfig): AxiosPromise<AccountResponseDTO> {
-            return localVarFp.accountControllerGetAllAccounts(options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * AccountApi - object-oriented interface
- * @export
- * @class AccountApi
- * @extends {BaseAPI}
- */
-export class AccountApi extends BaseAPI {
-    /**
-     * This endpoint deletes an account by its ID.
-     * @summary Delete account by ID
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountApi
-     */
-    public accountControllerDeleteAccount(id: string, options?: RawAxiosRequestConfig) {
-        return AccountApiFp(this.configuration).accountControllerDeleteAccount(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This endpoint retrieves account details by its ID.
-     * @summary Get account by ID
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountApi
-     */
-    public accountControllerGetAccountById(id: string, options?: RawAxiosRequestConfig) {
-        return AccountApiFp(this.configuration).accountControllerGetAccountById(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This endpoint retrieves a list of all accounts in the system.
-     * @summary List all accounts
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountApi
-     */
-    public accountControllerGetAllAccounts(options?: RawAxiosRequestConfig) {
-        return AccountApiFp(this.configuration).accountControllerGetAllAccounts(options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-
-/**
- * AuthenticationApi - axios parameter creator
- * @export
- */
-export const AuthenticationApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * This endpoint allows a user to log in to the system.
-         * @summary User login
-         * @param {LoginRequestDTO} loginRequestDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        loginControllerLogin: async (loginRequestDTO: LoginRequestDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'loginRequestDTO' is not null or undefined
-            assertParamExists('loginControllerLogin', 'loginRequestDTO', loginRequestDTO)
-            const localVarPath = `/auth/login`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(loginRequestDTO, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * This endpoint allows a user to log out from the system.
-         * @summary User logout
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        loginControllerLogout: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/auth/logout`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * This endpoint allows a user to refresh their access token using a valid refresh token.
-         * @summary Refresh access token
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        loginControllerRefreshTokens: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/auth/refresh`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * AuthenticationApi - functional programming interface
- * @export
- */
-export const AuthenticationApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = AuthenticationApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * This endpoint allows a user to log in to the system.
-         * @summary User login
-         * @param {LoginRequestDTO} loginRequestDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async loginControllerLogin(loginRequestDTO: LoginRequestDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LoginResponseDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.loginControllerLogin(loginRequestDTO, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthenticationApi.loginControllerLogin']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * This endpoint allows a user to log out from the system.
-         * @summary User logout
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async loginControllerLogout(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.loginControllerLogout(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthenticationApi.loginControllerLogout']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * This endpoint allows a user to refresh their access token using a valid refresh token.
-         * @summary Refresh access token
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async loginControllerRefreshTokens(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.loginControllerRefreshTokens(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AuthenticationApi.loginControllerRefreshTokens']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-    }
-};
-
-/**
- * AuthenticationApi - factory interface
- * @export
- */
-export const AuthenticationApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = AuthenticationApiFp(configuration)
-    return {
-        /**
-         * This endpoint allows a user to log in to the system.
-         * @summary User login
-         * @param {LoginRequestDTO} loginRequestDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        loginControllerLogin(loginRequestDTO: LoginRequestDTO, options?: RawAxiosRequestConfig): AxiosPromise<LoginResponseDTO> {
-            return localVarFp.loginControllerLogin(loginRequestDTO, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This endpoint allows a user to log out from the system.
-         * @summary User logout
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        loginControllerLogout(options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.loginControllerLogout(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This endpoint allows a user to refresh their access token using a valid refresh token.
-         * @summary Refresh access token
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        loginControllerRefreshTokens(options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.loginControllerRefreshTokens(options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * AuthenticationApi - object-oriented interface
- * @export
- * @class AuthenticationApi
- * @extends {BaseAPI}
- */
-export class AuthenticationApi extends BaseAPI {
-    /**
-     * This endpoint allows a user to log in to the system.
-     * @summary User login
-     * @param {LoginRequestDTO} loginRequestDTO 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AuthenticationApi
-     */
-    public loginControllerLogin(loginRequestDTO: LoginRequestDTO, options?: RawAxiosRequestConfig) {
-        return AuthenticationApiFp(this.configuration).loginControllerLogin(loginRequestDTO, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This endpoint allows a user to log out from the system.
-     * @summary User logout
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AuthenticationApi
-     */
-    public loginControllerLogout(options?: RawAxiosRequestConfig) {
-        return AuthenticationApiFp(this.configuration).loginControllerLogout(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This endpoint allows a user to refresh their access token using a valid refresh token.
-     * @summary Refresh access token
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AuthenticationApi
-     */
-    public loginControllerRefreshTokens(options?: RawAxiosRequestConfig) {
-        return AuthenticationApiFp(this.configuration).loginControllerRefreshTokens(options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
 
 /**
  * FileApi - axios parameter creator
@@ -1169,11 +745,11 @@ export const FileApiAxiosParamCreator = function (configuration?: Configuration)
         /**
          * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
          * @summary Upload a new files
-         * @param {File} [file] 
+         * @param {File} [files] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        fileControllerCreate: async (file?: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        fileControllerCreate: async (files?: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/file`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1188,8 +764,8 @@ export const FileApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
 
 
-            if (file !== undefined) { 
-                localVarFormParams.append('file', file as any);
+            if (files !== undefined) { 
+                localVarFormParams.append('files', files as any);
             }
     
     
@@ -1356,12 +932,12 @@ export const FileApiFp = function(configuration?: Configuration) {
         /**
          * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
          * @summary Upload a new files
-         * @param {File} [file] 
+         * @param {File} [files] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async fileControllerCreate(file?: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FileReponseDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.fileControllerCreate(file, options);
+        async fileControllerCreate(files?: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<FileReponseDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fileControllerCreate(files, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['FileApi.fileControllerCreate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1431,12 +1007,12 @@ export const FileApiFactory = function (configuration?: Configuration, basePath?
         /**
          * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
          * @summary Upload a new files
-         * @param {File} [file] 
+         * @param {File} [files] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        fileControllerCreate(file?: File, options?: RawAxiosRequestConfig): AxiosPromise<FileReponseDTO> {
-            return localVarFp.fileControllerCreate(file, options).then((request) => request(axios, basePath));
+        fileControllerCreate(files?: File, options?: RawAxiosRequestConfig): AxiosPromise<Array<FileReponseDTO>> {
+            return localVarFp.fileControllerCreate(files, options).then((request) => request(axios, basePath));
         },
         /**
          * This endpoint allows you to delete a file by its ID.
@@ -1491,13 +1067,13 @@ export class FileApi extends BaseAPI {
     /**
      * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
      * @summary Upload a new files
-     * @param {File} [file] 
+     * @param {File} [files] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FileApi
      */
-    public fileControllerCreate(file?: File, options?: RawAxiosRequestConfig) {
-        return FileApiFp(this.configuration).fileControllerCreate(file, options).then((request) => request(this.axios, this.basePath));
+    public fileControllerCreate(files?: File, options?: RawAxiosRequestConfig) {
+        return FileApiFp(this.configuration).fileControllerCreate(files, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1552,18 +1128,323 @@ export class FileApi extends BaseAPI {
 
 
 /**
- * HealthApi - axios parameter creator
+ * LoginApi - axios parameter creator
  * @export
  */
-export const HealthApiAxiosParamCreator = function (configuration?: Configuration) {
+export const LoginApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * 
+         * This endpoint allows a user to log in to the system.
+         * @summary User login
+         * @param {LoginRequestDTO} loginRequestDTO 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        appControllerHealth: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/`;
+        loginControllerLogin: async (loginRequestDTO: LoginRequestDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'loginRequestDTO' is not null or undefined
+            assertParamExists('loginControllerLogin', 'loginRequestDTO', loginRequestDTO)
+            const localVarPath = `/auth/login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(loginRequestDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint allows a user to log out from the system.
+         * @summary User logout
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginControllerLogout: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/auth/logout`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint allows a user to refresh their access token using a valid refresh token.
+         * @summary Refresh access token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginControllerRefreshTokens: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/auth/refresh`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * LoginApi - functional programming interface
+ * @export
+ */
+export const LoginApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = LoginApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * This endpoint allows a user to log in to the system.
+         * @summary User login
+         * @param {LoginRequestDTO} loginRequestDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async loginControllerLogin(loginRequestDTO: LoginRequestDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LoginResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.loginControllerLogin(loginRequestDTO, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LoginApi.loginControllerLogin']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows a user to log out from the system.
+         * @summary User logout
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async loginControllerLogout(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.loginControllerLogout(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LoginApi.loginControllerLogout']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows a user to refresh their access token using a valid refresh token.
+         * @summary Refresh access token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async loginControllerRefreshTokens(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LoginResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.loginControllerRefreshTokens(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['LoginApi.loginControllerRefreshTokens']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * LoginApi - factory interface
+ * @export
+ */
+export const LoginApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = LoginApiFp(configuration)
+    return {
+        /**
+         * This endpoint allows a user to log in to the system.
+         * @summary User login
+         * @param {LoginRequestDTO} loginRequestDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginControllerLogin(loginRequestDTO: LoginRequestDTO, options?: RawAxiosRequestConfig): AxiosPromise<LoginResponseDTO> {
+            return localVarFp.loginControllerLogin(loginRequestDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows a user to log out from the system.
+         * @summary User logout
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginControllerLogout(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.loginControllerLogout(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows a user to refresh their access token using a valid refresh token.
+         * @summary Refresh access token
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        loginControllerRefreshTokens(options?: RawAxiosRequestConfig): AxiosPromise<LoginResponseDTO> {
+            return localVarFp.loginControllerRefreshTokens(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * LoginApi - object-oriented interface
+ * @export
+ * @class LoginApi
+ * @extends {BaseAPI}
+ */
+export class LoginApi extends BaseAPI {
+    /**
+     * This endpoint allows a user to log in to the system.
+     * @summary User login
+     * @param {LoginRequestDTO} loginRequestDTO 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApi
+     */
+    public loginControllerLogin(loginRequestDTO: LoginRequestDTO, options?: RawAxiosRequestConfig) {
+        return LoginApiFp(this.configuration).loginControllerLogin(loginRequestDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows a user to log out from the system.
+     * @summary User logout
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApi
+     */
+    public loginControllerLogout(options?: RawAxiosRequestConfig) {
+        return LoginApiFp(this.configuration).loginControllerLogout(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows a user to refresh their access token using a valid refresh token.
+     * @summary Refresh access token
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LoginApi
+     */
+    public loginControllerRefreshTokens(options?: RawAxiosRequestConfig) {
+        return LoginApiFp(this.configuration).loginControllerRefreshTokens(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * ProblemsApi - axios parameter creator
+ * @export
+ */
+export const ProblemsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * This endpoint allows you to create a new problem in the system.
+         * @summary Create a new problem
+         * @param {CreateProblemDTO} createProblemDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerCreateProblem: async (createProblemDTO: CreateProblemDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createProblemDTO' is not null or undefined
+            assertParamExists('problemControllerCreateProblem', 'createProblemDTO', createProblemDTO)
+            const localVarPath = `/problems`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createProblemDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint allows you to delete a problem from the system.
+         * @summary Delete a problem
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerDeleteProblem: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('problemControllerDeleteProblem', 'id', id)
+            const localVarPath = `/problems/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint retrieves a list of all problems in the system.
+         * @summary List all problems
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerGetAllProblems: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/problems`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1586,63 +1467,283 @@ export const HealthApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This endpoint retrieves a problem by its ID.
+         * @summary Get problem by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerGetProblemById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('problemControllerGetProblemById', 'id', id)
+            const localVarPath = `/problems/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint allows you to update an existing problem in the system.
+         * @summary Update an existing problem
+         * @param {string} id 
+         * @param {UpdateProblemDTO} updateProblemDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerUpdateProblem: async (id: string, updateProblemDTO: UpdateProblemDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('problemControllerUpdateProblem', 'id', id)
+            // verify required parameter 'updateProblemDTO' is not null or undefined
+            assertParamExists('problemControllerUpdateProblem', 'updateProblemDTO', updateProblemDTO)
+            const localVarPath = `/problems/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateProblemDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
 /**
- * HealthApi - functional programming interface
+ * ProblemsApi - functional programming interface
  * @export
  */
-export const HealthApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = HealthApiAxiosParamCreator(configuration)
+export const ProblemsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ProblemsApiAxiosParamCreator(configuration)
     return {
         /**
-         * 
+         * This endpoint allows you to create a new problem in the system.
+         * @summary Create a new problem
+         * @param {CreateProblemDTO} createProblemDTO 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async appControllerHealth(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.appControllerHealth(options);
+        async problemControllerCreateProblem(createProblemDTO: CreateProblemDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProblemResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerCreateProblem(createProblemDTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['HealthApi.appControllerHealth']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerCreateProblem']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows you to delete a problem from the system.
+         * @summary Delete a problem
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async problemControllerDeleteProblem(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerDeleteProblem(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerDeleteProblem']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint retrieves a list of all problems in the system.
+         * @summary List all problems
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async problemControllerGetAllProblems(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProblemResponseDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerGetAllProblems(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerGetAllProblems']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint retrieves a problem by its ID.
+         * @summary Get problem by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async problemControllerGetProblemById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProblemResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerGetProblemById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerGetProblemById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows you to update an existing problem in the system.
+         * @summary Update an existing problem
+         * @param {string} id 
+         * @param {UpdateProblemDTO} updateProblemDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async problemControllerUpdateProblem(id: string, updateProblemDTO: UpdateProblemDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProblemResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerUpdateProblem(id, updateProblemDTO, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerUpdateProblem']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
- * HealthApi - factory interface
+ * ProblemsApi - factory interface
  * @export
  */
-export const HealthApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = HealthApiFp(configuration)
+export const ProblemsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ProblemsApiFp(configuration)
     return {
         /**
-         * 
+         * This endpoint allows you to create a new problem in the system.
+         * @summary Create a new problem
+         * @param {CreateProblemDTO} createProblemDTO 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        appControllerHealth(options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.appControllerHealth(options).then((request) => request(axios, basePath));
+        problemControllerCreateProblem(createProblemDTO: CreateProblemDTO, options?: RawAxiosRequestConfig): AxiosPromise<ProblemResponseDTO> {
+            return localVarFp.problemControllerCreateProblem(createProblemDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows you to delete a problem from the system.
+         * @summary Delete a problem
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerDeleteProblem(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.problemControllerDeleteProblem(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint retrieves a list of all problems in the system.
+         * @summary List all problems
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerGetAllProblems(options?: RawAxiosRequestConfig): AxiosPromise<Array<ProblemResponseDTO>> {
+            return localVarFp.problemControllerGetAllProblems(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint retrieves a problem by its ID.
+         * @summary Get problem by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerGetProblemById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<ProblemResponseDTO> {
+            return localVarFp.problemControllerGetProblemById(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows you to update an existing problem in the system.
+         * @summary Update an existing problem
+         * @param {string} id 
+         * @param {UpdateProblemDTO} updateProblemDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerUpdateProblem(id: string, updateProblemDTO: UpdateProblemDTO, options?: RawAxiosRequestConfig): AxiosPromise<ProblemResponseDTO> {
+            return localVarFp.problemControllerUpdateProblem(id, updateProblemDTO, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * HealthApi - object-oriented interface
+ * ProblemsApi - object-oriented interface
  * @export
- * @class HealthApi
+ * @class ProblemsApi
  * @extends {BaseAPI}
  */
-export class HealthApi extends BaseAPI {
+export class ProblemsApi extends BaseAPI {
     /**
-     * 
+     * This endpoint allows you to create a new problem in the system.
+     * @summary Create a new problem
+     * @param {CreateProblemDTO} createProblemDTO 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof HealthApi
+     * @memberof ProblemsApi
      */
-    public appControllerHealth(options?: RawAxiosRequestConfig) {
-        return HealthApiFp(this.configuration).appControllerHealth(options).then((request) => request(this.axios, this.basePath));
+    public problemControllerCreateProblem(createProblemDTO: CreateProblemDTO, options?: RawAxiosRequestConfig) {
+        return ProblemsApiFp(this.configuration).problemControllerCreateProblem(createProblemDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows you to delete a problem from the system.
+     * @summary Delete a problem
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProblemsApi
+     */
+    public problemControllerDeleteProblem(id: string, options?: RawAxiosRequestConfig) {
+        return ProblemsApiFp(this.configuration).problemControllerDeleteProblem(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint retrieves a list of all problems in the system.
+     * @summary List all problems
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProblemsApi
+     */
+    public problemControllerGetAllProblems(options?: RawAxiosRequestConfig) {
+        return ProblemsApiFp(this.configuration).problemControllerGetAllProblems(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint retrieves a problem by its ID.
+     * @summary Get problem by ID
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProblemsApi
+     */
+    public problemControllerGetProblemById(id: string, options?: RawAxiosRequestConfig) {
+        return ProblemsApiFp(this.configuration).problemControllerGetProblemById(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows you to update an existing problem in the system.
+     * @summary Update an existing problem
+     * @param {string} id 
+     * @param {UpdateProblemDTO} updateProblemDTO 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProblemsApi
+     */
+    public problemControllerUpdateProblem(id: string, updateProblemDTO: UpdateProblemDTO, options?: RawAxiosRequestConfig) {
+        return ProblemsApiFp(this.configuration).problemControllerUpdateProblem(id, updateProblemDTO, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -2082,22 +2183,22 @@ export class SignupApi extends BaseAPI {
 
 
 /**
- * UserApi - axios parameter creator
+ * SubmitApi - axios parameter creator
  * @export
  */
-export const UserApiAxiosParamCreator = function (configuration?: Configuration) {
+export const SubmitApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * This endpoint allows you to create a new user in the system.
-         * @summary Create a new user
-         * @param {CreateUserDTO} createUserDTO 
+         * This endpoint allows you to create a new submit
+         * @summary Create Submit
+         * @param {CreateSubmitDTO} createSubmitDTO 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerCreateUser: async (createUserDTO: CreateUserDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createUserDTO' is not null or undefined
-            assertParamExists('userControllerCreateUser', 'createUserDTO', createUserDTO)
-            const localVarPath = `/user`;
+        submitControllerCreateSubmit: async (createSubmitDTO: CreateSubmitDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createSubmitDTO' is not null or undefined
+            assertParamExists('submitControllerCreateSubmit', 'createSubmitDTO', createSubmitDTO)
+            const localVarPath = `/submit`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2116,13 +2217,356 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createUserDTO, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(createSubmitDTO, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This endpoint allows you to delete a submit
+         * @summary Delete Submit
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerDeleteSubmit: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('submitControllerDeleteSubmit', 'id', id)
+            const localVarPath = `/submit/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint allows you to get all submits
+         * @summary Get All Submits
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerGetAllSubmits: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/submit`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint allows you to get a submit by its problem ID
+         * @summary Get Submit by Problem ID
+         * @param {string} problemId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerGetSubmitByProblemId: async (problemId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'problemId' is not null or undefined
+            assertParamExists('submitControllerGetSubmitByProblemId', 'problemId', problemId)
+            const localVarPath = `/submit/{problemId}`
+                .replace(`{${"problemId"}}`, encodeURIComponent(String(problemId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint allows you to get a submit by its user ID
+         * @summary Get Submit by User ID
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerGetSubmitByUserId: async (userId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('submitControllerGetSubmitByUserId', 'userId', userId)
+            const localVarPath = `/submit/user/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * SubmitApi - functional programming interface
+ * @export
+ */
+export const SubmitApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = SubmitApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * This endpoint allows you to create a new submit
+         * @summary Create Submit
+         * @param {CreateSubmitDTO} createSubmitDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async submitControllerCreateSubmit(createSubmitDTO: CreateSubmitDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.submitControllerCreateSubmit(createSubmitDTO, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SubmitApi.submitControllerCreateSubmit']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows you to delete a submit
+         * @summary Delete Submit
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async submitControllerDeleteSubmit(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.submitControllerDeleteSubmit(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SubmitApi.submitControllerDeleteSubmit']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows you to get all submits
+         * @summary Get All Submits
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async submitControllerGetAllSubmits(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.submitControllerGetAllSubmits(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SubmitApi.submitControllerGetAllSubmits']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows you to get a submit by its problem ID
+         * @summary Get Submit by Problem ID
+         * @param {string} problemId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async submitControllerGetSubmitByProblemId(problemId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.submitControllerGetSubmitByProblemId(problemId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SubmitApi.submitControllerGetSubmitByProblemId']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint allows you to get a submit by its user ID
+         * @summary Get Submit by User ID
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async submitControllerGetSubmitByUserId(userId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.submitControllerGetSubmitByUserId(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SubmitApi.submitControllerGetSubmitByUserId']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * SubmitApi - factory interface
+ * @export
+ */
+export const SubmitApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = SubmitApiFp(configuration)
+    return {
+        /**
+         * This endpoint allows you to create a new submit
+         * @summary Create Submit
+         * @param {CreateSubmitDTO} createSubmitDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerCreateSubmit(createSubmitDTO: CreateSubmitDTO, options?: RawAxiosRequestConfig): AxiosPromise<SubmitResponseDTO> {
+            return localVarFp.submitControllerCreateSubmit(createSubmitDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows you to delete a submit
+         * @summary Delete Submit
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerDeleteSubmit(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.submitControllerDeleteSubmit(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows you to get all submits
+         * @summary Get All Submits
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerGetAllSubmits(options?: RawAxiosRequestConfig): AxiosPromise<SubmitResponseDTO> {
+            return localVarFp.submitControllerGetAllSubmits(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows you to get a submit by its problem ID
+         * @summary Get Submit by Problem ID
+         * @param {string} problemId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerGetSubmitByProblemId(problemId: string, options?: RawAxiosRequestConfig): AxiosPromise<SubmitResponseDTO> {
+            return localVarFp.submitControllerGetSubmitByProblemId(problemId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint allows you to get a submit by its user ID
+         * @summary Get Submit by User ID
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitControllerGetSubmitByUserId(userId: string, options?: RawAxiosRequestConfig): AxiosPromise<SubmitResponseDTO> {
+            return localVarFp.submitControllerGetSubmitByUserId(userId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * SubmitApi - object-oriented interface
+ * @export
+ * @class SubmitApi
+ * @extends {BaseAPI}
+ */
+export class SubmitApi extends BaseAPI {
+    /**
+     * This endpoint allows you to create a new submit
+     * @summary Create Submit
+     * @param {CreateSubmitDTO} createSubmitDTO 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SubmitApi
+     */
+    public submitControllerCreateSubmit(createSubmitDTO: CreateSubmitDTO, options?: RawAxiosRequestConfig) {
+        return SubmitApiFp(this.configuration).submitControllerCreateSubmit(createSubmitDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows you to delete a submit
+     * @summary Delete Submit
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SubmitApi
+     */
+    public submitControllerDeleteSubmit(id: string, options?: RawAxiosRequestConfig) {
+        return SubmitApiFp(this.configuration).submitControllerDeleteSubmit(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows you to get all submits
+     * @summary Get All Submits
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SubmitApi
+     */
+    public submitControllerGetAllSubmits(options?: RawAxiosRequestConfig) {
+        return SubmitApiFp(this.configuration).submitControllerGetAllSubmits(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows you to get a submit by its problem ID
+     * @summary Get Submit by Problem ID
+     * @param {string} problemId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SubmitApi
+     */
+    public submitControllerGetSubmitByProblemId(problemId: string, options?: RawAxiosRequestConfig) {
+        return SubmitApiFp(this.configuration).submitControllerGetSubmitByProblemId(problemId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint allows you to get a submit by its user ID
+     * @summary Get Submit by User ID
+     * @param {string} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SubmitApi
+     */
+    public submitControllerGetSubmitByUserId(userId: string, options?: RawAxiosRequestConfig) {
+        return SubmitApiFp(this.configuration).submitControllerGetSubmitByUserId(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * UserApi - axios parameter creator
+ * @export
+ */
+export const UserApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
         /**
          * This endpoint allows you to delete a user from the system.
          * @summary Delete a user
@@ -2164,13 +2608,13 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * This endpoint allows you to delete a user phone from the system.
-         * @summary Delete a user phone
+         * This endpoint retrieves a list of all users in the system.
+         * @summary List all users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerDeleteUserPhone: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/user/phone`;
+        userControllerGetAllUsers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2178,7 +2622,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -2194,13 +2638,43 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * This endpoint retrieves a list of all users in the system.
-         * @summary List all users
+         * This endpoint retrieves the top users of the month based on their performance.
+         * @summary Get monthly top users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerGetAllUsers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/user`;
+        userControllerGetMonthlyTopUsers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user/top/monthly`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint retrieves the top users based on their performance.
+         * @summary Get top users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerGetTopUsers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user/top/all-time`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2258,17 +2732,13 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * This endpoint retrieves a user along with their account information by their unique ID.
-         * @summary Get a user with account information by ID
-         * @param {string} id 
+         * This endpoint allows you to reset the points of all users in the system.
+         * @summary Reset user points
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerGetUserWithAccount: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('userControllerGetUserWithAccount', 'id', id)
-            const localVarPath = `/user/account/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+        userControllerResetUserPoints: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user/reset-points`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2276,7 +2746,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -2342,19 +2812,6 @@ export const UserApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UserApiAxiosParamCreator(configuration)
     return {
         /**
-         * This endpoint allows you to create a new user in the system.
-         * @summary Create a new user
-         * @param {CreateUserDTO} createUserDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async userControllerCreateUser(createUserDTO: CreateUserDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponseDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerCreateUser(createUserDTO, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerCreateUser']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * This endpoint allows you to delete a user from the system.
          * @summary Delete a user
          * @param {string} id 
@@ -2369,18 +2826,6 @@ export const UserApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to delete a user phone from the system.
-         * @summary Delete a user phone
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async userControllerDeleteUserPhone(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerDeleteUserPhone(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerDeleteUserPhone']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * This endpoint retrieves a list of all users in the system.
          * @summary List all users
          * @param {*} [options] Override http request option.
@@ -2390,6 +2835,30 @@ export const UserApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetAllUsers(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetAllUsers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint retrieves the top users of the month based on their performance.
+         * @summary Get monthly top users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userControllerGetMonthlyTopUsers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UserResponseDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetMonthlyTopUsers(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetMonthlyTopUsers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * This endpoint retrieves the top users based on their performance.
+         * @summary Get top users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userControllerGetTopUsers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UserResponseDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetTopUsers(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetTopUsers']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2406,16 +2875,15 @@ export const UserApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint retrieves a user along with their account information by their unique ID.
-         * @summary Get a user with account information by ID
-         * @param {string} id 
+         * This endpoint allows you to reset the points of all users in the system.
+         * @summary Reset user points
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async userControllerGetUserWithAccount(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateUserWithAccountResponseDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetUserWithAccount(id, options);
+        async userControllerResetUserPoints(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerResetUserPoints(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetUserWithAccount']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerResetUserPoints']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2443,16 +2911,6 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
     const localVarFp = UserApiFp(configuration)
     return {
         /**
-         * This endpoint allows you to create a new user in the system.
-         * @summary Create a new user
-         * @param {CreateUserDTO} createUserDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        userControllerCreateUser(createUserDTO: CreateUserDTO, options?: RawAxiosRequestConfig): AxiosPromise<UserResponseDTO> {
-            return localVarFp.userControllerCreateUser(createUserDTO, options).then((request) => request(axios, basePath));
-        },
-        /**
          * This endpoint allows you to delete a user from the system.
          * @summary Delete a user
          * @param {string} id 
@@ -2464,15 +2922,6 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.userControllerDeleteUser(id, deleteUserDTO, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to delete a user phone from the system.
-         * @summary Delete a user phone
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        userControllerDeleteUserPhone(options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.userControllerDeleteUserPhone(options).then((request) => request(axios, basePath));
-        },
-        /**
          * This endpoint retrieves a list of all users in the system.
          * @summary List all users
          * @param {*} [options] Override http request option.
@@ -2480,6 +2929,24 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          */
         userControllerGetAllUsers(options?: RawAxiosRequestConfig): AxiosPromise<Array<UserResponseDTO>> {
             return localVarFp.userControllerGetAllUsers(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint retrieves the top users of the month based on their performance.
+         * @summary Get monthly top users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerGetMonthlyTopUsers(options?: RawAxiosRequestConfig): AxiosPromise<Array<UserResponseDTO>> {
+            return localVarFp.userControllerGetMonthlyTopUsers(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This endpoint retrieves the top users based on their performance.
+         * @summary Get top users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerGetTopUsers(options?: RawAxiosRequestConfig): AxiosPromise<Array<UserResponseDTO>> {
+            return localVarFp.userControllerGetTopUsers(options).then((request) => request(axios, basePath));
         },
         /**
          * This endpoint retrieves a user by their unique ID.
@@ -2492,14 +2959,13 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.userControllerGetUserById(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint retrieves a user along with their account information by their unique ID.
-         * @summary Get a user with account information by ID
-         * @param {string} id 
+         * This endpoint allows you to reset the points of all users in the system.
+         * @summary Reset user points
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerGetUserWithAccount(id: string, options?: RawAxiosRequestConfig): AxiosPromise<CreateUserWithAccountResponseDTO> {
-            return localVarFp.userControllerGetUserWithAccount(id, options).then((request) => request(axios, basePath));
+        userControllerResetUserPoints(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.userControllerResetUserPoints(options).then((request) => request(axios, basePath));
         },
         /**
          * This endpoint allows you to update an existing user in the system.
@@ -2523,18 +2989,6 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
  */
 export class UserApi extends BaseAPI {
     /**
-     * This endpoint allows you to create a new user in the system.
-     * @summary Create a new user
-     * @param {CreateUserDTO} createUserDTO 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApi
-     */
-    public userControllerCreateUser(createUserDTO: CreateUserDTO, options?: RawAxiosRequestConfig) {
-        return UserApiFp(this.configuration).userControllerCreateUser(createUserDTO, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * This endpoint allows you to delete a user from the system.
      * @summary Delete a user
      * @param {string} id 
@@ -2548,17 +3002,6 @@ export class UserApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to delete a user phone from the system.
-     * @summary Delete a user phone
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApi
-     */
-    public userControllerDeleteUserPhone(options?: RawAxiosRequestConfig) {
-        return UserApiFp(this.configuration).userControllerDeleteUserPhone(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * This endpoint retrieves a list of all users in the system.
      * @summary List all users
      * @param {*} [options] Override http request option.
@@ -2567,6 +3010,28 @@ export class UserApi extends BaseAPI {
      */
     public userControllerGetAllUsers(options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).userControllerGetAllUsers(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint retrieves the top users of the month based on their performance.
+     * @summary Get monthly top users
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userControllerGetMonthlyTopUsers(options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userControllerGetMonthlyTopUsers(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint retrieves the top users based on their performance.
+     * @summary Get top users
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userControllerGetTopUsers(options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userControllerGetTopUsers(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2582,15 +3047,14 @@ export class UserApi extends BaseAPI {
     }
 
     /**
-     * This endpoint retrieves a user along with their account information by their unique ID.
-     * @summary Get a user with account information by ID
-     * @param {string} id 
+     * This endpoint allows you to reset the points of all users in the system.
+     * @summary Reset user points
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UserApi
      */
-    public userControllerGetUserWithAccount(id: string, options?: RawAxiosRequestConfig) {
-        return UserApiFp(this.configuration).userControllerGetUserWithAccount(id, options).then((request) => request(this.axios, this.basePath));
+    public userControllerResetUserPoints(options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userControllerResetUserPoints(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2604,187 +3068,6 @@ export class UserApi extends BaseAPI {
      */
     public userControllerUpdateUser(id: string, updateUserDTO: UpdateUserDTO, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).userControllerUpdateUser(id, updateUserDTO, options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-
-/**
- * VerifyPhoneApi - axios parameter creator
- * @export
- */
-export const VerifyPhoneApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * This endpoint allows a user to validate the phone verification token.
-         * @summary Validate phone verification
-         * @param {ValidateVerifyPhoneDTO} validateVerifyPhoneDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        verifyPhoneControllerValidateVerifyPhone: async (validateVerifyPhoneDTO: ValidateVerifyPhoneDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'validateVerifyPhoneDTO' is not null or undefined
-            assertParamExists('verifyPhoneControllerValidateVerifyPhone', 'validateVerifyPhoneDTO', validateVerifyPhoneDTO)
-            const localVarPath = `/verify-phone/validate`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(validateVerifyPhoneDTO, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * This endpoint allows a user to verify their phone number.
-         * @summary User phone verification
-         * @param {VerifyPhoneRequestDTO} verifyPhoneRequestDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        verifyPhoneControllerVerifyPhone: async (verifyPhoneRequestDTO: VerifyPhoneRequestDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'verifyPhoneRequestDTO' is not null or undefined
-            assertParamExists('verifyPhoneControllerVerifyPhone', 'verifyPhoneRequestDTO', verifyPhoneRequestDTO)
-            const localVarPath = `/verify-phone`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(verifyPhoneRequestDTO, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * VerifyPhoneApi - functional programming interface
- * @export
- */
-export const VerifyPhoneApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = VerifyPhoneApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * This endpoint allows a user to validate the phone verification token.
-         * @summary Validate phone verification
-         * @param {ValidateVerifyPhoneDTO} validateVerifyPhoneDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async verifyPhoneControllerValidateVerifyPhone(validateVerifyPhoneDTO: ValidateVerifyPhoneDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyPhoneControllerValidateVerifyPhone(validateVerifyPhoneDTO, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['VerifyPhoneApi.verifyPhoneControllerValidateVerifyPhone']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * This endpoint allows a user to verify their phone number.
-         * @summary User phone verification
-         * @param {VerifyPhoneRequestDTO} verifyPhoneRequestDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async verifyPhoneControllerVerifyPhone(verifyPhoneRequestDTO: VerifyPhoneRequestDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ValidateVerifyPhoneResponseDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyPhoneControllerVerifyPhone(verifyPhoneRequestDTO, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['VerifyPhoneApi.verifyPhoneControllerVerifyPhone']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-    }
-};
-
-/**
- * VerifyPhoneApi - factory interface
- * @export
- */
-export const VerifyPhoneApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = VerifyPhoneApiFp(configuration)
-    return {
-        /**
-         * This endpoint allows a user to validate the phone verification token.
-         * @summary Validate phone verification
-         * @param {ValidateVerifyPhoneDTO} validateVerifyPhoneDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        verifyPhoneControllerValidateVerifyPhone(validateVerifyPhoneDTO: ValidateVerifyPhoneDTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.verifyPhoneControllerValidateVerifyPhone(validateVerifyPhoneDTO, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This endpoint allows a user to verify their phone number.
-         * @summary User phone verification
-         * @param {VerifyPhoneRequestDTO} verifyPhoneRequestDTO 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        verifyPhoneControllerVerifyPhone(verifyPhoneRequestDTO: VerifyPhoneRequestDTO, options?: RawAxiosRequestConfig): AxiosPromise<ValidateVerifyPhoneResponseDTO> {
-            return localVarFp.verifyPhoneControllerVerifyPhone(verifyPhoneRequestDTO, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * VerifyPhoneApi - object-oriented interface
- * @export
- * @class VerifyPhoneApi
- * @extends {BaseAPI}
- */
-export class VerifyPhoneApi extends BaseAPI {
-    /**
-     * This endpoint allows a user to validate the phone verification token.
-     * @summary Validate phone verification
-     * @param {ValidateVerifyPhoneDTO} validateVerifyPhoneDTO 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof VerifyPhoneApi
-     */
-    public verifyPhoneControllerValidateVerifyPhone(validateVerifyPhoneDTO: ValidateVerifyPhoneDTO, options?: RawAxiosRequestConfig) {
-        return VerifyPhoneApiFp(this.configuration).verifyPhoneControllerValidateVerifyPhone(validateVerifyPhoneDTO, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This endpoint allows a user to verify their phone number.
-     * @summary User phone verification
-     * @param {VerifyPhoneRequestDTO} verifyPhoneRequestDTO 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof VerifyPhoneApi
-     */
-    public verifyPhoneControllerVerifyPhone(verifyPhoneRequestDTO: VerifyPhoneRequestDTO, options?: RawAxiosRequestConfig) {
-        return VerifyPhoneApiFp(this.configuration).verifyPhoneControllerVerifyPhone(verifyPhoneRequestDTO, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

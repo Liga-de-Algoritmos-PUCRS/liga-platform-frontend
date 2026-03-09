@@ -1,4 +1,4 @@
-# AuthenticationApi
+# LoginApi
 
 All URIs are relative to *http://localhost*
 
@@ -17,13 +17,13 @@ This endpoint allows a user to log in to the system.
 
 ```typescript
 import {
-    AuthenticationApi,
+    LoginApi,
     Configuration,
     LoginRequestDTO
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AuthenticationApi(configuration);
+const apiInstance = new LoginApi(configuration);
 
 let loginRequestDTO: LoginRequestDTO; //
 
@@ -71,12 +71,12 @@ This endpoint allows a user to log out from the system.
 
 ```typescript
 import {
-    AuthenticationApi,
+    LoginApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AuthenticationApi(configuration);
+const apiInstance = new LoginApi(configuration);
 
 const { status, data } = await apiInstance.loginControllerLogout();
 ```
@@ -102,13 +102,14 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
+|**200** | User logged out successfully. |  -  |
 |**401** | Unauthorized. The user is not authenticated. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **loginControllerRefreshTokens**
-> loginControllerRefreshTokens()
+> LoginResponseDTO loginControllerRefreshTokens()
 
 This endpoint allows a user to refresh their access token using a valid refresh token.
 
@@ -116,12 +117,12 @@ This endpoint allows a user to refresh their access token using a valid refresh 
 
 ```typescript
 import {
-    AuthenticationApi,
+    LoginApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AuthenticationApi(configuration);
+const apiInstance = new LoginApi(configuration);
 
 const { status, data } = await apiInstance.loginControllerRefreshTokens();
 ```
@@ -132,7 +133,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-void (empty response body)
+**LoginResponseDTO**
 
 ### Authorization
 
@@ -141,12 +142,13 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
+|**200** | Access token refreshed successfully. |  -  |
 |**401** | Unauthorized. The provided refresh token is invalid or expired. |  -  |
 |**404** | User not found. The user associated with the refresh token does not exist. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |

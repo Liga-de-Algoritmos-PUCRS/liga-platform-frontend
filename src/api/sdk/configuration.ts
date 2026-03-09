@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Template - Backend
- * Essa API descreve as operações do sistema do Bee CRM.
+ * Essa API descreve as operações do sistema do Liga de Algoritmos.
  *
  * The version of the OpenAPI document: 1.0
  * 

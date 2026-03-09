@@ -4,67 +4,13 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**userControllerCreateUser**](#usercontrollercreateuser) | **POST** /user | Create a new user|
 |[**userControllerDeleteUser**](#usercontrollerdeleteuser) | **DELETE** /user/{id} | Delete a user|
-|[**userControllerDeleteUserPhone**](#usercontrollerdeleteuserphone) | **POST** /user/phone | Delete a user phone|
 |[**userControllerGetAllUsers**](#usercontrollergetallusers) | **GET** /user | List all users|
+|[**userControllerGetMonthlyTopUsers**](#usercontrollergetmonthlytopusers) | **GET** /user/top/monthly | Get monthly top users|
+|[**userControllerGetTopUsers**](#usercontrollergettopusers) | **GET** /user/top/all-time | Get top users|
 |[**userControllerGetUserById**](#usercontrollergetuserbyid) | **GET** /user/{id} | Get a user by ID|
-|[**userControllerGetUserWithAccount**](#usercontrollergetuserwithaccount) | **GET** /user/account/{id} | Get a user with account information by ID|
+|[**userControllerResetUserPoints**](#usercontrollerresetuserpoints) | **POST** /user/reset-points | Reset user points|
 |[**userControllerUpdateUser**](#usercontrollerupdateuser) | **PATCH** /user/{id} | Update an existing user|
-
-# **userControllerCreateUser**
-> UserResponseDTO userControllerCreateUser(createUserDTO)
-
-This endpoint allows you to create a new user in the system.
-
-### Example
-
-```typescript
-import {
-    UserApi,
-    Configuration,
-    CreateUserDTO
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new UserApi(configuration);
-
-let createUserDTO: CreateUserDTO; //
-
-const { status, data } = await apiInstance.userControllerCreateUser(
-    createUserDTO
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **createUserDTO** | **CreateUserDTO**|  | |
-
-
-### Return type
-
-**UserResponseDTO**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**201** | User created successfully. |  -  |
-|**400** | Bad request. The input data is invalid or missing. |  -  |
-|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userControllerDeleteUser**
 > userControllerDeleteUser(deleteUserDTO)
@@ -125,51 +71,6 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **userControllerDeleteUserPhone**
-> userControllerDeleteUserPhone()
-
-This endpoint allows you to delete a user phone from the system.
-
-### Example
-
-```typescript
-import {
-    UserApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new UserApi(configuration);
-
-const { status, data } = await apiInstance.userControllerDeleteUserPhone();
-```
-
-### Parameters
-This endpoint does not have any parameters.
-
-
-### Return type
-
-void (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: Not defined
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | User phone deleted successfully. |  -  |
-|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **userControllerGetAllUsers**
 > Array<UserResponseDTO> userControllerGetAllUsers()
 
@@ -212,6 +113,98 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | List of users retrieved successfully. |  -  |
 |**404** | No users found. The system does not contain any users. |  -  |
+|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **userControllerGetMonthlyTopUsers**
+> Array<UserResponseDTO> userControllerGetMonthlyTopUsers()
+
+This endpoint retrieves the top users of the month based on their performance.
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+const { status, data } = await apiInstance.userControllerGetMonthlyTopUsers();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**Array<UserResponseDTO>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Monthly top users retrieved successfully. |  -  |
+|**404** | No monthly top users found. The system does not contain any monthly top users. |  -  |
+|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **userControllerGetTopUsers**
+> Array<UserResponseDTO> userControllerGetTopUsers()
+
+This endpoint retrieves the top users based on their performance.
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+const { status, data } = await apiInstance.userControllerGetTopUsers();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**Array<UserResponseDTO>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Top users retrieved successfully. |  -  |
+|**404** | No top users found. The system does not contain any top users. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -269,10 +262,10 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **userControllerGetUserWithAccount**
-> CreateUserWithAccountResponseDTO userControllerGetUserWithAccount()
+# **userControllerResetUserPoints**
+> userControllerResetUserPoints()
 
-This endpoint retrieves a user along with their account information by their unique ID.
+This endpoint allows you to reset the points of all users in the system.
 
 ### Example
 
@@ -285,23 +278,16 @@ import {
 const configuration = new Configuration();
 const apiInstance = new UserApi(configuration);
 
-let id: string; // (default to undefined)
-
-const { status, data } = await apiInstance.userControllerGetUserWithAccount(
-    id
-);
+const { status, data } = await apiInstance.userControllerResetUserPoints();
 ```
 
 ### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**string**] |  | defaults to undefined|
+This endpoint does not have any parameters.
 
 
 ### Return type
 
-**CreateUserWithAccountResponseDTO**
+void (empty response body)
 
 ### Authorization
 
@@ -310,14 +296,13 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: application/json
+ - **Accept**: Not defined
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | User with account information retrieved successfully. |  -  |
-|**404** | User not found. The user with the specified ID does not exist. |  -  |
+|**200** | User points reset successfully. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

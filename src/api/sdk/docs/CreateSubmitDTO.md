@@ -1,19 +1,21 @@
-# UpdateCourseModulesOrderRequestDTO
+# CreateSubmitDTO
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**newOrder** | **Array&lt;string&gt;** | Array of module\&#39;s UUIDs that will define the order by index | [default to undefined]
+**problemId** | **string** | Problem id | [default to undefined]
+**answer** | **string** | Answer | [default to undefined]
 
 ## Example
 
 ```typescript
-import { UpdateCourseModulesOrderRequestDTO } from './api';
+import { CreateSubmitDTO } from './api';
 
-const instance: UpdateCourseModulesOrderRequestDTO = {
-    newOrder,
+const instance: CreateSubmitDTO = {
+    problemId,
+    answer,
 };
 ```
 

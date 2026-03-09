@@ -110,6 +110,7 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
+|**200** | Password reset successfully. |  -  |
 |**401** | Unauthorized. The provided credentials are invalid. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
@@ -163,6 +164,7 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
+|**200** | Reset password token validated successfully. |  -  |
 |**401** | Unauthorized. The provided credentials are invalid. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 

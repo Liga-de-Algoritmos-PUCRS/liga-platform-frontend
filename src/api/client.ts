@@ -1,28 +1,13 @@
-import { Configuration, AccountApi, UserApi, FileApi, ResetPasswordApi, VerifyPhoneApi, SignupApi, AuthenticationApi } from "./sdk"
-import axios, { InternalAxiosRequestConfig } from "axios";
+import axios from "axios"
+import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi} from "./sdk"
 
 const BASE_URL = import.meta.env.VITE_API || "http://localhost:3000"
 
 let accessToken: string = ""
-let isRefreshing = false;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let failedQueue: Array<{ resolve: (value?: unknown) => void; reject: (reason?: any) => void }> = [];
 
 export function setAccessToken(token: string) {
   accessToken = token
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
 
 const apiConfig = {
   baseURL: BASE_URL,
@@ -42,62 +27,26 @@ axiosInstance.interceptors.request.use(config => {
   return config
 })
 
-// Interface estendida para evitar erros do TypeScript na flag _retry
-interface RetryConfig extends InternalAxiosRequestConfig {
-  _retry?: boolean;
-}
-
 axiosInstance.interceptors.response.use(
   res => res,
   async error => {
-    const originalRequest = error.config as RetryConfig;
+    const originalRequest = error.config
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      
-      if (isRefreshing) {
-        // Se já está a fazer refresh, coloca este pedido em espera na fila
-        return new Promise(function(resolve, reject) {
-          failedQueue.push({ resolve, reject })
-        }).then(token => {
-          originalRequest.headers["Authorization"] = 'Bearer ' + token;
-          return axiosInstance(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err);
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
+      originalRequest._retry = true
 
       try {
         const refreshRes = await rawAxios.post("/auth/refresh")
+        
         const { accessToken: newAccess } = refreshRes.data
 
         setAccessToken(newAccess)
-        
-        // Sincronizar com o LocalStorage do AuthProvider
-        localStorage.setItem('accessToken', newAccess);
 
-        axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + newAccess;
         originalRequest.headers["Authorization"] = `Bearer ${newAccess}`
-        
-        processQueue(null, newAccess);
-        
         return axiosInstance(originalRequest)
       } catch (err) {
-        processQueue(err, null);
-        setAccessToken("");
-        
-        // Limpar os dados do AuthProvider para forçar o logout visualmente
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user_data');
-        
-        // Opcional: Redirecionar para o login se o refresh falhar permanentemente
-        window.location.href = '/login'; 
-        
+        setAccessToken("")
         return Promise.reject(err)
-      } finally {
-        isRefreshing = false;
       }
     }
 
@@ -107,23 +56,22 @@ axiosInstance.interceptors.response.use(
 
 const config = new Configuration({ basePath: BASE_URL })
 
-const accountApi = new AccountApi(config, undefined, axiosInstance)
+const loginApi = new LoginApi(config, undefined, rawAxios)
 const resetPasswordApi = new ResetPasswordApi(config, undefined, axiosInstance)
 const signupApi = new SignupApi(config, undefined, axiosInstance)
-const verifyPhoneApi = new VerifyPhoneApi(config, undefined, axiosInstance)
 const fileApi = new FileApi(config, undefined, axiosInstance)
 const userApi = new UserApi(config, undefined, axiosInstance)
-const authApi = new AuthenticationApi(config, undefined, axiosInstance)
+const problemApi = new ProblemsApi(config, undefined, axiosInstance)
+const submitApi = new SubmitApi(config, undefined, axiosInstance)
 
 export class ApiClient {
-  account = accountApi
   user = userApi
   file = fileApi
+  login = loginApi
   resetPassword = resetPasswordApi
   signup = signupApi
-  verifyPhone = verifyPhoneApi
-  login = authApi // Ajustado aqui para bater certo com a chamada client.login.loginControllerLogin do seu AuthProvider
-  authenticationApi = authApi
+  problem = problemApi
+  submit = submitApi
 }
 
 const client = new ApiClient()

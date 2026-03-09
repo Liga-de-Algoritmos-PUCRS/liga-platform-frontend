@@ -1,35 +1,36 @@
-# FileApi
+# ProblemsApi
 
 All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**fileControllerCreate**](#filecontrollercreate) | **POST** /file | Upload a new files|
-|[**fileControllerDeleteFile**](#filecontrollerdeletefile) | **DELETE** /file/{id} | Delete file by ID|
-|[**fileControllerGetFileById**](#filecontrollergetfilebyid) | **GET** /file/{id} | Get file by ID|
-|[**fileControllerGetFilesByAuthorId**](#filecontrollergetfilesbyauthorid) | **GET** /file/user/{userId} | List all files by one user|
-|[**fileControllerUpdateFile**](#filecontrollerupdatefile) | **PATCH** /file | Update file by ID|
+|[**problemControllerCreateProblem**](#problemcontrollercreateproblem) | **POST** /problems | Create a new problem|
+|[**problemControllerDeleteProblem**](#problemcontrollerdeleteproblem) | **DELETE** /problems/{id} | Delete a problem|
+|[**problemControllerGetAllProblems**](#problemcontrollergetallproblems) | **GET** /problems | List all problems|
+|[**problemControllerGetProblemById**](#problemcontrollergetproblembyid) | **GET** /problems/{id} | Get problem by ID|
+|[**problemControllerUpdateProblem**](#problemcontrollerupdateproblem) | **PATCH** /problems/{id} | Update an existing problem|
 
-# **fileControllerCreate**
-> Array<FileReponseDTO> fileControllerCreate()
+# **problemControllerCreateProblem**
+> ProblemResponseDTO problemControllerCreateProblem(createProblemDTO)
 
-This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
+This endpoint allows you to create a new problem in the system.
 
 ### Example
 
 ```typescript
 import {
-    FileApi,
-    Configuration
+    ProblemsApi,
+    Configuration,
+    CreateProblemDTO
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new FileApi(configuration);
+const apiInstance = new ProblemsApi(configuration);
 
-let files: File; // (optional) (default to undefined)
+let createProblemDTO: CreateProblemDTO; //
 
-const { status, data } = await apiInstance.fileControllerCreate(
-    files
+const { status, data } = await apiInstance.problemControllerCreateProblem(
+    createProblemDTO
 );
 ```
 
@@ -37,12 +38,12 @@ const { status, data } = await apiInstance.fileControllerCreate(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **files** | [**File**] |  | (optional) defaults to undefined|
+| **createProblemDTO** | **CreateProblemDTO**|  | |
 
 
 ### Return type
 
-**Array<FileReponseDTO>**
+**ProblemResponseDTO**
 
 ### Authorization
 
@@ -50,39 +51,38 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: multipart/form-data
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**201** | Files successfully uploaded. |  -  |
+|**201** | Problem created successfully. |  -  |
 |**400** | Bad request. The input data is invalid or missing. |  -  |
-|**413** | File size exceeds the maximum size allowed or the quantity of files to be uploaded exceeded: Maximum file sie: 100 | Allowed files quantity: 10 |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **fileControllerDeleteFile**
-> fileControllerDeleteFile()
+# **problemControllerDeleteProblem**
+> problemControllerDeleteProblem()
 
-This endpoint allows you to delete a file by its ID.
+This endpoint allows you to delete a problem from the system.
 
 ### Example
 
 ```typescript
 import {
-    FileApi,
+    ProblemsApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new FileApi(configuration);
+const apiInstance = new ProblemsApi(configuration);
 
 let id: string; // (default to undefined)
 
-const { status, data } = await apiInstance.fileControllerDeleteFile(
+const { status, data } = await apiInstance.problemControllerDeleteProblem(
     id
 );
 ```
@@ -111,32 +111,75 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | File deleted successfully. |  -  |
-|**403** | Forbidden. You cannot delete files for another user. |  -  |
-|**404** | File not found. The specified file does not exist. |  -  |
+|**200** | Problem deleted successfully. |  -  |
+|**404** | Problem not found. The problem with the specified ID does not exist. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **fileControllerGetFileById**
-> FileReponseDTO fileControllerGetFileById()
+# **problemControllerGetAllProblems**
+> Array<ProblemResponseDTO> problemControllerGetAllProblems()
 
-This endpoint allows you to retrieve a file by its ID.
+This endpoint retrieves a list of all problems in the system.
 
 ### Example
 
 ```typescript
 import {
-    FileApi,
+    ProblemsApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new FileApi(configuration);
+const apiInstance = new ProblemsApi(configuration);
+
+const { status, data } = await apiInstance.problemControllerGetAllProblems();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**Array<ProblemResponseDTO>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | List of problems retrieved successfully. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **problemControllerGetProblemById**
+> ProblemResponseDTO problemControllerGetProblemById()
+
+This endpoint retrieves a problem by its ID.
+
+### Example
+
+```typescript
+import {
+    ProblemsApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ProblemsApi(configuration);
 
 let id: string; // (default to undefined)
 
-const { status, data } = await apiInstance.fileControllerGetFileById(
+const { status, data } = await apiInstance.problemControllerGetProblemById(
     id
 );
 ```
@@ -150,7 +193,7 @@ const { status, data } = await apiInstance.fileControllerGetFileById(
 
 ### Return type
 
-**FileReponseDTO**
+**ProblemResponseDTO**
 
 ### Authorization
 
@@ -165,87 +208,36 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | File updated successfully. |  -  |
+|**200** | Problem retrieved successfully. |  -  |
 |**400** | Bad request. The input data is invalid or missing. |  -  |
-|**404** | File not found. The specified file does not exist. |  -  |
+|**404** | Problem not found. The problem with the specified ID does not exist. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **fileControllerGetFilesByAuthorId**
-> Array<FileReponseDTO> fileControllerGetFilesByAuthorId()
+# **problemControllerUpdateProblem**
+> ProblemResponseDTO problemControllerUpdateProblem(updateProblemDTO)
 
-This endpoint retrieves a list of all files for a user.
+This endpoint allows you to update an existing problem in the system.
 
 ### Example
 
 ```typescript
 import {
-    FileApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new FileApi(configuration);
-
-let userId: string; // (default to undefined)
-
-const { status, data } = await apiInstance.fileControllerGetFilesByAuthorId(
-    userId
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userId** | [**string**] |  | defaults to undefined|
-
-
-### Return type
-
-**Array<FileReponseDTO>**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | List of files retrieved successfully. |  -  |
-|**404** | No files found. The system does not contain any files. |  -  |
-|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **fileControllerUpdateFile**
-> FileReponseDTO fileControllerUpdateFile(updateFileDTO)
-
-This endpoint allows you to update a file by its ID.
-
-### Example
-
-```typescript
-import {
-    FileApi,
+    ProblemsApi,
     Configuration,
-    UpdateFileDTO
+    UpdateProblemDTO
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new FileApi(configuration);
+const apiInstance = new ProblemsApi(configuration);
 
-let updateFileDTO: UpdateFileDTO; //
+let id: string; // (default to undefined)
+let updateProblemDTO: UpdateProblemDTO; //
 
-const { status, data } = await apiInstance.fileControllerUpdateFile(
-    updateFileDTO
+const { status, data } = await apiInstance.problemControllerUpdateProblem(
+    id,
+    updateProblemDTO
 );
 ```
 
@@ -253,12 +245,13 @@ const { status, data } = await apiInstance.fileControllerUpdateFile(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **updateFileDTO** | **UpdateFileDTO**|  | |
+| **updateProblemDTO** | **UpdateProblemDTO**|  | |
+| **id** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
 
-**FileReponseDTO**
+**ProblemResponseDTO**
 
 ### Authorization
 
@@ -273,9 +266,9 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | File updated successfully. |  -  |
+|**200** | Problem updated successfully. |  -  |
 |**400** | Bad request. The input data is invalid or missing. |  -  |
-|**404** | File not found. The specified file does not exist. |  -  |
+|**404** | Problem not found. The problem with the specified ID  does not exist. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
