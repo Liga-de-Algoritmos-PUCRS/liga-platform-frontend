@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { RankingTable } from "@/components/ranking/RankingTable";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface RankingUser {
 }
 
 export function RankingPage() {
+  const navigate = useNavigate();
   const [view, setView] = useState<"monthly" | "alltime">("monthly");
   const [selectedUser, setSelectedUser] = useState<UserWithAccount | null>(null);
 
@@ -118,8 +120,9 @@ export function RankingPage() {
               Resolva os problemas semanais e suba no ranking. Clique nos nomes para ver o perfil.
             </p>
           </div>
-          <Button size="lg" className="w-full sm:w-auto rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-bold">
-            Treinar Agora
+          <Button size="lg" className="w-full sm:w-auto rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-bold" onClick={() => navigate({ to: "/problemas" })}
+>
+             Ver Problemas
           </Button>
         </div>
       </div>
