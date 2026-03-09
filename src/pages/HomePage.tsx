@@ -1,10 +1,15 @@
+import { HeroSection } from "@/components/home/HeroSection";
+import { PurposeSection } from "@/components/home/PurposeSection";
+import { TeamSection } from "@/components/home/TeamSection";
+import { FooterSection } from "@/components/home/FooterSection";
 
-export function HomePage() {
+export default function HomePage() {
   return (
-    <div>
-      <div>
-        Teste
-      </div>
-    </div>
-  )
+    <main className="flex flex-col min-h-svh bg-background">
+      <HeroSection />
+      <PurposeSection />
+      <TeamSection />
+      <FooterSection />
+    </main>
+  );
 }

@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Sun,
-  Moon,
   User,
   LayoutDashboard,
   Terminal,
   Trophy,
   Menu,
+  Settings,
+  LogOut,
+  History,  
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -20,19 +20,32 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { cn } from "@/lib/utils";
-import { useColor } from "@/providers/ColorProvider";
+import { useAuth } from "@/providers/AuthProvider";
+
+import Logo from '@/assets/liga-de-algoritmos.png'
 
 export function Navbar() {
-  const { setTheme, resolvedTheme } = useColor();
   const navigate = useNavigate();
   const state = useRouterState();
   const [isOpen, setIsOpen] = useState(false);
+  
+  const { user, logout } = useAuth();
 
   const activeTab = state.location.pathname;
 
   const navItems = [
     { name: "Início", path: "/", icon: LayoutDashboard },
+    { name: "História", path: "/historia", icon: History },
     { name: "Problemas", path: "/problemas", icon: Terminal },
     { name: "Ranking", path: "/ranking", icon: Trophy },
   ];
@@ -42,32 +55,30 @@ export function Navbar() {
     setIsOpen(false);
   };
 
-  const handleThemeChange = (checked: boolean) => {
-    setTheme(checked ? "dark" : "light");
+  const handleLogout = async () => {
+    await logout();
+    navigate({ to: '/login' });
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-white/10 bg-gradient-to-r from-background/40 via-background/20 to-background/40 backdrop-blur-xl shadow-xs transition-all duration-300 text-white">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
 
-        {/* ESQUERDA: Logo e Menu Mobile */}
-        <div className="flex items-center gap-4">
-          {/* TRIGGER MOBILE */}
+        <div className="flex flex-1 items-center gap-4">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-white/10">
                 <Menu className="h-6 w-6" />
+                <span className="sr-only">Abrir menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent
-              aria-describedby={undefined}
-              side="left" className="w-75 sm:w-87.5">
+            <SheetContent side="left" className="w-[280px] sm:w-[350px] bg-background/95 backdrop-blur-xl border-white/10 text-white">
               <SheetHeader className="mb-8 text-left">
-                <SheetTitle className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg">
-                    <img className="w-8" src="/src/assets/liga-de-algoritmos-clean.png" alt="Logo" />
+                <SheetTitle className="flex items-center gap-3 text-white">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary p-1">
+                    <img className="h-full w-full object-contain brightness-0 invert" src={Logo} alt="Logo Liga" />
                   </div>
-                  <span className="font-bold tracking-tight">
+                  <span className="font-bold tracking-tight text-lg">
                     Liga de <span className="text-primary">Algoritmos</span>
                   </span>
                 </SheetTitle>
@@ -80,13 +91,13 @@ export function Navbar() {
                       key={item.name}
                       onClick={() => handleNavigation(item.path)}
                       className={cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
                         isActive
-                          ? "bg-primary/10 text-primary shadow-sm"
-                          : "text-muted-foreground hover:bg-secondary/50"
+                          ? "bg-primary text-white"
+                          : "text-gray-300 hover:bg-secondary/50 hover:text-white"
                       )}
                     >
-                      <item.icon size={18} />
+                      <item.icon size={18} className={isActive ? "text-white" : "text-gray-300"} />
                       {item.name}
                     </button>
                   );
@@ -95,22 +106,20 @@ export function Navbar() {
             </SheetContent>
           </Sheet>
 
-          {/* Logo Desktop/Mobile */}
           <div
-            className="flex items-center gap-2.5 group cursor-pointer"
+            className="flex items-center gap-3 group cursor-pointer"
             onClick={() => handleNavigation("/")}
           >
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 transition-all group-hover:scale-105">
-              <img className="w-24" src="/src/assets/liga-de-algoritmos-clean.png" />
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-primary p-1 shadow-md shadow-primary/20 transition-transform group-hover:scale-105">
+              <img className="h-full w-full object-contain drop-shadow-sm brightness-0 invert" src={Logo} alt="Logo" />
             </div>
-            <span className="hidden sm:inline-block font-bold text-lg sm:text-xl tracking-tight">
+            <span className="hidden sm:inline-block font-bold text-lg sm:text-xl tracking-tight text-white">
               Liga de <span className="text-primary">Algoritmos</span>
             </span>
           </div>
         </div>
 
-        {/* MEIO: Navegação Desktop */}
-        <nav className="hidden md:flex items-center bg-secondary/50 p-1.5 rounded-full border border-border/50 shadow-inner">
+        <div className="hidden md:flex flex-none items-center bg-secondary/20 p-1.5 rounded-full border border-white/10 backdrop-blur-md gap-1">
           {navItems.map((item) => {
             const isActive = activeTab === item.path;
             return (
@@ -120,55 +129,67 @@ export function Navbar() {
                 className={cn(
                   "flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 relative outline-none",
                   isActive
-                    ? "bg-background text-foreground shadow-md ring-1 ring-black/5 dark:ring-white/10 scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:bg-background/40"
+                    ? "bg-primary text-white shadow-sm ring-1 ring-primary/50 scale-100"
+                    : "text-gray-300 hover:text-white hover:bg-white/10"
                 )}
               >
                 <item.icon
                   size={16}
                   className={cn(
                     "transition-colors",
-                    isActive ? "text-primary" : "text-muted-foreground"
+                    isActive ? "text-white" : "text-gray-300"
                   )}
                 />
                 {item.name}
               </button>
             );
           })}
-        </nav>
-
-        {/* DIREITA: Switch e User */}
-        <div className="flex items-center gap-2 sm:gap-5">
-          {/* Theme Switch */}
-          <div className="flex items-center gap-2 sm:gap-3 bg-secondary/30 px-2 sm:px-3 py-1.5 rounded-full border border-border/40">
-            <Sun className={cn(
-              "h-3.5 w-3.5 sm:h-4 transition-all duration-500",
-              resolvedTheme === 'light' ? "text-orange-500 scale-110" : "text-muted-foreground opacity-40"
-            )} />
-            <Switch
-              checked={resolvedTheme === "dark"}
-              onCheckedChange={handleThemeChange}
-              className="scale-75 sm:scale-100"
-            />
-            <Moon className={cn(
-              "h-3.5 w-3.5 sm:h-4 transition-all duration-500",
-              resolvedTheme === 'dark' ? "text-primary scale-110" : "text-muted-foreground opacity-40"
-            )} />
-          </div>
-
-          <div className="hidden xs:block h-8 w-px bg-border/60" />
-
-          {/* Avatar com efeito Glow */}
-          <div className="relative group cursor-pointer">
-            <div className="absolute -inset-0.5 rounded-full bg-primary opacity-0 group-hover:opacity-50 transition duration-500 blur-md" />
-            <Avatar className="relative h-9 w-9 sm:h-10 sm:w-10 border-2 border-background ring-1 ring-border transition-transform group-active:scale-90">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback className="bg-muted">
-                <User size={18} />
-              </AvatarFallback>
-            </Avatar>
-          </div>
         </div>
+
+        <div className="flex flex-1 items-center justify-end gap-3 sm:gap-5">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="relative group cursor-pointer outline-none">
+                  <Avatar className="relative h-9 w-9 sm:h-10 sm:w-10 border-2 border-transparent ring-2 ring-transparent transition-all duration-300 hover:ring-primary/50 hover:border-background shadow-sm">
+                    <AvatarImage src={user.avatarUrl || "https://github.com/shadcn.png"} alt="User profile" />
+                    <AvatarFallback className="bg-primary text-white">
+                      <User size={18} />
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 mt-2 bg-background/95 backdrop-blur-xl text-white border-white/10">
+                <DropdownMenuLabel className="truncate" title={user.name}>
+                  {user.name}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Meu Perfil</span>
+                </DropdownMenuItem>
+                
+                {(user.role === 'ADMIN' || user.role === 'ROOT') && (
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Gerenciar</span>
+                  </DropdownMenuItem>
+                )}
+                
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-400 hover:bg-red-500/10 hover:text-red-400">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button onClick={() => handleNavigation('/login')} className="rounded-full bg-primary text-white hover:bg-primary/90">
+              Entrar
+            </Button>
+          )}
+        </div>
+        
       </div>
     </header>
   );

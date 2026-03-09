@@ -1,77 +1,78 @@
 import axios from "axios"
+import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi} from "./sdk"
+
+const BASE_URL = import.meta.env.VITE_API || "http://localhost:3000"
 
 let accessToken: string = ""
 
-const baseURL = "http://localhost:3000/"
-
-// setter usado pelo AuthProvider
 export function setAccessToken(token: string) {
-  accessToken = token;
+  accessToken = token
 }
 
-// axios principal
-const axiosInstance = axios.create({
-  baseURL,
-})
+const apiConfig = {
+  baseURL: BASE_URL,
+  withCredentials: true, 
+}
 
-// axios sem interceptors → usado só para refresh
-const rawAxios = axios.create({
-  baseURL,
-})
+const axiosInstance = axios.create(apiConfig)
+export const api = axiosInstance;
 
-axiosInstance.interceptors.request.use((config) => {
+export const rawAxios = axios.create(apiConfig)
+
+axiosInstance.interceptors.request.use(config => {
   if (accessToken) {
-    config.headers = config.headers || {};
-    (config.headers as Record<string, string>)["Authorization"] =
-      `Bearer ${accessToken}`;
+    config.headers = config.headers || {}
+    ;(config.headers as Record<string, string>)["Authorization"] = `Bearer ${accessToken}`
   }
-  return config;
-});
+  return config
+})
 
 axiosInstance.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    const originalRequest = error.config;
+  res => res,
+  async error => {
+    const originalRequest = error.config
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) {
-        setAccessToken("");
-        localStorage.removeItem("refreshToken");
-        return Promise.reject(error);
-      }
+      originalRequest._retry = true
 
       try {
-        // usa rawAxios → evita cair no mesmo interceptor
-        const refreshRes = await rawAxios.post("/auth/refresh", {
-          refreshToken,
-        });
-        const { accessToken: newAccess, refreshToken: newRefresh } =
-          refreshRes.data;
+        const refreshRes = await rawAxios.post("/auth/refresh")
+        
+        const { accessToken: newAccess } = refreshRes.data
 
-        setAccessToken(newAccess);
-        localStorage.setItem("refreshToken", newRefresh);
+        setAccessToken(newAccess)
 
-        originalRequest.headers["Authorization"] = `Bearer ${newAccess}`;
-        return axiosInstance(originalRequest);
+        originalRequest.headers["Authorization"] = `Bearer ${newAccess}`
+        return axiosInstance(originalRequest)
       } catch (err) {
-        setAccessToken("");
-        localStorage.removeItem("refreshToken");
-        return Promise.reject(err);
+        setAccessToken("")
+        return Promise.reject(err)
       }
     }
 
-    return Promise.reject(error);
-  },
-);
+    return Promise.reject(error)
+  }
+)
 
-// const usersApi = new UsersApi(config, undefined, axiosInstance)
+const config = new Configuration({ basePath: BASE_URL })
+
+const loginApi = new LoginApi(config, undefined, rawAxios)
+const resetPasswordApi = new ResetPasswordApi(config, undefined, axiosInstance)
+const signupApi = new SignupApi(config, undefined, axiosInstance)
+const fileApi = new FileApi(config, undefined, axiosInstance)
+const userApi = new UserApi(config, undefined, axiosInstance)
+const problemApi = new ProblemsApi(config, undefined, axiosInstance)
+const submitApi = new SubmitApi(config, undefined, axiosInstance)
 
 export class ApiClient {
-  // users = usersApi
-};
+  user = userApi
+  file = fileApi
+  login = loginApi
+  resetPassword = resetPasswordApi
+  signup = signupApi
+  problem = problemApi
+  submit = submitApi
+}
 
-const client = new ApiClient();
-export default client;
+const client = new ApiClient()
+export default client
