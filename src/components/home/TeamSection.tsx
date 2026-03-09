@@ -8,8 +8,8 @@ export function TeamSection() {
       role: "Presidente", 
       highlight: true,
       points: [
-        "Liderança estratégica e representação institucional",
-        "Desenvolvedor Fullstack com foco em performance",
+        "Desenvolvedor Fullstack",
+        "Atuando na OryzaLabs",
         "Competidor ativo em maratonas de programação"
       ] 
     },
@@ -18,9 +18,9 @@ export function TeamSection() {
       role: "Vice-Presidente", 
       highlight: true,
       points: [
-        "Vice-Presidente da Liga de Algoritmos da PUCRS",
-        "Participante de maratonas de programação da SBC",
-        "Desenvolvedor Fullstack focado em TypeScript e Cloud AWS"
+        "Desenvolvedor Backend focado em Cloud",
+        "Atua como Devops na OryzaLabs",
+        "Compete com o time TCHE++"
       ]
     },
     { 
@@ -28,9 +28,9 @@ export function TeamSection() {
       role: "Vice-Presidente", 
       highlight: true,
       points: [
-        "Gestão de treinamentos técnicos e simulados",
-        "Mentoria de algoritmos para novos membros",
-        "Pesquisa voltada a Inteligência Artificial e Lógica"
+        "Especialista de Produto focado em Growth",
+        "Atuando na KorzaApp com vendas",
+        "O líder de produto"
       ]
     },
   ];
@@ -43,10 +43,9 @@ export function TeamSection() {
         </h2>
         
         <div className="relative mb-20 group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
           <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
             <img 
-              src="/team-photo.jpg" 
+              src="https://liga-de-algoritmos.s3.us-east-1.amazonaws.com/IMG_4683.jpeg" 
               alt="Equipe da Liga de Algoritmos" 
               className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
             />
