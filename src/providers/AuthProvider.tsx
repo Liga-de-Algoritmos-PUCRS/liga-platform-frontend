@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUserWithAccount = useCallback(async () => {
     try {
-      const response = await client.user.userControllerGetUserWithAccount("me")
+      const response = await client.user.userControllerGetUserById("me")
       const userData = response.data as UserWithAccount;
       
       setUser(userData)
@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = useCallback(async () => {
     try {
-      await client.authenticationApi.loginControllerLogout()
+      await client.login.loginControllerLogout()
     } catch (err) {
       console.error("Erro no logout backend:", err)
     } finally {
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               await fetchUserWithAccount()
             } catch (error) {
                console.error("Erro ao validar sessão:", error)
-               await logout()
+               await logout() 
             }
         }
       } else {
