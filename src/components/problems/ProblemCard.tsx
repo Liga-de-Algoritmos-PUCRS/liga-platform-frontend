@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 interface ProblemCardProps {
   problem: ProblemResponseDTO;
-  isFinished?: boolean; // Propriedade nova
+  isFinished?: boolean;  
   onClick?: (problem: ProblemResponseDTO) => void; 
 }
 
@@ -42,7 +42,6 @@ export function ProblemCard({ problem, isFinished, onClick }: ProblemCardProps) 
       <div className="relative h-1/2 w-full overflow-hidden shrink-0">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-purple-900/20 to-transparent z-0" />
         
-        {/* Badge de Resolvido (Visual) */}
         {isFinished && (
           <div className="absolute top-5 left-6 z-30 flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-tighter shadow-xl animate-in zoom-in duration-300">
             <Check size={12} strokeWidth={4} />

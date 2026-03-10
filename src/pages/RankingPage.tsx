@@ -80,7 +80,6 @@ export function RankingPage() {
   return (
     <div className="relative min-h-screen bg-background pt-24 pb-20 px-4 md:px-6 overflow-hidden">
       
-      {/* Efeito de Blur Rosinha no fundo */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] md:w-[95%] md:h-[95%] bg-pink-500/15 blur-[100px] md:blur-[200px] rounded-full animate-pulse z-0 pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center">

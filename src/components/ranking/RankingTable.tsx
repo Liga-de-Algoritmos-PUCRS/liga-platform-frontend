@@ -51,7 +51,7 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 border border-white/10 group-hover:border-primary/50 transition-colors">
-                        <AvatarImage src={user.avatarUrl || ""} />
+                        <AvatarImage src={user.avatarUrl || ""}  className="object-cover"/>
                         <AvatarFallback className="bg-secondary text-[10px]">
                           {user.name?.substring(0, 2).toUpperCase()}
                         </AvatarFallback>

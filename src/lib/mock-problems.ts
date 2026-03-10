@@ -1,6 +1,6 @@
 export const MOCK_PROBLEMS = [
   {
-    id: "ANDOAOSBF", // Removi o '#' para facilitar o uso em URLs
+    id: "ANDOAOSBF", 
     title: "Soma de Dois Números",
     description: "Dado um array de inteiros, encontre os índices dos elementos que somam o valor alvo.",
     difficulty: "EASY",
@@ -10,5 +10,4 @@ export const MOCK_PROBLEMS = [
     updatedAt: "2026-03-01T10:00:00Z",
     input: "nums = [2,7,11,15], target = 9",
   },
-  // ... adicione os outros problemas aqui (sem o '#' no ID)
 ];

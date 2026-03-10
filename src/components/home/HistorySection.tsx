@@ -34,13 +34,11 @@ export function HistorySection() {
   ];
 
   return (
-    // Removido o bg-background e elementos de fundo para integrar com a HistoryPage
     <section className="relative w-full pb-24 md:pb-40 overflow-hidden bg-transparent">
       
       <div className="container relative z-10 mx-auto px-6">
         
         <div className="relative">
-          {/* Linha do tempo central */}
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/20 to-primary/50 hidden md:block" />
 
           <div className="space-y-12 md:space-y-20">

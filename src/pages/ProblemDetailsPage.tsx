@@ -159,10 +159,8 @@ export function ProblemDetailsPage() {
   return (
     <div className="pt-16 bg-[#0a0a0b] text-white flex flex-col lg:flex-row h-screen overflow-hidden">
       
-      {/* Lado Esquerdo - Detalhes e Instruções */}
       <div className="flex-1 flex flex-col border-r border-white/5 overflow-hidden">
         
-        {/* Banner Fixo */}
         <div className="relative h-60 w-full overflow-hidden shrink-0">
           <Link to="/problemas" className="absolute top-6 left-6 z-30">
             <Button variant="ghost" size="icon" className="bg-black/50 hover:bg-black/80 rounded-full">
@@ -196,16 +194,13 @@ export function ProblemDetailsPage() {
           </div>
         </div>
 
-        {/* Conteúdo Esquerdo com GAP e Scroll Apenas na Descrição */}
         <div className="flex-1 flex flex-col p-10 gap-8 overflow-hidden">
           
-          {/* Cabeçalho de Instruções (FIXO) */}
           <div className="flex items-center gap-3 text-primary/80 border-b border-white/5 pb-4 shrink-0">
             <FileText size={20} />
             <h3 className="font-bold uppercase tracking-[0.2em] text-xs">Instruções do Desafio</h3>
           </div>
 
-          {/* Área de Scroll apenas para o Texto */}
           <div className="flex-1 overflow-y-auto custom-scrollbar pr-4">
             <div className="prose prose-invert max-w-none pb-10">
               <div className="text-lg text-gray-400 leading-relaxed font-medium">
@@ -218,10 +213,8 @@ export function ProblemDetailsPage() {
         </div>
       </div>
 
-      {/* Lado Direito - Sidebar */}
       <div className="w-full lg:w-[400px] bg-white/[0.01] p-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar shrink-0 h-full">
         
-        {/* Recursos de Entrada */}
         <div className="space-y-3">
           <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 ml-1">Recursos de Entrada</Label>
           <div className="p-4 rounded-[24px] bg-white/[0.03] border border-white/5 flex items-center justify-between group hover:border-primary/40 transition-all">
@@ -235,7 +228,6 @@ export function ProblemDetailsPage() {
           </div>
         </div>
 
-        {/* Taxa de Acerto */}
         <div className="space-y-3">
           <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 ml-1">Taxa de Acerto</Label>
           <div className="p-6 rounded-[32px] bg-gradient-to-br from-white/[0.04] to-transparent border border-white/5 space-y-5">
@@ -261,7 +253,6 @@ export function ProblemDetailsPage() {
           </div>
         </div>
 
-        {/* Identificador (Engordado/Mais alto) */}
         <div className="space-y-3">
           <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 ml-1">Identificador</Label>
           <div className="px-6 py-5 rounded-[24px] bg-white/[0.02] border border-white/5 flex items-center justify-between group">
@@ -277,7 +268,6 @@ export function ProblemDetailsPage() {
           </div>
         </div>
 
-        {/* Área de Ação (Empurrada para o final) */}
         <div className="mt-auto pt-6 space-y-4">
           {!isAuthenticated ? (
              <Button onClick={() => navigate({ to: '/login' })} className="w-full h-16 rounded-[24px] bg-primary/20 hover:bg-primary border border-primary/50 text-white font-bold">Faça Login para Enviar</Button>

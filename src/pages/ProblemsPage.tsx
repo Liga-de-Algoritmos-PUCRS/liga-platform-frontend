@@ -28,7 +28,6 @@ export function ProblemsPage() {
   const [userFinishedIds, setUserFinishedIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   
-  // Filtros
   const [nameFilter, setNameFilter] = useState("");
   const [idFilter, setIdFilter] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("ALL");
@@ -172,7 +171,6 @@ export function ProblemsPage() {
                 </div>
               </div>
 
-              {/* Novo Filtro de Status */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">
                   <CheckCircle2 size={12} />

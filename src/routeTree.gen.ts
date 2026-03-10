@@ -17,6 +17,8 @@ import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as HistoriaIndexRouteImport } from './routes/historia/index'
 import { Route as HomeIndexRouteImport } from './routes/_home/index'
 import { Route as ProblemasProblemIdRouteImport } from './routes/problemas/$problemId'
+import { Route as AuthenticatedProfileRouteImport } from './routes/authenticated/profile'
+import { Route as AuthenticatedIntegrantesRouteImport } from './routes/authenticated/integrantes'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/authenticated',
@@ -58,9 +60,22 @@ const ProblemasProblemIdRoute = ProblemasProblemIdRouteImport.update({
   path: '/problemas/$problemId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedIntegrantesRoute =
+  AuthenticatedIntegrantesRouteImport.update({
+    id: '/integrantes',
+    path: '/integrantes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/authenticated': typeof AuthenticatedRoute
+  '/authenticated': typeof AuthenticatedRouteWithChildren
+  '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
+  '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
   '/': typeof HomeIndexRoute
   '/historia/': typeof HistoriaIndexRoute
@@ -70,7 +85,9 @@ export interface FileRoutesByFullPath {
   '/signup/': typeof SignupIndexRoute
 }
 export interface FileRoutesByTo {
-  '/authenticated': typeof AuthenticatedRoute
+  '/authenticated': typeof AuthenticatedRouteWithChildren
+  '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
+  '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
   '/': typeof HomeIndexRoute
   '/historia': typeof HistoriaIndexRoute
@@ -81,7 +98,9 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/authenticated': typeof AuthenticatedRoute
+  '/authenticated': typeof AuthenticatedRouteWithChildren
+  '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
+  '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
   '/_home/': typeof HomeIndexRoute
   '/historia/': typeof HistoriaIndexRoute
@@ -94,6 +113,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/authenticated'
+    | '/authenticated/integrantes'
+    | '/authenticated/profile'
     | '/problemas/$problemId'
     | '/'
     | '/historia/'
@@ -104,6 +125,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/authenticated'
+    | '/authenticated/integrantes'
+    | '/authenticated/profile'
     | '/problemas/$problemId'
     | '/'
     | '/historia'
@@ -114,6 +137,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/authenticated'
+    | '/authenticated/integrantes'
+    | '/authenticated/profile'
     | '/problemas/$problemId'
     | '/_home/'
     | '/historia/'
@@ -124,7 +149,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRoute: typeof AuthenticatedRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   ProblemasProblemIdRoute: typeof ProblemasProblemIdRoute
   HomeIndexRoute: typeof HomeIndexRoute
   HistoriaIndexRoute: typeof HistoriaIndexRoute
@@ -192,11 +217,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProblemasProblemIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/authenticated/profile': {
+      id: '/authenticated/profile'
+      path: '/profile'
+      fullPath: '/authenticated/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/authenticated/integrantes': {
+      id: '/authenticated/integrantes'
+      path: '/integrantes'
+      fullPath: '/authenticated/integrantes'
+      preLoaderRoute: typeof AuthenticatedIntegrantesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedIntegrantesRoute: typeof AuthenticatedIntegrantesRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedIntegrantesRoute: AuthenticatedIntegrantesRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRoute: AuthenticatedRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   ProblemasProblemIdRoute: ProblemasProblemIdRoute,
   HomeIndexRoute: HomeIndexRoute,
   HistoriaIndexRoute: HistoriaIndexRoute,
