@@ -31,12 +31,14 @@ export function ValidateSignup({ tokenId, onBack }: ValidateSignupProps) {
         token: otp,
       })
       
-      toast.success("Conta verificada com sucesso!")
+      toast.success("Conta verificada com sucesso!", {
+          description: "Você já pode fazer o seu login."
+      })
       navigate({ to: "/login" })
     } catch (err) {
       console.error(err)
       toast.error("Código inválido", {
-        description: "Por favor verifique o código enviado para o seu email.",
+        description: "O código inserido está incorreto. Tente novamente.",
       })
     } finally {
       setIsLoading(false)

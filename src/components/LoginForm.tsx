@@ -37,11 +37,11 @@ export function LoginForm() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
       await login(data)
-      toast.success("Login efetuado com sucesso!")
+      toast.success("Login bem sucedido!")
     } catch (error) {
-        console.error(error)
-      toast.error("Falha ao entrar", {
-        description: "Email ou senha incorretos.",
+      console.error(error)
+      toast.error("Credenciais inválidas", {
+        description: "Verifique seu email e senha e tente novamente.",
       })
     }
   }

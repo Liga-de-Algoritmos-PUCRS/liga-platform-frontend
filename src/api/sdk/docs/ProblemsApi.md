@@ -6,6 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**problemControllerCreateProblem**](#problemcontrollercreateproblem) | **POST** /problems | Create a new problem|
 |[**problemControllerDeleteProblem**](#problemcontrollerdeleteproblem) | **DELETE** /problems/{id} | Delete a problem|
+|[**problemControllerGetAdminProblemById**](#problemcontrollergetadminproblembyid) | **GET** /problems/{id}/admin | Get problem by ID|
 |[**problemControllerGetAllProblems**](#problemcontrollergetallproblems) | **GET** /problems | List all problems|
 |[**problemControllerGetProblemById**](#problemcontrollergetproblembyid) | **GET** /problems/{id} | Get problem by ID|
 |[**problemControllerUpdateProblem**](#problemcontrollerupdateproblem) | **PATCH** /problems/{id} | Update an existing problem|
@@ -112,6 +113,60 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | Problem deleted successfully. |  -  |
+|**404** | Problem not found. The problem with the specified ID does not exist. |  -  |
+|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **problemControllerGetAdminProblemById**
+> ProblemResponseDTO problemControllerGetAdminProblemById()
+
+This endpoint retrieves a problem by its ID.
+
+### Example
+
+```typescript
+import {
+    ProblemsApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ProblemsApi(configuration);
+
+let id: string; // (default to undefined)
+
+const { status, data } = await apiInstance.problemControllerGetAdminProblemById(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**ProblemResponseDTO**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Problem retrieved successfully. |  -  |
+|**400** | Bad request. The input data is invalid or missing. |  -  |
 |**404** | Problem not found. The problem with the specified ID does not exist. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 

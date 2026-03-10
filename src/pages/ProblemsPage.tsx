@@ -1,8 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ProblemCard } from "@/components/problems/ProblemCard";
-import { ProblemDetailsModal } from "@/components/problems/ProblemDetailsModal";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 import { 
   Search, 
   Sparkles, 
@@ -11,82 +10,89 @@ import {
   Hash, 
   Trophy, 
   BarChart3,
-  X
+  X,
+  Loader2,
+  CheckCircle2,
+  Circle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const MOCK_PROBLEMS = [
-  {
-    id: "#ANDOAOSBF",
-    title: "Soma de Dois Números",
-    description: "Dado um array de inteiros, encontre os índices dos elementos que somam o valor alvo.",
-    difficulty: "EASY",
-    points: 100,
-    resolved: 154,
-    submissions: 890,
-    updatedAt: "2026-03-01T10:00:00Z",
-    input: "nums = [2,7,11,15], target = 9",
-  },
-  {
-    id: "#BSTSEARCH",
-    title: "Busca em Árvore Binária",
-    description: "Implemente um algoritmo de busca eficiente para encontrar um nó em uma BST.",
-    difficulty: "MEDIUM",
-    points: 250,
-    resolved: 42,
-    submissions: 310,
-    updatedAt: "2026-02-15T14:30:00Z",
-    input: "root = [4,2,7,1,3], val = 2",
-  },
-  {
-    id: "#DIJKSTRA",
-    title: "Caminho Mínimo em Grafos",
-    description: "Utilize Dijkstra para encontrar a menor distância entre dois pontos em um mapa de conexões.",
-    difficulty: "HARD",
-    points: 500,
-    resolved: 12,
-    submissions: 145,
-    updatedAt: "2026-03-05T09:00:00Z",
-    input: "edges = [[0,1,100],[1,2,100],[0,2,500]], src = 0, dst = 2",
-  },
-  {
-    id: "#PALINDROM",
-    title: "Palíndromo de Inteiros",
-    description: "Verifique se um número inteiro é um palíndromo sem convertê-lo para string.",
-    difficulty: "EASY",
-    points: 80,
-    resolved: 210,
-    submissions: 1100,
-    updatedAt: "2026-01-20T11:00:00Z",
-    input: "x = 121",
-  },
-];
+import client from "@/api/client";
+import { ProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
+import { useAuth } from "@/providers/AuthProvider";
 
 export function ProblemsPage() {
-  const [selectedProblem, setSelectedProblem] = useState<any | null>(null);
+  const [, setSelectedProblem] = useState<ProblemResponseDTO | null>(null);
+  const { user, isAuthenticated } = useAuth();
   
+  const [problems, setProblems] = useState<ProblemResponseDTO[]>([]);
+  const [userFinishedIds, setUserFinishedIds] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Filtros
   const [nameFilter, setNameFilter] = useState("");
   const [idFilter, setIdFilter] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "DONE" | "PENDING">("ALL");
   const [minPoints, setMinPoints] = useState<number>(0);
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredProblems = useMemo(() => {
-    return MOCK_PROBLEMS.filter(p => {
-      const matchesName = p.title.toLowerCase().includes(nameFilter.toLowerCase());
-      const matchesId = p.id.toLowerCase().includes(idFilter.toLowerCase()) || 
-                        p.id.toLowerCase().includes(`#${idFilter.toLowerCase()}`);
-      const matchesDifficulty = difficultyFilter === "ALL" || p.difficulty === difficultyFilter;
-      const matchesPoints = p.points >= minPoints;
+  useEffect(() => {
+    let isMounted = true;
 
-      return matchesName && matchesId && matchesDifficulty && matchesPoints;
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+        const probResponse = await client.problem.problemControllerGetAllProblems();
+        
+        if (isAuthenticated && user?.id) {
+          const subResponse = await client.submit.submitControllerGetSubmitByUserId(String(user.id));
+          const finished = (subResponse.data as SubmitResponseDTO[])
+            .filter(s => s.isFinished)
+            .map(s => s.problemId);
+          if (isMounted) setUserFinishedIds(new Set(finished as string[]));
+        }
+
+        if (isMounted) {
+          setProblems(probResponse.data as ProblemResponseDTO[]);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => { isMounted = false; };
+  }, [isAuthenticated, user?.id]);
+
+  const filteredProblems = useMemo(() => {
+    return problems.filter(p => {
+      const title = p.title || "";
+      const id = p.id || "";
+      const diff = p.difficulty || "MEDIUM";
+      const pts = p.points || 0;
+      const isDone = userFinishedIds.has(id);
+
+      const matchesName = title.toLowerCase().includes(nameFilter.toLowerCase());
+      const matchesId = id.toLowerCase().includes(idFilter.toLowerCase()) || 
+                        id.toLowerCase().includes(`#${idFilter.toLowerCase()}`);
+      const matchesDifficulty = difficultyFilter === "ALL" || diff === difficultyFilter;
+      const matchesPoints = pts >= minPoints;
+      const matchesStatus = 
+        statusFilter === "ALL" || 
+        (statusFilter === "DONE" && isDone) || 
+        (statusFilter === "PENDING" && !isDone);
+
+      return matchesName && matchesId && matchesDifficulty && matchesPoints && matchesStatus;
     });
-  }, [nameFilter, idFilter, difficultyFilter, minPoints]);
+  }, [problems, nameFilter, idFilter, difficultyFilter, minPoints, statusFilter, userFinishedIds]);
 
   const clearFilters = () => {
     setNameFilter("");
     setIdFilter("");
     setDifficultyFilter("ALL");
+    setStatusFilter("ALL");
     setMinPoints(0);
   };
 
@@ -102,7 +108,7 @@ export function ProblemsPage() {
             <Sparkles size={12} className="animate-spin-slow" />
             <span>Biblioteca de Algoritmos</span>
           </div>
-          <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-primary leading-none uppercase">
+          <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-fuchsia-600 leading-none uppercase">
             PROBLEMAS
           </h1>
         </div>
@@ -166,6 +172,35 @@ export function ProblemsPage() {
                 </div>
               </div>
 
+              {/* Novo Filtro de Status */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">
+                  <CheckCircle2 size={12} />
+                  Status
+                </div>
+                <div className="flex gap-2">
+                  {[
+                    { id: "ALL", label: "Todos", icon: null },
+                    { id: "DONE", label: "Feitos", icon: CheckCircle2 },
+                    { id: "PENDING", label: "Pendentes", icon: Circle }
+                  ].map((status) => (
+                    <button
+                      key={status.id}
+                      onClick={() => setStatusFilter(status.id as "ALL" | "DONE" | "PENDING")}
+                      className={cn(
+                        "flex-1 py-2 text-[10px] font-black rounded-xl border transition-all uppercase flex items-center justify-center gap-1.5",
+                        statusFilter === status.id 
+                          ? "bg-primary border-primary text-white shadow-lg shadow-primary/20" 
+                          : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                      )}
+                    >
+                      {status.icon && <status.icon size={12} />}
+                      {status.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">
                   <Trophy size={12} />
@@ -182,11 +217,11 @@ export function ProblemsPage() {
                 />
               </div>
 
-              <div className="flex items-end">
+              <div className="flex items-end lg:col-span-3">
                 <Button 
                   onClick={clearFilters}
                   variant="ghost" 
-                  className="w-full h-11 text-[10px] font-bold uppercase tracking-widest hover:text-red-400 gap-2"
+                  className="w-full h-11 text-[10px] font-bold uppercase tracking-widest hover:text-white"
                 >
                   Limpar todos os filtros
                 </Button>
@@ -204,23 +239,25 @@ export function ProblemsPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          {filteredProblems.map((problem) => (
-            <ProblemCard 
-              key={problem.id} 
-              problem={problem} 
-              onClick={setSelectedProblem} 
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-32">
+            <Loader2 size={48} className="animate-spin text-primary mb-4" />
+            <h3 className="text-xl font-bold text-white uppercase tracking-widest">A carregar desafios...</h3>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            {filteredProblems.map((problem) => (
+              <ProblemCard 
+                key={problem.id} 
+                problem={problem} 
+                isFinished={userFinishedIds.has(problem.id || "")}
+                onClick={setSelectedProblem} 
+              />
+            ))}
+          </div>
+        )}
 
-        <ProblemDetailsModal 
-          problem={selectedProblem}
-          isOpen={!!selectedProblem}
-          onClose={() => setSelectedProblem(null)}
-        />
-
-        {filteredProblems.length === 0 && (
+        {!isLoading && filteredProblems.length === 0 && (
           <div className="flex flex-col items-center justify-center py-32 text-center">
             <div className="p-6 rounded-full bg-white/5 border border-white/10 mb-6">
               <Terminal size={48} className="text-gray-700" />

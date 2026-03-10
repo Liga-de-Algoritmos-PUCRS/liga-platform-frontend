@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Sparkles
 } from "lucide-react";
+import { UserResponseDTO } from "@/api/sdk"; 
 
 const COURSE_LABELS: Record<string, string> = {
   SOFTWARE_ENGINEERING: "Eng. Software",
@@ -28,22 +29,9 @@ const SEMESTER_LABELS: Record<string, string> = {
   NINTH: "9º Sem", TENTH: "10º Sem", GRADUATED: "Formado",
 };
 
-interface UserInterface {
-  name: string;
-  email: string;
-  createdAt?: string;
-  course?: string;
-  semester?: string;
-  bannerUrl?: string | null;
-  avatarUrl?: string | null;
-  monthlyPoints?: number;
-  allTimePoints?: number;
-  submissions?: number;
-  problemsResolved?: number;
-}
-
+// Substituímos a interface local pela Props usando o DTO do client
 interface UserInfoModalProps {
-  user: UserInterface | null;
+  user: UserResponseDTO | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -62,6 +50,7 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
+      {/* ... Mantenha o restante do código do modal inalterado ... */}
       <DialogContent className="w-[95vw] sm:max-w-[500px] p-0 overflow-hidden border-white/10 bg-[#0a0a0b]/95 backdrop-blur-3xl text-white shadow-2xl shadow-primary/20 outline-none rounded-3xl">
         
         <div className="relative h-24 sm:h-28 w-full overflow-hidden">
@@ -78,7 +67,7 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
             <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-[4px] sm:border-[6px] border-[#0a0a0b] shadow-2xl relative">
               <AvatarImage src={user.avatarUrl || ""} className="object-cover" />
               <AvatarFallback className="bg-secondary text-2xl font-black text-white">
-                {user.name.substring(0, 2).toUpperCase()}
+                {user?.name?.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
           </div>

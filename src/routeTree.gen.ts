@@ -16,6 +16,7 @@ import { Route as ProblemasIndexRouteImport } from './routes/problemas/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as HistoriaIndexRouteImport } from './routes/historia/index'
 import { Route as HomeIndexRouteImport } from './routes/_home/index'
+import { Route as ProblemasProblemIdRouteImport } from './routes/problemas/$problemId'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/authenticated',
@@ -52,9 +53,15 @@ const HomeIndexRoute = HomeIndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProblemasProblemIdRoute = ProblemasProblemIdRouteImport.update({
+  id: '/problemas/$problemId',
+  path: '/problemas/$problemId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/authenticated': typeof AuthenticatedRoute
+  '/problemas/$problemId': typeof ProblemasProblemIdRoute
   '/': typeof HomeIndexRoute
   '/historia/': typeof HistoriaIndexRoute
   '/login/': typeof LoginIndexRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/authenticated': typeof AuthenticatedRoute
+  '/problemas/$problemId': typeof ProblemasProblemIdRoute
   '/': typeof HomeIndexRoute
   '/historia': typeof HistoriaIndexRoute
   '/login': typeof LoginIndexRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/authenticated': typeof AuthenticatedRoute
+  '/problemas/$problemId': typeof ProblemasProblemIdRoute
   '/_home/': typeof HomeIndexRoute
   '/historia/': typeof HistoriaIndexRoute
   '/login/': typeof LoginIndexRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/authenticated'
+    | '/problemas/$problemId'
     | '/'
     | '/historia/'
     | '/login/'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/authenticated'
+    | '/problemas/$problemId'
     | '/'
     | '/historia'
     | '/login'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/authenticated'
+    | '/problemas/$problemId'
     | '/_home/'
     | '/historia/'
     | '/login/'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRoute
+  ProblemasProblemIdRoute: typeof ProblemasProblemIdRoute
   HomeIndexRoute: typeof HomeIndexRoute
   HistoriaIndexRoute: typeof HistoriaIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
@@ -172,11 +185,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/problemas/$problemId': {
+      id: '/problemas/$problemId'
+      path: '/problemas/$problemId'
+      fullPath: '/problemas/$problemId'
+      preLoaderRoute: typeof ProblemasProblemIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRoute,
+  ProblemasProblemIdRoute: ProblemasProblemIdRoute,
   HomeIndexRoute: HomeIndexRoute,
   HistoriaIndexRoute: HistoriaIndexRoute,
   LoginIndexRoute: LoginIndexRoute,

@@ -34,26 +34,13 @@ export function HistorySection() {
   ];
 
   return (
-    <section className="relative w-full mt-16 pt-10 pb-24 md:pb-40 bg-background overflow-hidden">
+    // Removido o bg-background e elementos de fundo para integrar com a HistoryPage
+    <section className="relative w-full pb-24 md:pb-40 overflow-hidden bg-transparent">
       
-      <div className="absolute top-1/2 left-0 w-[50%] h-[50%] bg-primary/15 blur-[150px] md:blur-[250px] rounded-full -translate-x-1/2 -translate-y-1/2 z-0" />
-      <div className="absolute bottom-0 right-0 w-[40%] h-[40%] bg-primary/10 blur-[120px] md:blur-[200px] rounded-full translate-x-1/2 translate-y-1/2 z-0" />
-
       <div className="container relative z-10 mx-auto px-6">
         
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-5xl mx-auto mb-12 md:mb-16"
-        >
-          <h3 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter text-white leading-none whitespace-nowrap uppercase">
-            Nossa <span className="text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]">História</span>
-          </h3>
-        </motion.div>
-
         <div className="relative">
+          {/* Linha do tempo central */}
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/20 to-primary/50 hidden md:block" />
 
           <div className="space-y-12 md:space-y-20">
@@ -71,7 +58,7 @@ export function HistorySection() {
                 <div className="hidden md:block w-[42%]" />
 
                 <div className="relative z-10 flex flex-col items-center mb-6 md:mb-0">
-                  <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-[0_0_25px_rgba(var(--primary),0.6)] border-4 border-background transition-transform duration-300 group-hover:scale-110">
+                  <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-[0_0_25px_rgba(var(--primary),0.6)] border-4 border-[#0a0a0b] transition-transform duration-300 group-hover:scale-110">
                     {event.icon}
                   </div>
                   <span className="mt-3 text-primary font-mono font-bold tracking-widest text-lg">
@@ -101,11 +88,6 @@ export function HistorySection() {
           </div>
         </div>
       </div>
-
-      <div className="absolute inset-0 z-[-1] opacity-[0.02]" style={{
-        backgroundImage: "radial-gradient(rgb(var(--foreground)) 1px, transparent 1px)",
-        backgroundSize: "50px 50px",
-      }} />
     </section>
   );
 }

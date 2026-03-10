@@ -15,6 +15,8 @@ Name | Type | Description | Notes
 **bannerUrl** | **string** | Problem banner URL | [optional] [default to undefined]
 **updatedAt** | **string** | Problem creation date | [default to undefined]
 **createdAt** | **string** | Problem creation date | [default to undefined]
+**resolved** | **number** | Number of users who have resolved the problem | [default to undefined]
+**submissions** | **number** | Number of submissions for the problem | [default to undefined]
 
 ## Example
 
@@ -32,6 +34,8 @@ const instance: ProblemResponseDTO = {
     bannerUrl,
     updatedAt,
     createdAt,
+    resolved,
+    submissions,
 };
 ```
 

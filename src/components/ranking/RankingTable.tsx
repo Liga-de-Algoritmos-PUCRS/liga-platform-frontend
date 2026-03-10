@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy, Medal, Award } from "lucide-react";
-import { cn } from "@/lib/utils";
-import UserWithAccount from "@/types/user.types";
+import { cn } from "@/lib/utils"
+import { UserResponseDTO } from "@/api/sdk";
 
 interface RankingTableProps {
-  data: Partial<UserWithAccount>[]; 
-  onUserClick: (user: UserWithAccount) => void;
+  data: Partial<UserResponseDTO>[]; 
+  onUserClick: (user: UserResponseDTO) => void;
 }
 
 export function RankingTable({ data, onUserClick }: RankingTableProps) {
@@ -19,14 +19,14 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
   };
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-background/40 backdrop-blur-xl shadow-2xl">
+    <div className="w-full overflow-hidden rounded-2xl border border-white/10 bg-background/40 shadow-2xl">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/10 bg-white/5">
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary">Posição</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary">Usuário</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary text-right">Pontuação</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest color-primary">Posição</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest color-primary">Usuário</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest color-primary text-right">Pontuação</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -47,7 +47,7 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
                   </td>
                   <td 
                     className="px-6 py-4 cursor-pointer"
-                    onClick={() => onUserClick(user as UserWithAccount)}
+                    onClick={() => onUserClick(user as UserResponseDTO)}
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 border border-white/10 group-hover:border-primary/50 transition-colors">

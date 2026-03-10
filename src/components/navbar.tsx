@@ -152,7 +152,8 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <div className="relative group cursor-pointer outline-none">
                   <Avatar className="relative h-9 w-9 sm:h-10 sm:w-10 border-2 border-transparent ring-2 ring-transparent transition-all duration-300 hover:ring-primary/50 hover:border-background shadow-sm">
-                    <AvatarImage src={user.avatarUrl || "https://github.com/shadcn.png"} alt="User profile" />
+                  
+                    <AvatarImage src={user.avatarUrl ?? ''} alt="User profile" />
                     <AvatarFallback className="bg-primary text-white">
                       <User size={18} />
                     </AvatarFallback>

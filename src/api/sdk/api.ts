@@ -263,6 +263,18 @@ export interface ProblemResponseDTO {
      * @memberof ProblemResponseDTO
      */
     'createdAt': string;
+    /**
+     * Number of users who have resolved the problem
+     * @type {number}
+     * @memberof ProblemResponseDTO
+     */
+    'resolved': number;
+    /**
+     * Number of submissions for the problem
+     * @type {number}
+     * @memberof ProblemResponseDTO
+     */
+    'submissions': number;
 }
 /**
  * 
@@ -1450,6 +1462,40 @@ export const ProblemsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * This endpoint retrieves a problem by its ID.
+         * @summary Get problem by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerGetAdminProblemById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('problemControllerGetAdminProblemById', 'id', id)
+            const localVarPath = `/problems/{id}/admin`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This endpoint retrieves a list of all problems in the system.
          * @summary List all problems
          * @param {*} [options] Override http request option.
@@ -1590,6 +1636,19 @@ export const ProblemsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * This endpoint retrieves a problem by its ID.
+         * @summary Get problem by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async problemControllerGetAdminProblemById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProblemResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerGetAdminProblemById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerGetAdminProblemById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * This endpoint retrieves a list of all problems in the system.
          * @summary List all problems
          * @param {*} [options] Override http request option.
@@ -1659,6 +1718,16 @@ export const ProblemsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.problemControllerDeleteProblem(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * This endpoint retrieves a problem by its ID.
+         * @summary Get problem by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        problemControllerGetAdminProblemById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<ProblemResponseDTO> {
+            return localVarFp.problemControllerGetAdminProblemById(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * This endpoint retrieves a list of all problems in the system.
          * @summary List all problems
          * @param {*} [options] Override http request option.
@@ -1720,6 +1789,18 @@ export class ProblemsApi extends BaseAPI {
      */
     public problemControllerDeleteProblem(id: string, options?: RawAxiosRequestConfig) {
         return ProblemsApiFp(this.configuration).problemControllerDeleteProblem(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint retrieves a problem by its ID.
+     * @summary Get problem by ID
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProblemsApi
+     */
+    public problemControllerGetAdminProblemById(id: string, options?: RawAxiosRequestConfig) {
+        return ProblemsApiFp(this.configuration).problemControllerGetAdminProblemById(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2436,7 +2517,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async submitControllerGetSubmitByUserId(userId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubmitResponseDTO>> {
+        async submitControllerGetSubmitByUserId(userId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<SubmitResponseDTO>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.submitControllerGetSubmitByUserId(userId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SubmitApi.submitControllerGetSubmitByUserId']?.[localVarOperationServerIndex]?.url;
@@ -2498,7 +2579,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        submitControllerGetSubmitByUserId(userId: string, options?: RawAxiosRequestConfig): AxiosPromise<SubmitResponseDTO> {
+        submitControllerGetSubmitByUserId(userId: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<SubmitResponseDTO>> {
             return localVarFp.submitControllerGetSubmitByUserId(userId, options).then((request) => request(axios, basePath));
         },
     };
