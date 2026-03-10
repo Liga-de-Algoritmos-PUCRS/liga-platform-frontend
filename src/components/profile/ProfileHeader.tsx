@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { PhotoUploadModal } from "./PhotoUploadModal";
 import { cn } from "@/lib/utils";
 
-// Mapeamento de Labels
 const COURSE_LABELS: Record<string, string> = {
   [UserResponseDTOCourseEnum.SoftwareEngineering]: "Engenharia de Software",
   [UserResponseDTOCourseEnum.DataScience]: "Ciência de Dados",
@@ -30,7 +29,6 @@ const SEMESTER_LABELS: Record<string, string> = {
   [UserResponseDTOSemesterEnum.Graduated]: "Graduado",
 };
 
-// Mapeamento de Cores por Curso
 const COURSE_COLORS: Record<string, string> = {
   [UserResponseDTOCourseEnum.SoftwareEngineering]: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   [UserResponseDTOCourseEnum.DataScience]: "bg-purple-500/10 text-purple-400 border-purple-500/20",

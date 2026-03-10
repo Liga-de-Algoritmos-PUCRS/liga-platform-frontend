@@ -112,7 +112,7 @@ export function Navbar() {
             className="flex items-center gap-3 group cursor-pointer"
             onClick={() => handleNavigation("/")}
           >
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-105">     
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl  transition-transform group-hover:scale-105">     
               <img className="h-full w-full object-contain drop-shadow-sm" src={logo} alt="Logo" />
             </div>
             <span className="hidden sm:inline-block font-bold text-lg sm:text-xl tracking-tight text-white">

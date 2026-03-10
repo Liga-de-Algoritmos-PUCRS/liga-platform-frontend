@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Trophy, Code2, Target, Zap, CheckCircle2 } from "lucide-react"; // Adicionei CheckCircle2
+import { Trophy, Code2, Target, Zap, CheckCircle2 } from "lucide-react"; 
 import { useAuth } from "@/providers/AuthProvider";
 import client from "@/api/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
@@ -115,9 +115,8 @@ export function ProfilePage() {
 
   if (!user) return null;
 
-  // CÁLCULO DA TAXA DE ACERTO
   const successRate = user.submissions && user.submissions > 0 
-    ? Math.round((user.problemsResolved ?? 0 / user.submissions) * 100) 
+    ? Math.round((user.problemsResolved! / user.submissions) * 100) 
     : 0;
 
   return (
@@ -261,7 +260,6 @@ export function ProfilePage() {
   );
 }
 
-// AJUSTE NA TIPAGEM: value agora aceita string | number
 interface StatRowProps { label: string; value: string | number; icon: React.ElementType; color: string; }
 function StatRow({ label, value, icon: Icon, color }: StatRowProps) {
   return (
