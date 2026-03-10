@@ -19,4 +19,6 @@ export default interface UserWithAccount {
   bannerUrl?: string | null 
   allTimePoints: number,
   monthlyPoints: number,
+  submissions?: number;
+  problemsResolved?: number;
 }

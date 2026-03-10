@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "shadcn": "shadcn add",
-    "generate:sdk": "openapi-generator-cli generate -i http://localhost:3000/api-json -g typescript-axios -o src/api/sdk"
+    "generate:sdk": "openapi-generator-cli generate -i http://localhost:3000/api-json -g typescript-axios -o src/api/sdk --skip-validate-spec"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

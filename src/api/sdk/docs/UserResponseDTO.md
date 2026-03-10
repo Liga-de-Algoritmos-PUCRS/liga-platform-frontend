@@ -17,6 +17,8 @@ Name | Type | Description | Notes
 **historycalSubmissions** | **number** | User\&#39;s historical submissions | [optional] [default to undefined]
 **monthlyPoints** | **number** | User\&#39;s monthly points | [optional] [default to undefined]
 **allTimePoints** | **number** | User\&#39;s all-time points | [optional] [default to undefined]
+**submissions** | **number** | User\&#39;s all-time submission | [optional] [default to undefined]
+**problemsResolved** | **number** | Problems resolve by an user | [optional] [default to undefined]
 
 ## Example
 
@@ -36,6 +38,8 @@ const instance: UserResponseDTO = {
     historycalSubmissions,
     monthlyPoints,
     allTimePoints,
+    submissions,
+    problemsResolved,
 };
 ```
 

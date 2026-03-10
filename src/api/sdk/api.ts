@@ -633,6 +633,18 @@ export interface UserResponseDTO {
      * @memberof UserResponseDTO
      */
     'allTimePoints'?: number;
+    /**
+     * User\'s all-time submission
+     * @type {number}
+     * @memberof UserResponseDTO
+     */
+    'submissions'?: number;
+    /**
+     * Problems resolve by an user
+     * @type {number}
+     * @memberof UserResponseDTO
+     */
+    'problemsResolved'?: number;
 }
 
 export const UserResponseDTORoleEnum = {
@@ -2638,6 +2650,36 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
+         * This endpoint retrieves a user by their unique ID.
+         * @summary Get a user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerGetMe: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user/me/{id}`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This endpoint retrieves the top users of the month based on their performance.
          * @summary Get monthly top users
          * @param {*} [options] Override http request option.
@@ -2838,6 +2880,18 @@ export const UserApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * This endpoint retrieves a user by their unique ID.
+         * @summary Get a user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userControllerGetMe(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetMe(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetMe']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * This endpoint retrieves the top users of the month based on their performance.
          * @summary Get monthly top users
          * @param {*} [options] Override http request option.
@@ -2931,6 +2985,15 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.userControllerGetAllUsers(options).then((request) => request(axios, basePath));
         },
         /**
+         * This endpoint retrieves a user by their unique ID.
+         * @summary Get a user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerGetMe(options?: RawAxiosRequestConfig): AxiosPromise<UserResponseDTO> {
+            return localVarFp.userControllerGetMe(options).then((request) => request(axios, basePath));
+        },
+        /**
          * This endpoint retrieves the top users of the month based on their performance.
          * @summary Get monthly top users
          * @param {*} [options] Override http request option.
@@ -3010,6 +3073,17 @@ export class UserApi extends BaseAPI {
      */
     public userControllerGetAllUsers(options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).userControllerGetAllUsers(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint retrieves a user by their unique ID.
+     * @summary Get a user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userControllerGetMe(options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userControllerGetMe(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
