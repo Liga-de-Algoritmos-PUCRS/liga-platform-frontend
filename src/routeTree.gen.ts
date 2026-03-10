@@ -19,6 +19,7 @@ import { Route as HomeIndexRouteImport } from './routes/_home/index'
 import { Route as ProblemasProblemIdRouteImport } from './routes/problemas/$problemId'
 import { Route as AuthenticatedProfileRouteImport } from './routes/authenticated/profile'
 import { Route as AuthenticatedIntegrantesRouteImport } from './routes/authenticated/integrantes'
+import { Route as AuthenticatedAdminRouteImport } from './routes/authenticated/admin'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/authenticated',
@@ -71,9 +72,15 @@ const AuthenticatedIntegrantesRoute =
     path: '/integrantes',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/authenticated': typeof AuthenticatedRouteWithChildren
+  '/authenticated/admin': typeof AuthenticatedAdminRoute
   '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
   '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/authenticated': typeof AuthenticatedRouteWithChildren
+  '/authenticated/admin': typeof AuthenticatedAdminRoute
   '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
   '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/authenticated': typeof AuthenticatedRouteWithChildren
+  '/authenticated/admin': typeof AuthenticatedAdminRoute
   '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
   '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/authenticated'
+    | '/authenticated/admin'
     | '/authenticated/integrantes'
     | '/authenticated/profile'
     | '/problemas/$problemId'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/authenticated'
+    | '/authenticated/admin'
     | '/authenticated/integrantes'
     | '/authenticated/profile'
     | '/problemas/$problemId'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/authenticated'
+    | '/authenticated/admin'
     | '/authenticated/integrantes'
     | '/authenticated/profile'
     | '/problemas/$problemId'
@@ -231,15 +243,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIntegrantesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/authenticated/admin': {
+      id: '/authenticated/admin'
+      path: '/admin'
+      fullPath: '/authenticated/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedIntegrantesRoute: typeof AuthenticatedIntegrantesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedIntegrantesRoute: AuthenticatedIntegrantesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
 }

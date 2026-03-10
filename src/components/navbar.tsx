@@ -171,9 +171,8 @@ export function Navbar() {
                   <User className="mr-2 h-4 w-4" />
                   <span>Meu Perfil</span>
                 </DropdownMenuItem>
-                
                 {(user.role === 'ADMIN' || user.role === 'ROOT') && (
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white" onClick={() => navigate({ to: '/authenticated/admin' })}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Gerenciar</span>
                   </DropdownMenuItem>
