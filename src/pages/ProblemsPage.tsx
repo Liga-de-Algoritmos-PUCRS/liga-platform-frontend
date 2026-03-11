@@ -105,10 +105,15 @@ export function ProblemsPage() {
     setMinPoints(0);
   };
 
+  // Separação dos problemas fixados e normais
+  // Nota: Utilizei (p as any).fixed para evitar erros de TypeScript caso o SDK ainda não tenha sido gerado com a nova propriedade 'fixed'
+  const fixedProblems = filteredProblems.filter((p) => (p as ProblemResponseDTO).fixed);
+  const regularProblems = filteredProblems.filter((p) => !(p as ProblemResponseDTO).fixed);
+
   return (
     <div className="relative min-h-screen bg-background pt-24 pb-20 px-4 md:px-6 overflow-hidden">
       
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] md:w-[95%] md:h-[95%] bg-primary/15 blur-[100px] md:blur-[200px] rounded-full animate-pulse z-0 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] md:w-[95%] h-[95%] bg-primary/15 blur-[100px] md:blur-[200px] rounded-full animate-pulse z-0 pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto">
         
@@ -301,15 +306,48 @@ export function ProblemsPage() {
             <h3 className="text-xl font-bold text-white uppercase tracking-widest">A carregar desafios...</h3>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            {filteredProblems.map((problem) => (
-              <ProblemCard 
-                key={problem.id} 
-                problem={problem} 
-                isFinished={userFinishedIds.has(problem.id || "")}
-                onClick={setSelectedProblem} 
-              />
-            ))}
+          <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            {/* Seção: Problemas Fixados (Destaques) */}
+            {fixedProblems.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 border-b border-white/10 pb-4">
+                  <Sparkles className="text-primary" size={24} />
+                  <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Em Destaque</h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {fixedProblems.map((problem) => (
+                    <ProblemCard 
+                      key={problem.id} 
+                      problem={problem} 
+                      isFinished={userFinishedIds.has(problem.id || "")}
+                      onClick={setSelectedProblem} 
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Seção: Outros Problemas */}
+            {regularProblems.length > 0 && (
+              <div className="space-y-6">
+                {fixedProblems.length > 0 && (
+                  <div className="flex items-center gap-2 border-b border-white/10 pb-4">
+                    <Terminal className="text-gray-400" size={24} />
+                    <h2 className="text-2xl font-black text-gray-200 tracking-tighter uppercase">Outros Problemas</h2>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {regularProblems.map((problem) => (
+                    <ProblemCard 
+                      key={problem.id} 
+                      problem={problem} 
+                      isFinished={userFinishedIds.has(problem.id || "")}
+                      onClick={setSelectedProblem} 
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
