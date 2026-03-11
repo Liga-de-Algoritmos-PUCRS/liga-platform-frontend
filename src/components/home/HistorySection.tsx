@@ -6,53 +6,35 @@ export function HistorySection() {
     {
       year: "2026",
       title: "Futuro e Inovação",
-      description: "Consolidação como referência em algoritmos e preparação de elite para o mercado global.",
+      description: "No primeiro semestre de 2026, a Liga de Algoritmos vive seu auge, consolidando-se como uma referência no treinamento e estudos sobre algoritmos. Com uma infraestrutura tecnológica robusta e uma comunidade vibrante, o foco atual expandiu-se para a preparação de talentos para o mercado global de tecnologia, unindo o rigor acadêmico às demandas práticas da indústria.",
       icon: <Flag size={20} className="text-white" />,
-      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200",
+      image: "https://liga-de-algoritmos.s3.us-east-1.amazonaws.com/IMG_4683.jpeg",
     },
     {
-      year: "2024",
-      title: "Expansão Digital",
-      description: "Lançamento da plataforma oficial de treinos e integração com o ecossistema tech da PUCRS.",
+      year: "2025",
+      title: "Gestão Atual",
+      description: "O segundo semestre de 2025 marcou um ponto de virada estratégico com a posse da nova gestão, que assumiu o compromisso de profissionalizar ainda mais os processos internos e ampliar o alcance da plataforma digital. Este período foi focado na transição para um modelo de governança mais ágil, estabelecendo as bases para que a Liga pudesse suportar o crescimento exponencial de membros e a integração total com o ecossistema tecnológico da universidade.",
       icon: <Star size={20} className="text-white" />,
       image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=1200",
     },
     {
-      year: "2023",
-      title: "Primeiros Pódios",
-      description: "Destaque regional na Maratona de Programação da SBC e crescimento da comunidade acadêmica.",
+      year: "2017",
+      title: "Jogos Sulamericanos",
+      image: "https://liga-de-algoritmos.s3.us-east-1.amazonaws.com/WhatsApp+Image+2026-03-10+at+15.08.58.jpeg",
       icon: <Trophy size={20} className="text-white" />,
-      image: "https://images.unsplash.com/photo-1523240715630-991e2e706e0c?auto=format&fit=crop&q=80&w=1200",
+      description: "Um dos marcos históricos mais emblemáticos ocorreu em 2017, quando a dedicação dos membros foi recompensada com a classificação para a fase Sul-Americana da Maratona de Programação da SBC. Esse feito não apenas colocou a Liga no mapa das grandes instituições de computação do continente, mas também serviu como a prova que a PUCRS era capaz de competir em altíssimo nível internacional",
     },
     {
-      year: "2022",
+      year: "1990",
       title: "O Início",
-      description: "Fundação da Liga por estudantes apaixonados, focados em criar um polo de excelência na PUCRS.",
+      description: "As raízes da Liga remontam à década de 90, quando estudantes visionários e apaixonados por computação, juntamente ao Professor João Batista (JB), decidiram criar um espaço dedicado ao estudo profundo de algoritmos na PUCRS. Embora tenha passado por diversas evoluções desde sua fundação original, o espírito pioneiro daquela época permanece vivo, tendo evoluído de um pequeno grupo de estudos.",
       icon: <Rocket size={20} className="text-white" />,
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200",
     },
   ];
 
   return (
-    <section className="relative w-full mt-16 pt-10 pb-24 md:pb-40 bg-background overflow-hidden">
-      
-      <div className="absolute top-1/2 left-0 w-[50%] h-[50%] bg-primary/15 blur-[150px] md:blur-[250px] rounded-full -translate-x-1/2 -translate-y-1/2 z-0" />
-      <div className="absolute bottom-0 right-0 w-[40%] h-[40%] bg-primary/10 blur-[120px] md:blur-[200px] rounded-full translate-x-1/2 translate-y-1/2 z-0" />
-
+    <section className="relative w-full pb-24 md:pb-40 overflow-hidden bg-transparent">
       <div className="container relative z-10 mx-auto px-6">
-        
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-5xl mx-auto mb-12 md:mb-16"
-        >
-          <h3 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter text-white leading-none whitespace-nowrap uppercase">
-            Nossa <span className="text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]">História</span>
-          </h3>
-        </motion.div>
-
         <div className="relative">
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/20 to-primary/50 hidden md:block" />
 
@@ -71,7 +53,7 @@ export function HistorySection() {
                 <div className="hidden md:block w-[42%]" />
 
                 <div className="relative z-10 flex flex-col items-center mb-6 md:mb-0">
-                  <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-[0_0_25px_rgba(var(--primary),0.6)] border-4 border-background transition-transform duration-300 group-hover:scale-110">
+                  <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-[0_0_25px_rgba(var(--primary),0.6)] border-4 border-[#0a0a0b] transition-transform duration-300 group-hover:scale-110">
                     {event.icon}
                   </div>
                   <span className="mt-3 text-primary font-mono font-bold tracking-widest text-lg">
@@ -80,13 +62,16 @@ export function HistorySection() {
                 </div>
 
                 <div className="w-full md:w-[42%] rounded-[2rem] border border-white/5 bg-white/[0.03] backdrop-blur-xl overflow-hidden shadow-2xl transition-all hover:border-primary/20">
-                  <div className="h-40 sm:h-48 w-full overflow-hidden border-b border-white/5">
-                    <img 
-                      src={event.image} 
-                      alt={event.title} 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
+                  {event.image && (
+                    <div className="h-40 sm:h-48 w-full overflow-hidden border-b border-white/5">
+                      <img 
+                        src={event.image} 
+                        alt={event.title} 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  )}
+                  
                   <div className="p-6">
                     <h4 className="text-xl font-bold text-white mb-2">
                       {event.title}
@@ -101,11 +86,6 @@ export function HistorySection() {
           </div>
         </div>
       </div>
-
-      <div className="absolute inset-0 z-[-1] opacity-[0.02]" style={{
-        backgroundImage: "radial-gradient(rgb(var(--foreground)) 1px, transparent 1px)",
-        backgroundSize: "50px 50px",
-      }} />
     </section>
   );
 }

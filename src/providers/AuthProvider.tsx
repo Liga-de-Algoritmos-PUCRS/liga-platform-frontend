@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchUserWithAccount = useCallback(async () => {
     try {
-      const response = await client.user.userControllerGetUserById("me")
+      const response = await client.user.userControllerGetMe()
       const userData = response.data as UserWithAccount;
       
       setUser(userData)

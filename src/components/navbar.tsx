@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   History,  
+  Users
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,7 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/AuthProvider";
 
-import Logo from '@/assets/liga-de-algoritmos.png'
+import logo from "@/assets/liga-de-algoritmos.png";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export function Navbar() {
     { name: "História", path: "/historia", icon: History },
     { name: "Problemas", path: "/problemas", icon: Terminal },
     { name: "Ranking", path: "/ranking", icon: Trophy },
+    ...(user ? [{ name: "Integrantes", path: "/authenticated/integrantes", icon: Users }] : []),
   ];
 
   const handleNavigation = (path: string) => {
@@ -72,11 +74,11 @@ export function Navbar() {
                 <span className="sr-only">Abrir menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] sm:w-[350px] bg-background/95 backdrop-blur-xl border-white/10 text-white">
+            <SheetContent side="left" className="w-[280px] sm:w-[350px]  backdrop-blur-xl border-white/10 text-white">
               <SheetHeader className="mb-8 text-left">
                 <SheetTitle className="flex items-center gap-3 text-white">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary p-1">
-                    <img className="h-full w-full object-contain brightness-0 invert" src={Logo} alt="Logo Liga" />
+                  <div className="flex h-10 w-10 items-center justify-center ">
+                    <img className="h-full w-full object-contain" src={logo} alt="Logo" />
                   </div>
                   <span className="font-bold tracking-tight text-lg">
                     Liga de <span className="text-primary">Algoritmos</span>
@@ -110,8 +112,8 @@ export function Navbar() {
             className="flex items-center gap-3 group cursor-pointer"
             onClick={() => handleNavigation("/")}
           >
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-primary p-1 shadow-md shadow-primary/20 transition-transform group-hover:scale-105">
-              <img className="h-full w-full object-contain drop-shadow-sm brightness-0 invert" src={Logo} alt="Logo" />
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl  transition-transform group-hover:scale-105">     
+              <img className="h-full w-full object-contain drop-shadow-sm" src={logo} alt="Logo" />
             </div>
             <span className="hidden sm:inline-block font-bold text-lg sm:text-xl tracking-tight text-white">
               Liga de <span className="text-primary">Algoritmos</span>
@@ -152,7 +154,8 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <div className="relative group cursor-pointer outline-none">
                   <Avatar className="relative h-9 w-9 sm:h-10 sm:w-10 border-2 border-transparent ring-2 ring-transparent transition-all duration-300 hover:ring-primary/50 hover:border-background shadow-sm">
-                    <AvatarImage src={user.avatarUrl || "https://github.com/shadcn.png"} alt="User profile" />
+                  
+                    <AvatarImage src={user.avatarUrl ?? ''} alt="User profile" className="object-cover" />
                     <AvatarFallback className="bg-primary text-white">
                       <User size={18} />
                     </AvatarFallback>
@@ -164,13 +167,12 @@ export function Navbar() {
                   {user.name}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
+                <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white" onClick={() => navigate({ to: '/authenticated/profile' })}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Meu Perfil</span>
                 </DropdownMenuItem>
-                
                 {(user.role === 'ADMIN' || user.role === 'ROOT') && (
-                  <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
+                  <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white" onClick={() => navigate({ to: '/authenticated/admin' })}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Gerenciar</span>
                   </DropdownMenuItem>

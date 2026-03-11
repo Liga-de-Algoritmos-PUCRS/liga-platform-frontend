@@ -6,6 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**userControllerDeleteUser**](#usercontrollerdeleteuser) | **DELETE** /user/{id} | Delete a user|
 |[**userControllerGetAllUsers**](#usercontrollergetallusers) | **GET** /user | List all users|
+|[**userControllerGetMe**](#usercontrollergetme) | **GET** /user/me/{id} | Get a user|
 |[**userControllerGetMonthlyTopUsers**](#usercontrollergetmonthlytopusers) | **GET** /user/top/monthly | Get monthly top users|
 |[**userControllerGetTopUsers**](#usercontrollergettopusers) | **GET** /user/top/all-time | Get top users|
 |[**userControllerGetUserById**](#usercontrollergetuserbyid) | **GET** /user/{id} | Get a user by ID|
@@ -113,6 +114,52 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | List of users retrieved successfully. |  -  |
 |**404** | No users found. The system does not contain any users. |  -  |
+|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **userControllerGetMe**
+> UserResponseDTO userControllerGetMe()
+
+This endpoint retrieves a user by their unique ID.
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+const { status, data } = await apiInstance.userControllerGetMe();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**UserResponseDTO**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | User retrieved successfully. |  -  |
+|**404** | User not found. The user with the specified ID does not exist. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

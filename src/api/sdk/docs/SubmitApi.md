@@ -219,7 +219,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **submitControllerGetSubmitByUserId**
-> SubmitResponseDTO submitControllerGetSubmitByUserId()
+> Array<SubmitResponseDTO> submitControllerGetSubmitByUserId()
 
 This endpoint allows you to get a submit by its user ID
 
@@ -250,7 +250,7 @@ const { status, data } = await apiInstance.submitControllerGetSubmitByUserId(
 
 ### Return type
 
-**SubmitResponseDTO**
+**Array<SubmitResponseDTO>**
 
 ### Authorization
 

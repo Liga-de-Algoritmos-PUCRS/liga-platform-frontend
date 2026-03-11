@@ -1,5 +1,5 @@
 import { Instagram, Linkedin, Github, Mail } from "lucide-react";
-import Logo from '@/assets/liga-de-algoritmos.png';
+import logo from "@/assets/liga-de-algoritmos.png";
 
 export function FooterSection() {
   const currentYear = new Date().getFullYear();
@@ -36,16 +36,12 @@ export function FooterSection() {
       <div className="container mx-auto px-4 flex flex-col items-center gap-8">
         
         <div className="flex items-center gap-3 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary p-1 shadow-lg shadow-primary/20">
-            <img 
-              className="h-full w-full object-contain brightness-0 invert" 
-              src={Logo} 
-              alt="Logo Liga" 
-            />
-          </div>
-          <span className="font-bold text-lg tracking-tight text-white">
-            Liga de <span className="text-primary">Algoritmos</span>
-          </span>
+          <div className="flex h-10 w-10 items-center justify-center ">
+                    <img className="h-full w-full object-contain" src={logo} alt="Logo" />
+            </div>
+                  <span className="font-bold tracking-tight text-lg">
+                    Liga de <span className="text-primary">Algoritmos</span>
+                  </span>
         </div>
 
         <div className="flex gap-4">

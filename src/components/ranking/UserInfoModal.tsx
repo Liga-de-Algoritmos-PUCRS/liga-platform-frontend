@@ -28,7 +28,7 @@ const SEMESTER_LABELS: Record<string, string> = {
   NINTH: "9º Sem", TENTH: "10º Sem", GRADUATED: "Formado",
 };
 
-interface UserInterface {
+export interface UserInterface {
   name: string;
   email: string;
   createdAt?: string;

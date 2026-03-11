@@ -1,62 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { RankingTable } from "@/components/ranking/RankingTable";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import { Button } from "@/components/ui/button";
-import { Calendar, Globe2, Trophy, Sparkles } from "lucide-react";
-import UserWithAccount from "@/types/user.types";
-
-interface RankingUser {
-  name: string;
-  email: string;
-  createdAt: string;
-  course: 'SOFTWARE_ENGINEERING' | 'DATA_SCIENCE' | 'COMPUTING_SCIENCE' | 'INFORMATION_SYSTEMS' | 'COMPUTING_ENGINEERING';
-  semester: 'FIRST' | 'SECOND' | 'THIRD' | 'FOURTH' | 'FIFTH' | 'SIXTH' | 'SEVENTH' | 'EIGHTH' | 'NINTH' | 'TENTH' | 'GRADUATED';
-  avatarUrl: string | null;
-  bannerUrl?: string | null;
-  monthlyPoints?: number;
-  allTimePoints?: number;
-  submissions: number;
-  problemsResolved: number;
-}
+import { Calendar, Globe2, Trophy, Sparkles, Loader2, AlertTriangle } from "lucide-react";
+import { UserResponseDTO } from "@/api/sdk";
+import client from "@/api/client";
+import { toast } from "sonner"
+import { useAuth } from "@/providers/AuthProvider";
 
 export function RankingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROOT';
+
   const [view, setView] = useState<"monthly" | "alltime">("monthly");
-  const [selectedUser, setSelectedUser] = useState<UserWithAccount | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserResponseDTO | null>(null);
+  
+  const [monthlyUsers, setMonthlyUsers] = useState<UserResponseDTO[]>([]);
+  const [allTimeUsers, setAllTimeUsers] = useState<UserResponseDTO[]>([]);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [isResetting, setIsResetting] = useState(false);
 
-  const mockMonthly: RankingUser[] = Array.from({ length: 10 }).map((_, i) => ({
-    name: i === 1 ? "Bernardo Kirsch" : `Competidor ${i + 1}`,
-    email: i === 1 ? "bernardo.kirsch@edu.pucrs.br" : `user${i}@pucrs.br`,
-    createdAt: i === 1 ? "2024-03-01T00:00:00Z" : "2025-01-15T00:00:00Z",
-    course: i === 1 ? 'SOFTWARE_ENGINEERING' : 'COMPUTING_SCIENCE',
-    semester: i === 1 ? 'FOURTH' : 'SECOND',
-    monthlyPoints: 2500 - (i * 150),
-    problemsResolved: 45 - i,
-    submissions: 120 - i,
-    avatarUrl: i === 1 ? "https://github.com/bernardokirsch.png" : null,
-  }));
+  const fetchRankings = useCallback(async () => {
+    setIsLoading(true);
+    let isMounted = true;
+    
+    try {
+      const [monthlyResponse, allTimeResponse] = await Promise.all([
+        client.user.userControllerGetMonthlyTopUsers(),
+        client.user.userControllerGetTopUsers(),
+      ]);
 
-  const mockAllTime: RankingUser[] = Array.from({ length: 10 }).map((_, i) => ({
-    name: i === 0 ? "Bernardo Kirsch" : `Lenda ${i + 1}`,
-    email: i === 0 ? "bernardo.kirsch@edu.pucrs.br" : `legend${i}@pucrs.br`,
-    createdAt: "2023-08-10T00:00:00Z",
-    course: 'SOFTWARE_ENGINEERING',
-    semester: i === 0 ? 'FOURTH' : 'GRADUATED',
-    allTimePoints: 15000 - (i * 1000),
-    problemsResolved: 300 - (i * 10),
-    submissions: 800 - (i * 20),
-    avatarUrl: i === 0 ? "https://github.com/bernardokirsch.png" : null,
-  }));
+      if (isMounted) {
+        setMonthlyUsers(monthlyResponse.data as UserResponseDTO[]);
+        setAllTimeUsers(allTimeResponse.data as UserResponseDTO[]);
+      }
+    } catch (error) {
+      if (isMounted) console.error("Erro ao buscar dados do ranking:", error);
+    } finally {
+      if (isMounted) setIsLoading(false);
+    }
 
-  const handleUserClick = (user: UserWithAccount) => {
+    return () => { isMounted = false };
+  }, []);
+
+  useEffect(() => {
+    fetchRankings();
+  }, [fetchRankings]);
+
+  const handleUserClick = (user: UserResponseDTO) => {
     setSelectedUser(user);
   };
+
+  const handleResetPoints = async () => {
+    const confirmReset = window.confirm(
+      "CUIDADO: Tem certeza que deseja zerar a pontuação mensal de TODOS os usuários da Liga? Essa ação é irreversível."
+    );
+    
+    if (!confirmReset) return;
+
+    try {
+      setIsResetting(true);
+      await client.user.userControllerResetUserPoints();
+      toast.success("Pontuação mensal zerada com sucesso!");
+      await fetchRankings();
+    } catch (error) {
+      console.error("Erro ao zerar as pontuações:", error);
+      toast.error("Ocorreu um erro ao tentar zerar as pontuações.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const currentData = view === "monthly" ? monthlyUsers : allTimeUsers;
 
   return (
     <div className="relative min-h-screen bg-background pt-24 pb-20 px-4 md:px-6 overflow-hidden">
       
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] md:w-[95%] md:h-[95%] bg-primary/15 blur-[100px] md:blur-[200px] rounded-full animate-pulse z-0 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[80%] md:w-[95%] md:h-[95%] bg-pink-500/15 blur-[100px] md:blur-[200px] rounded-full animate-pulse z-0 pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center">
         
@@ -68,7 +92,7 @@ export function RankingPage() {
         </div>
 
         <div className="text-center mb-12">
-          <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-primary leading-none">
+          <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-fuchsia-600 leading-none">
             RANKING
           </h1>
           <p className="text-muted-foreground mt-6 text-base md:text-xl font-medium max-w-2xl mx-auto">
@@ -76,36 +100,61 @@ export function RankingPage() {
           </p>
         </div>
 
-        <div className="flex p-1.5 bg-secondary/20 rounded-full border border-white/10 backdrop-blur-md mb-10 w-full max-w-xs sm:max-w-md shadow-2xl">
-          <button
-            onClick={() => setView("monthly")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ${
-              view === "monthly" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"
-            }`}
-          >
-            <Calendar size={16} />
-            Mensal
-          </button>
-          <button
-            onClick={() => setView("alltime")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ${
-              view === "alltime" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"
-            }`}
-          >
-            <Globe2 size={16} />
-            Geral
-          </button>
+        <div className="flex flex-col items-center gap-6 mb-10 w-full max-w-xs sm:max-w-md">
+          <div className="flex p-1.5 bg-secondary/20 rounded-full border border-white/10 backdrop-blur-md w-full shadow-2xl">
+            <button
+              onClick={() => setView("monthly")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ${
+                view === "monthly" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"
+              }`}
+              disabled={isLoading}
+            >
+              <Calendar size={16} />
+              Mensal
+            </button>
+            <button
+              onClick={() => setView("alltime")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 ${
+                view === "alltime" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"
+              }`}
+              disabled={isLoading}
+            >
+              <Globe2 size={16} />
+              Geral
+            </button>
+          </div>
+
+          {isAdmin && view === "monthly" && (
+            <Button
+              onClick={handleResetPoints}
+              disabled={isResetting || isLoading}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-full px-6 shadow-lg shadow-red-900/20 border border-red-500/50 w-full sm:w-auto transition-all"
+            >
+              {isResetting ? (
+                <Loader2 size={16} className="animate-spin mr-2" />
+              ) : (
+                <AlertTriangle size={16} className="mr-2" />
+              )}
+              {isResetting ? "Zerando..." : "Zerar Pontuação Mensal"}
+            </Button>
+          )}
         </div>
 
-        <div className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <RankingTable 
-            data={view === "monthly" ? mockMonthly : mockAllTime} 
-            onUserClick={handleUserClick}
-          />
+        <div className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700 min-h-[300px] flex justify-center">
+          {isLoading ? (
+             <div className="flex items-center justify-center mt-20">
+               <Loader2 className="animate-spin text-primary" size={48} />
+             </div>
+          ) : (
+            <RankingTable 
+              data={currentData} 
+              onUserClick={handleUserClick}
+            />
+          )}
         </div>
 
         <UserInfoModal 
-          user={selectedUser as any}
+          user={selectedUser}
           isOpen={!!selectedUser}
           onClose={() => setSelectedUser(null)}
         />
@@ -120,8 +169,7 @@ export function RankingPage() {
               Resolva os problemas semanais e suba no ranking. Clique nos nomes para ver o perfil.
             </p>
           </div>
-          <Button size="lg" className="w-full sm:w-auto rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-bold" onClick={() => navigate({ to: "/problemas" })}
->
+          <Button size="lg" className="w-full sm:w-auto rounded-full px-8 bg-primary hover:bg-primary/90 text-white font-bold" onClick={() => navigate({ to: "/problemas" })}>
              Ver Problemas
           </Button>
         </div>

@@ -41,7 +41,7 @@ export function HeroSection() {
           </div>
           
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-3xl">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tighter text-primary leading-[0.8] lg:leading-[0.85]">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tighter text-fuchsia-600 leading-[0.8] lg:leading-[0.85]">
               LIGA DE <br className="hidden lg:block" />
               <span className="text-foreground"> ALGORITMOS</span>
             </h1>

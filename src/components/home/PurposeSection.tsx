@@ -41,7 +41,7 @@ export function PurposeSection() {
             O que nos move
           </h2>
           <h3 className="text-4xl md:text-6xl font-black tracking-tighter text-white leading-tight tex">
-            Transformamos lógica em <span className="text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]">impacto tecnológico</span>.
+            Transformamos lógica em <span className="text-fuchsia-600 drop-shadow-[0_0_15px_rgba(var(--primary),0.3)]">impacto tecnológico</span>.
           </h3>
           <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl">
            Além de código, construímos pontes: um ecossistema de networking entre os alunos da PUCRS movidos por desafios.

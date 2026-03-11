@@ -37,12 +37,16 @@ export function SignupForm({ onSuccess }: { onSuccess: (tokenId: string) => void
     try {
       const { data } = await client.signup.signupControllerValidateSignup(values)
       if (data.id) {
-        toast.success("Conta criada! Verifique o seu email.")
+        toast.success("Conta criada com sucesso!", {
+            description: "Enviamos um código para o seu email."
+        })
         onSuccess(data.id)
       }
     } catch (error) {
       console.log(error)
-      toast.error("Erro ao criar conta", { description: "Verifique os dados e tente novamente." })
+      toast.error("Erro ao criar conta", { 
+          description: "Verifique os dados informados e tente novamente." 
+      })
     }
   }
 
