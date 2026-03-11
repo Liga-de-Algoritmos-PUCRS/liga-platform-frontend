@@ -105,8 +105,6 @@ export function ProblemsPage() {
     setMinPoints(0);
   };
 
-  // Separação dos problemas fixados e normais
-  // Nota: Utilizei (p as any).fixed para evitar erros de TypeScript caso o SDK ainda não tenha sido gerado com a nova propriedade 'fixed'
   const fixedProblems = filteredProblems.filter((p) => (p as ProblemResponseDTO).fixed);
   const regularProblems = filteredProblems.filter((p) => !(p as ProblemResponseDTO).fixed);
 
