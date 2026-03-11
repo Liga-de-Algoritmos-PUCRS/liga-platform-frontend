@@ -12,4 +12,6 @@ export default interface ProblemInterface {
   updatedAt?: Date;
   resolved?: number;
   submissions?: number;
+  archived?: boolean; 
+  fixed?: boolean; 
 }

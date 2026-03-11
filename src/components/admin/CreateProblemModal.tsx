@@ -12,14 +12,13 @@ import { CreateProblemDTO } from "@/api/sdk";
 interface CreateProblemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void; // Função para atualizar a tabela após criar
+  onSuccess: () => void; 
 }
 
 export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblemModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   
-  // Estado inicial limpo
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -32,7 +31,6 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validação básica
     if (!formData.title || !formData.description || !formData.input || !formData.answer) {
       toast.error("Por favor, preenche todos os campos obrigatórios.");
       return;
@@ -42,15 +40,13 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
     try {
       let bannerUrl = "";
 
-      // 1. Se houver um ficheiro de banner, faz o upload primeiro
       if (bannerFile) {
         toast.loading("A fazer upload da capa...", { id: "upload-toast" });
         const fileResponse = await client.file.fileControllerCreate(bannerFile);
-        bannerUrl = fileResponse.data[0].fileUrl; // Pegamos a URL devolvida pela API
+        bannerUrl = fileResponse.data[0].fileUrl; 
         toast.dismiss("upload-toast");
       }
 
-      // 2. Prepara o objeto completo do Problema
       const newProblem: CreateProblemDTO = {
         title: formData.title,
         description: formData.description,
@@ -58,22 +54,22 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
         points: Number(formData.points),
         input: formData.input,
         answer: formData.answer,
-        bannerUrl: bannerUrl // Envia a URL (ou vazia se não houver)
+        bannerUrl: bannerUrl, 
+        archived: false,
+        fixed: false
       };
 
-      // 3. Cria o problema no backend
       toast.loading("A criar problema...", { id: "create-toast" });
       await client.problem.problemControllerCreateProblem(newProblem);
       toast.dismiss("create-toast");
       
       toast.success("Problema criado com sucesso!");
       
-      // Limpa os estados
       setFormData({ title: "", description: "", difficulty: "EASY", points: 0, input: "", answer: "" });
       setBannerFile(null);
       
-      onSuccess(); // Atualiza a tabela
-      onClose();   // Fecha o modal
+      onSuccess(); 
+      onClose();  
 
     } catch (error) {
       toast.dismiss();
@@ -95,7 +91,6 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
 
         <form onSubmit={handleSubmit} className="space-y-5 py-4">
           
-          {/* Zona de Upload de Imagem inspirada no PhotoUploadModal */}
           <div className="space-y-2">
             <Label className="text-gray-400">Imagem de Capa (Opcional)</Label>
             <div 
@@ -154,9 +149,9 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
                 onChange={(e) => setFormData({...formData, difficulty: e.target.value})}
                 className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
               >
-                <option value="EASY" className="bg-[#0a0a0b] text-emerald-400">EASY</option>
-                <option value="MEDIUM" className="bg-[#0a0a0b] text-amber-400">MEDIUM</option>
-                <option value="HARD" className="bg-[#0a0a0b] text-red-400">HARD</option>
+                <option value="EASY" className="bg-[#0a0a0b] text-emerald-400">Fácil</option>
+                <option value="MEDIUM" className="bg-[#0a0a0b] text-amber-400">Médio</option>
+                <option value="HARD" className="bg-[#0a0a0b] text-red-400">Difícil</option>
               </select>
             </div>
 

@@ -17,6 +17,8 @@ Name | Type | Description | Notes
 **createdAt** | **string** | Problem creation date | [default to undefined]
 **resolved** | **number** | Number of users who have resolved the problem | [default to undefined]
 **submissions** | **number** | Number of submissions for the problem | [default to undefined]
+**fixed** | **boolean** | Problem fixed | [default to undefined]
+**archived** | **boolean** | Problem archived | [optional] [default to undefined]
 
 ## Example
 
@@ -36,6 +38,8 @@ const instance: ProblemResponseDTO = {
     createdAt,
     resolved,
     submissions,
+    fixed,
+    archived,
 };
 ```
 

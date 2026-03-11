@@ -12,6 +12,8 @@ Name | Type | Description | Notes
 **input** | **string** | Problem input | [optional] [default to undefined]
 **points** | **number** | Problem points | [optional] [default to undefined]
 **bannerUrl** | **string** | Problem banner URL | [optional] [default to undefined]
+**archived** | **boolean** | Problem archived | [optional] [default to undefined]
+**fixed** | **boolean** | Problem fixed | [optional] [default to undefined]
 
 ## Example
 
@@ -26,6 +28,8 @@ const instance: UpdateProblemDTO = {
     input,
     points,
     bannerUrl,
+    archived,
+    fixed,
 };
 ```
 

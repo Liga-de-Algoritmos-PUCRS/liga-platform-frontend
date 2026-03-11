@@ -13,12 +13,22 @@ import {
   X,
   Loader2,
   CheckCircle2,
-  Circle
+  Circle,
+  HelpCircle 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import client from "@/api/client";
 import { ProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import { useAuth } from "@/providers/AuthProvider";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function ProblemsPage() {
   const [, setSelectedProblem] = useState<ProblemResponseDTO | null>(null);
@@ -102,6 +112,54 @@ export function ProblemsPage() {
 
       <div className="relative z-10 max-w-7xl mx-auto">
         
+        <div className="absolute right-0 top-0 md:top-2 md:right-2 z-20">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-all shadow-sm border border-transparent hover:border-primary/20"
+                title="Como funciona?"
+              >
+                <HelpCircle size={22} />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] bg-background/95 backdrop-blur-md border-white/10">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold text-fuchsia-600 uppercase tracking-tight">
+                  Como Funciona?
+                </DialogTitle>
+                <DialogDescription className="text-gray-400">
+                  Guia rápido de como utilizar a Liga de Algoritmos.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-5 py-4 text-sm text-gray-300">
+                <div className="flex gap-4 items-start">
+                  <Terminal className="text-primary mt-0.5 shrink-0" size={20} />
+                  <div>
+                    <h4 className="font-bold text-white">Desafios de Código</h4>
+                    <p className="text-gray-400 mt-1 leading-relaxed">Explore nossa biblioteca de problemas. Eles variam em dificuldade (EASY, MEDIUM, HARD) e pontuação.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 items-start">
+                  <Filter className="text-primary mt-0.5 shrink-0" size={20} />
+                  <div>
+                    <h4 className="font-bold text-white">Filtros Inteligentes</h4>
+                    <p className="text-gray-400 mt-1 leading-relaxed">Use a barra de busca e os filtros avançados para encontrar o desafio ideal com base no seu nível e status atual.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 items-start">
+                  <Trophy className="text-primary mt-0.5 shrink-0" size={20} />
+                  <div>
+                    <h4 className="font-bold text-white">Pontuação e Ranking</h4>
+                    <p className="text-gray-400 mt-1 leading-relaxed">Resolva os algoritmos, submeta o seu código e acumule pontos para subir posições no ranking geral da plataforma.</p>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
         <div className="flex flex-col items-center text-center mb-12">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-primary tracking-widest uppercase shadow-xl">
             <Sparkles size={12} className="animate-spin-slow" />

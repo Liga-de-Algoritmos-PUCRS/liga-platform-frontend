@@ -32,7 +32,7 @@ export function SubmissionsTable() {
       const [subsRes, usersRes, probsRes] = await Promise.all([
         client.submit.submitControllerGetAllSubmits(),
         client.user.userControllerGetAllUsers(),
-        client.problem.problemControllerGetAllProblems()
+        client.problem.problemControllerGetAllAdminProblems("teste")
       ]);
 
       const subsData = Array.isArray(subsRes.data) ? subsRes.data : [subsRes.data] as SubmitResponseDTO[];
@@ -128,11 +128,9 @@ export function SubmissionsTable() {
       <CardContent>
         <div className="rounded-xl border border-white/10 overflow-hidden bg-black/20">
           <div className="overflow-x-auto">
-            {/* Mantemos o table-fixed, mas com o min-w adequado */}
             <table className="w-full text-sm text-left table-fixed min-w-[900px]">
               <thead className="text-xs text-gray-400 uppercase bg-white/5 border-b border-white/10">
                 <tr>
-                  {/* Novas porcentagens mais proporcionais */}
                   <th className="w-[20%] px-6 py-4 font-semibold tracking-wider">Usuário</th>
                   <th className="w-[40%] px-6 py-4 font-semibold tracking-wider">Problema</th>
                   <th className="w-[10%] px-6 py-4 font-semibold tracking-wider text-center">Tentativas</th>
@@ -169,7 +167,6 @@ export function SubmissionsTable() {
                         </button>
                       </td>
                       <td className="px-6 py-4">
-                        {/* A mágica do alinhamento: flex-row padrão (justify-start), truncamento contido no span */}
                         <div className="flex items-center gap-3 w-full">
                           <span 
                             className="truncate font-medium text-gray-200" 

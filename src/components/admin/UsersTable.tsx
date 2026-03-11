@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import client from "@/api/client";
 import { UserResponseDTO, UpdateUserDTO } from "@/api/sdk";
-import { UserInfoModal } from "@/components/ranking/UserInfoModal";
+import { UserInfoModal, UserInterface } from "@/components/ranking/UserInfoModal";
 
 const COURSES = [
   { value: "SOFTWARE_ENGINEERING", label: "Engenharia de Software" },
@@ -76,22 +76,17 @@ export function UsersTable() {
     );
   });
 
-  // ==========================================
-  // ATUALIZAÇÃO INTEGRADA COM O BACKEND
-  // ==========================================
+ 
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
     
     setActionLoading(true);
     try {
-      // 1. Preparamos o objeto apenas com dados válidos
       const payload: UpdateUserDTO = {
         name: editFormData.name,
       };
 
-      // Só adicionamos curso e semestre se não forem strings vazias
-      // Isso evita o erro de validação de Enum do Backend
       if (editFormData.course && editFormData.course !== "") {
         payload.course = editFormData.course;
       }
@@ -100,7 +95,6 @@ export function UsersTable() {
         payload.semester = editFormData.semester;
       }
 
-      // 2. Se as imagens foram limpas (string vazia), enviamos para a API apagar
       if (editFormData.avatarUrl === "") {
         payload.avatarUrl = ""; 
       }
@@ -108,11 +102,10 @@ export function UsersTable() {
         payload.bannerUrl = ""; 
       }
 
-      // 3. Chamamos o SDK
       await client.user.userControllerUpdateUser(editingUser.id, payload);
       
       setEditingUser(null);
-      await fetchUsers(); // Atualiza a tabela com as novas informações
+      await fetchUsers(); 
       toast.success("Usuário atualizado com sucesso!")
     } catch (error) {
       console.error("Erro ao atualizar utilizador:", error);
@@ -291,7 +284,7 @@ export function UsersTable() {
       </CardContent>
 
       <UserInfoModal 
-        user={selectedUser as any}
+        user={selectedUser as UserInterface}
         isOpen={isInfoModalOpen} 
         onClose={() => setIsInfoModalOpen(false)} 
       />

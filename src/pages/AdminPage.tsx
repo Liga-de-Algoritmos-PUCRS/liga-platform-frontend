@@ -61,7 +61,6 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {/* Conteúdo Dinâmico das Abas renderizando nossos novos componentes */}
       <div className="mt-6">
         {activeTab === 'submissions' && <SubmissionsTable />}
         {activeTab === 'users' && <UsersTable />}

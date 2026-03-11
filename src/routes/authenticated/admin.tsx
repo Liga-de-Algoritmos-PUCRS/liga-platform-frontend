@@ -1,5 +1,3 @@
-// Arquivo: src/routes/authenticated/admin.tsx
-
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import AdminPage from '@/pages/AdminPage'
 

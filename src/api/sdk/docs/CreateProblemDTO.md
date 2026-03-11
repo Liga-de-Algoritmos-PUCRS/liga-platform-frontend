@@ -12,6 +12,8 @@ Name | Type | Description | Notes
 **input** | **string** | Problem input | [default to undefined]
 **points** | **number** | Problem points | [default to undefined]
 **bannerUrl** | **string** | Problem banner URL | [default to undefined]
+**archived** | **boolean** | Problem archived | [optional] [default to undefined]
+**fixed** | **boolean** | Problem fixed | [optional] [default to undefined]
 
 ## Example
 
@@ -26,6 +28,8 @@ const instance: CreateProblemDTO = {
     input,
     points,
     bannerUrl,
+    archived,
+    fixed,
 };
 ```
 

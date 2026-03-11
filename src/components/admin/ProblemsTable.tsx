@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { RefreshCcw, Edit2, Trash2, Eye, AlertTriangle, Search, FileCode2, Star, ImageOff } from "lucide-react";
+import { RefreshCcw, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Search, FileCode2, Star, Pin, PinOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,33 +8,28 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import client from "@/api/client";
 import { ProblemResponseDTO, UpdateProblemDTO } from "@/api/sdk";
-
-// Importação do nosso novo modal de criação
 import { CreateProblemModal } from "@/components/admin/CreateProblemModal";
+import { toast } from "sonner";
 
 export function ProblemsTable() {
   const [problems, setProblems] = useState<ProblemResponseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Estado para controlar o Modal de Criação
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  // Estados para os Modais de Edição e Eliminação
   const [editingProblem, setEditingProblem] = useState<ProblemResponseDTO | null>(null);
   const [deletingProblem, setDeletingProblem] = useState<ProblemResponseDTO | null>(null);
-  
   const [editFormData, setEditFormData] = useState<UpdateProblemDTO>({});
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Função para buscar todos os problemas
   const fetchProblems = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await client.problem.problemControllerGetAllProblems();
-      const sortedProblems = response.data.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      const response = await client.problem.problemControllerGetAllAdminProblems("teste");
+      const sortedProblems = response.data.sort((a, b) => {
+        if (a.fixed && !b.fixed) return -1;
+        if (!a.fixed && b.fixed) return 1;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
       setProblems(sortedProblems);
     } catch (error) {
       console.error("Erro ao buscar problemas:", error);
@@ -54,15 +49,14 @@ export function ProblemsTable() {
   const handleDeleteProblem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!deletingProblem) return;
-
     setActionLoading(true);
     try {
       await client.problem.problemControllerDeleteProblem(deletingProblem.id);
       setDeletingProblem(null);
+      toast.success("Problema eliminado com sucesso!");
       await fetchProblems(); 
-    } catch (error) {
-      console.error("Erro ao eliminar problema:", error);
-      alert("Falha ao eliminar problema.");
+    } catch {
+      toast.error("Falha ao eliminar problema.");
     } finally {
       setActionLoading(false);
     }
@@ -71,7 +65,6 @@ export function ProblemsTable() {
   const handleUpdateProblem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProblem) return;
-
     setActionLoading(true);
     try {
       const payload: UpdateProblemDTO = {
@@ -82,28 +75,45 @@ export function ProblemsTable() {
         input: editFormData.input,
         points: editFormData.points
       };
-
-      if (editFormData.bannerUrl === "") {
-        payload.bannerUrl = "";
-      }
+      if (editFormData.bannerUrl === "") payload.bannerUrl = "";
 
       await client.problem.problemControllerUpdateProblem(editingProblem.id, payload);
       setEditingProblem(null);
+      toast.success("Problema atualizado com sucesso!");
       await fetchProblems(); 
-    } catch (error) {
-      console.error("Erro ao atualizar problema:", error);
-      alert("Falha ao atualizar problema.");
+    } catch {
+      toast.error("Falha ao atualizar problema.");
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleToggleArchive = (problemTitle: string) => {
-    alert(`A funcionalidade de arquivar o problema "${problemTitle}" requer a adição da propriedade 'isArchived' no Backend/SDK.`);
+  const handleToggleArchive = async (problem: ProblemResponseDTO) => {
+    try {
+      await client.problem.problemControllerUpdateProblem(problem.id, {
+        archived: !problem.archived
+      });
+      toast.success(problem.archived ? "Problema desarquivado!" : "Problema arquivado!");
+      await fetchProblems();
+    } catch {
+      toast.error("Falha ao atualizar o estado de arquivo.");
+    }
+  };
+
+  const handleTogglePin = async (problem: ProblemResponseDTO) => {
+    try {
+      await client.problem.problemControllerUpdateProblem(problem.id, {
+        fixed: !problem.fixed
+      });
+      toast.success(problem.fixed ? "Problema desafixado!" : "Problema fixado no topo!");
+      await fetchProblems();
+    } catch {
+      toast.error("Falha ao fixar/desafixar o problema.");
+    }
   };
 
   return (
-    <Card className="bg-background/50 border-white/10 text-white shadow-xl py-4">
+    <Card className="bg-background/50 border-white/10 text-white shadow-xl py-4 relative">
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <CardTitle className="flex items-center gap-2">
@@ -114,12 +124,10 @@ export function ProblemsTable() {
             Adicione novos desafios, edite, arquive ou exclua problemas existentes.
           </CardDescription>
         </div>
-        
         <div className="flex w-full sm:w-auto items-center gap-2">
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              type="text"
               placeholder="Pesquisar problema..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -135,8 +143,6 @@ export function ProblemsTable() {
             <RefreshCcw size={16} className={cn(loading && "animate-spin", "sm:mr-2")} />
             <span className="hidden sm:inline">Atualizar</span>
           </button>
-          
-          {/* Botão que abre o modal de criação */}
           <Button 
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-primary text-white hover:bg-primary/90 shrink-0"
@@ -157,7 +163,7 @@ export function ProblemsTable() {
                   <th className="w-[10%] px-6 py-4 font-semibold tracking-wider text-center">Acertos</th>
                   <th className="w-[15%] px-6 py-4 font-semibold tracking-wider text-center">Pontos</th>
                   <th className="w-[15%] px-6 py-4 font-semibold tracking-wider text-center">Data</th>
-                  <th className="w-[15%] px-6 py-4 font-semibold tracking-wider text-right">Ações</th>
+                  <th className="w-[20%] px-6 py-4 font-semibold tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -170,31 +176,31 @@ export function ProblemsTable() {
                       </div>
                     </td>
                   </tr>
-                ) : filteredProblems.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
-                      {searchTerm ? "Nenhum problema encontrado com esta pesquisa." : "Nenhum problema registado."}
-                    </td>
-                  </tr>
                 ) : (
                   filteredProblems.map((problem) => (
-                    <tr key={problem.id} className="border-b border-white/5 hover:bg-white/[0.04] transition-colors">
+                    <tr key={problem.id} className={cn(
+                      "border-b border-white/5 transition-colors",
+                      problem.archived ? "bg-white/[0.02] opacity-60" : "hover:bg-white/[0.04]",
+                      problem.fixed && !problem.archived ? "bg-primary/5" : ""
+                    )}>
                       <td className="px-6 py-4">
-                        <div className="flex flex-col truncate">
-                          <span className="font-semibold text-gray-200 truncate" title={problem.title}>
-                            {problem.title}
-                          </span>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            {problem.fixed && <Pin size={14} className="text-primary fill-primary/20 shrink-0" />}
+                            <span className="font-semibold text-gray-200 truncate">{problem.title}</span>
+                            {problem.archived && (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                                Arquivado
+                              </span>
+                            )}
+                          </div>
                           <span className="text-[10px] text-gray-500 font-mono uppercase mt-0.5">
                             Dificuldade: {problem.difficulty}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center font-mono text-gray-300">
-                        {problem.submissions || 0}
-                      </td>
-                      <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">
-                        {problem.resolved || 0}
-                      </td>
+                      <td className="px-6 py-4 text-center font-mono text-gray-300">{problem.submissions || 0}</td>
+                      <td className="px-6 py-4 text-center font-mono text-emerald-400 font-bold">{problem.resolved || 0}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-1.5 text-amber-400 font-mono font-bold">
                           <Star size={14} className="fill-amber-400/20" />
@@ -202,44 +208,32 @@ export function ProblemsTable() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center text-gray-400 text-xs font-mono">
-                        {new Date(problem.createdAt).toLocaleDateString('pt-BR', {
-                          day: '2-digit', month: '2-digit', year: 'numeric'
-                        })}
+                        {new Date(problem.createdAt).toLocaleDateString('pt-BR')}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button 
+                            onClick={() => handleTogglePin(problem)}
+                            className={cn("p-2 rounded-md transition-all border", problem.fixed ? "bg-primary/20 text-primary border-primary/30" : "bg-white/5 text-gray-300 border-white/5")}
+                          >
+                            {problem.fixed ? <PinOff size={16} /> : <Pin size={16} />}
+                          </button>
+                          <button 
                             onClick={() => {
                               setEditingProblem(problem);
-                              setEditFormData({
-                                title: problem.title,
-                                description: problem.description,
-                                difficulty: problem.difficulty,
-                                answer: problem.answer,
-                                input: problem.input,
-                                points: problem.points,
-                                bannerUrl: problem.bannerUrl || undefined
-                              });
+                              setEditFormData({ ...problem });
                             }}
-                            className="p-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-primary rounded-md transition-colors border border-white/5"
-                            title="Editar Problema"
+                            className="p-2 bg-white/5 text-gray-300 rounded-md border border-white/5"
                           >
                             <Edit2 size={16} />
                           </button>
-                          
                           <button 
-                            onClick={() => handleToggleArchive(problem.title)}
-                            className="p-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-amber-400 rounded-md transition-colors border border-white/5"
-                            title="Arquivar / Ocultar Problema"
+                            onClick={() => handleToggleArchive(problem)}
+                            className={cn("p-2 rounded-md transition-all border", problem.archived ? "bg-amber-500/20 text-amber-400" : "bg-white/5 text-gray-300")}
                           >
-                            <Eye size={16} />
+                            {problem.archived ? <Eye size={16} /> : <EyeOff size={16} />}
                           </button>
-
-                          <button 
-                            onClick={() => setDeletingProblem(problem)}
-                            className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-md transition-colors border border-red-500/20"
-                            title="Eliminar Problema"
-                          >
+                          <button onClick={() => setDeletingProblem(problem)} className="p-2 bg-red-500/10 text-red-400 rounded-md border border-red-500/20">
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -253,152 +247,53 @@ export function ProblemsTable() {
         </div>
       </CardContent>
 
-      {/* MODAL DE CRIAÇÃO (Novo!) */}
-      <CreateProblemModal 
-        isOpen={isCreateModalOpen} 
-        onClose={() => setIsCreateModalOpen(false)} 
-        onSuccess={fetchProblems}
-      />
+      <CreateProblemModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={fetchProblems} />
 
-      {/* MODAL DE EDIÇÃO EXPANDIDO */}
       <Dialog open={!!editingProblem} onOpenChange={(open) => !open && setEditingProblem(null)}>
         <DialogContent className="bg-[#0a0a0b] border-white/10 text-white sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Editar Problema</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Editar Problema</DialogTitle></DialogHeader>
           <form onSubmit={handleUpdateProblem} className="space-y-5 py-4">
-            
-            {/* Título */}
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-gray-400">Título do Problema</Label>
-              <Input 
-                id="title" 
-                value={editFormData.title || ""} 
-                onChange={(e) => setEditFormData({...editFormData, title: e.target.value})}
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-primary" 
-              />
+              <Label className="text-gray-400">Título</Label>
+              <Input value={editFormData.title || ""} onChange={(e) => setEditFormData({...editFormData, title: e.target.value})} className="bg-white/5 border-white/10" />
             </div>
-
-            {/* Descrição */}
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-gray-400">Descrição (Markdown/Texto)</Label>
-              <textarea 
-                id="description" 
-                rows={4}
-                value={editFormData.description || ""} 
-                onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
-                className="w-full flex min-h-[100px] rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-y" 
-              />
+              <Label className="text-gray-400">Descrição</Label>
+              <textarea rows={4} value={editFormData.description || ""} onChange={(e) => setEditFormData({...editFormData, description: e.target.value})} className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm" />
             </div>
-            
-            {/* Dificuldade e Pontos */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="difficulty" className="text-gray-400">Dificuldade</Label>
-                <select
-                  id="difficulty"
-                  value={editFormData.difficulty || ""}
-                  onChange={(e) => setEditFormData({...editFormData, difficulty: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                >
-                  <option value="EASY" className="bg-[#0a0a0b] text-emerald-400">EASY</option>
-                  <option value="MEDIUM" className="bg-[#0a0a0b] text-amber-400">MEDIUM</option>
-                  <option value="HARD" className="bg-[#0a0a0b] text-red-400">HARD</option>
+                <Label className="text-gray-400">Dificuldade</Label>
+                <select value={editFormData.difficulty || ""} onChange={(e) => setEditFormData({...editFormData, difficulty: e.target.value})} className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm">
+                  <option value="EASY">Fácil</option>
+                  <option value="MEDIUM">Médio</option>
+                  <option value="HARD">Difícil</option>
                 </select>
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="points" className="text-gray-400">Pontuação</Label>
-                <Input 
-                  id="points" 
-                  type="number"
-                  value={editFormData.points || 0} 
-                  onChange={(e) => setEditFormData({...editFormData, points: Number(e.target.value)})}
-                  className="bg-white/5 border-white/10 text-white focus-visible:ring-primary" 
-                />
+                <Label className="text-gray-400">Pontuação</Label>
+                <Input type="number" value={editFormData.points || 0} onChange={(e) => setEditFormData({...editFormData, points: Number(e.target.value)})} className="bg-white/5 border-white/10" />
               </div>
             </div>
-
-            {/* Entrada (Input) e Saída Esperada (Answer) */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="input" className="text-gray-400">Entrada (Input de teste)</Label>
-                <textarea 
-                  id="input" 
-                  rows={3}
-                  value={editFormData.input || ""} 
-                  onChange={(e) => setEditFormData({...editFormData, input: e.target.value})}
-                  placeholder="Ex: 2\n5 10"
-                  className="w-full flex min-h-[80px] font-mono rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-y" 
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="answer" className="text-gray-400">Saída Esperada (Answer)</Label>
-                <textarea 
-                  id="answer" 
-                  rows={3}
-                  value={editFormData.answer || ""} 
-                  onChange={(e) => setEditFormData({...editFormData, answer: e.target.value})}
-                  placeholder="Ex: 15"
-                  className="w-full flex min-h-[80px] font-mono rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-emerald-400 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors resize-y" 
-                />
-              </div>
-            </div>
-
-            {/* Moderação de Imagem/Capa */}
-            <div className="space-y-2 pt-2 border-t border-white/10">
-              <Label className="text-gray-400">Imagem de Capa (Banner)</Label>
-              <div className="flex gap-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm"
-                  disabled={!editFormData.bannerUrl && editFormData.bannerUrl !== ""} 
-                  onClick={() => setEditFormData({...editFormData, bannerUrl: ""})}
-                  className="w-full bg-white/5 border-white/10 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 disabled:opacity-30"
-                >
-                  <ImageOff size={14} className="mr-2" /> Remover Capa do Problema
-                </Button>
-              </div>
-            </div>
-
-            <DialogFooter className="pt-4 border-t border-white/10 mt-6">
-              <Button type="button" variant="ghost" onClick={() => setEditingProblem(null)} className="hover:bg-white/10 text-gray-300">
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={actionLoading} className="bg-primary text-white hover:bg-primary/90">
-                {actionLoading ? "A guardar..." : "Guardar Alterações"}
-              </Button>
+            <DialogFooter className="pt-4 border-t border-white/10">
+              <Button type="button" variant="ghost" onClick={() => setEditingProblem(null)}>Cancelar</Button>
+              <Button type="submit" disabled={actionLoading} className="bg-primary">{actionLoading ? "A guardar..." : "Guardar Alterações"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* MODAL DE ELIMINAÇÃO */}
       <Dialog open={!!deletingProblem} onOpenChange={(open) => !open && setDeletingProblem(null)}>
         <DialogContent className="bg-[#0a0a0b] border-red-500/20 text-white sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-500">
-              <AlertTriangle size={20} />
-              Eliminar Problema
-            </DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle className="text-red-500 flex items-center gap-2"><AlertTriangle size={20} /> Eliminar Problema</DialogTitle></DialogHeader>
           <form onSubmit={handleDeleteProblem} className="space-y-4 py-2">
-            <p className="text-sm text-gray-400">
-              Tem a certeza de que pretende eliminar o problema <strong className="text-white">{deletingProblem?.title}</strong>? Esta ação removerá todas as submissões atreladas a ele e é irreversível.
-            </p>
-            <DialogFooter className="pt-4">
-              <Button type="button" variant="ghost" onClick={() => setDeletingProblem(null)} className="hover:bg-white/10 text-gray-300">
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={actionLoading} className="bg-red-500 text-white hover:bg-red-600">
-                {actionLoading ? "A eliminar..." : "Sim, Eliminar"}
-              </Button>
-            </DialogFooter>
+            <p className="text-sm text-gray-400">Pretende eliminar <strong>{deletingProblem?.title}</strong>? Esta ação é irreversível.</p>
+            <DialogFooter><Button type="button" variant="ghost" onClick={() => setDeletingProblem(null)}>Cancelar</Button><Button type="submit" disabled={actionLoading} className="bg-red-500">{actionLoading ? "A eliminar..." : "Sim, Eliminar"}</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+
+      
     </Card>
   );
 }
