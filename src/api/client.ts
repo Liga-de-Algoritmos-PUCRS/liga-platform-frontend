@@ -1,5 +1,5 @@
 import axios from "axios"
-import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi} from "./sdk"
+import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi, ReportBugApi} from "./sdk"
 
 const BASE_URL = import.meta.env.VITE_API || "http://localhost:3000"
 
@@ -63,7 +63,7 @@ const fileApi = new FileApi(config, undefined, axiosInstance)
 const userApi = new UserApi(config, undefined, axiosInstance)
 const problemApi = new ProblemsApi(config, undefined, axiosInstance)
 const submitApi = new SubmitApi(config, undefined, axiosInstance)
-
+const reportBugApi = new ReportBugApi(config, undefined, axiosInstance)
 export class ApiClient {
   user = userApi
   file = fileApi
@@ -71,6 +71,7 @@ export class ApiClient {
   resetPassword = resetPasswordApi
   signup = signupApi
   problem = problemApi
+  reportBug = reportBugApi
   submit = submitApi
 }
 
