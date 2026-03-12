@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   History,  
-  Users
+  Users,
+  Bug
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,11 +35,13 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/AuthProvider";
 
 import logo from "@/assets/liga-de-algoritmos.png";
+import { ReportBugModal } from "@/components/ReportBugModal";
 
 export function Navbar() {
   const navigate = useNavigate();
   const state = useRouterState();
   const [isOpen, setIsOpen] = useState(false);
+  const [isReportBugModalOpen, setIsReportBugModalOpen] = useState(false);
   
   const { user, logout } = useAuth();
 
@@ -171,6 +174,12 @@ export function Navbar() {
                   <User className="mr-2 h-4 w-4" />
                   <span>Meu Perfil</span>
                 </DropdownMenuItem>
+
+                <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white" onClick={() => setIsReportBugModalOpen(true)}>
+                  <Bug className="mr-2 h-4 w-4 text-red-400" />
+                  <span>Reportar Bug</span>
+                </DropdownMenuItem>
+
                 {(user.role === 'ADMIN' || user.role === 'ROOT') && (
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white" onClick={() => navigate({ to: '/authenticated/admin' })}>
                     <Settings className="mr-2 h-4 w-4" />
@@ -193,6 +202,11 @@ export function Navbar() {
         </div>
         
       </div>
+      
+      <ReportBugModal 
+        isOpen={isReportBugModalOpen} 
+        onClose={() => setIsReportBugModalOpen(false)} 
+      />
     </header>
   );
 }

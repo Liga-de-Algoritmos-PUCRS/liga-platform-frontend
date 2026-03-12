@@ -303,6 +303,19 @@ export interface ProblemResponseDTO {
 /**
  * 
  * @export
+ * @interface ReportBugServiceDTO
+ */
+export interface ReportBugServiceDTO {
+    /**
+     * Description of the bug being reported
+     * @type {string}
+     * @memberof ReportBugServiceDTO
+     */
+    'description': string;
+}
+/**
+ * 
+ * @export
  * @interface ResetPasswordDTO
  */
 export interface ResetPasswordDTO {
@@ -1942,6 +1955,116 @@ export class ProblemsApi extends BaseAPI {
      */
     public problemControllerUpdateProblem(id: string, updateProblemDTO: UpdateProblemDTO, options?: RawAxiosRequestConfig) {
         return ProblemsApiFp(this.configuration).problemControllerUpdateProblem(id, updateProblemDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * ReportBugApi - axios parameter creator
+ * @export
+ */
+export const ReportBugApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * This endpoint allows users to report a bug in the system.
+         * @summary Report a bug
+         * @param {ReportBugServiceDTO} reportBugServiceDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportBugControllerReportBug: async (reportBugServiceDTO: ReportBugServiceDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'reportBugServiceDTO' is not null or undefined
+            assertParamExists('reportBugControllerReportBug', 'reportBugServiceDTO', reportBugServiceDTO)
+            const localVarPath = `/report-bug`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(reportBugServiceDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ReportBugApi - functional programming interface
+ * @export
+ */
+export const ReportBugApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ReportBugApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * This endpoint allows users to report a bug in the system.
+         * @summary Report a bug
+         * @param {ReportBugServiceDTO} reportBugServiceDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportBugControllerReportBug(reportBugServiceDTO: ReportBugServiceDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportBugControllerReportBug(reportBugServiceDTO, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ReportBugApi.reportBugControllerReportBug']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * ReportBugApi - factory interface
+ * @export
+ */
+export const ReportBugApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ReportBugApiFp(configuration)
+    return {
+        /**
+         * This endpoint allows users to report a bug in the system.
+         * @summary Report a bug
+         * @param {ReportBugServiceDTO} reportBugServiceDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportBugControllerReportBug(reportBugServiceDTO: ReportBugServiceDTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.reportBugControllerReportBug(reportBugServiceDTO, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ReportBugApi - object-oriented interface
+ * @export
+ * @class ReportBugApi
+ * @extends {BaseAPI}
+ */
+export class ReportBugApi extends BaseAPI {
+    /**
+     * This endpoint allows users to report a bug in the system.
+     * @summary Report a bug
+     * @param {ReportBugServiceDTO} reportBugServiceDTO 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportBugApi
+     */
+    public reportBugControllerReportBug(reportBugServiceDTO: ReportBugServiceDTO, options?: RawAxiosRequestConfig) {
+        return ReportBugApiFp(this.configuration).reportBugControllerReportBug(reportBugServiceDTO, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
