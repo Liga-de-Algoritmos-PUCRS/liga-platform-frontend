@@ -14,6 +14,8 @@ import { useAuth } from "@/providers/AuthProvider";
 import client from "@/api/client";
 import { ProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw"; 
+import remarkGfm from "remark-gfm"; 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export function ProblemDetailsPage() {
@@ -111,10 +113,6 @@ export function ProblemDetailsPage() {
   const problemDifficulty = problem.difficulty || "MEDIUM";
   const currentDiffStyle = difficultyStyles[problemDifficulty] || difficultyStyles.MEDIUM;
 
-  const formatDescription = (text: string) => {
-    return text.replace(/<[^>]*>?/gm, '');
-  };
-
   const handleDownloadInput = () => {
     if (!problem.input) return;
     const blob = new Blob([String(problem.input)], { type: "text/plain" });
@@ -202,10 +200,29 @@ export function ProblemDetailsPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar pr-4">
-            <div className="prose prose-invert max-w-none pb-10">
+            <div className="prose prose-invert max-w-none pb-10 
+              prose-headings:text-white prose-a:text-primary prose-strong:text-white
+              prose-img:rounded-3xl prose-img:border prose-img:border-white/10 prose-img:shadow-2xl">
               <div className="text-lg text-gray-400 leading-relaxed font-medium">
-                <ReactMarkdown>
-                  {formatDescription(problem.description || "")}
+                <ReactMarkdown 
+                  rehypePlugins={[rehypeRaw]} 
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    // Garante que imagens no Markdown sejam responsivas e bonitas
+                    img: ({ node, ...props }) => (
+                      <img 
+                        {...props} 
+                        className="max-w-full h-auto rounded-2xl my-8 border border-white/5" 
+                        alt={props.alt || "Conteúdo do problema"} 
+                      />
+                    ),
+                    // Ajuste opcional para links abrirem em nova aba
+                    a: ({ node, ...props }) => (
+                      <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
+                    )
+                  }}
+                >
+                  {problem.description || ""}
                 </ReactMarkdown>
               </div>
             </div>
@@ -214,7 +231,6 @@ export function ProblemDetailsPage() {
       </div>
 
       <div className="w-full lg:w-[400px] bg-white/[0.01] p-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar shrink-0 h-full">
-        
         <div className="space-y-3">
           <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 ml-1">Recursos de Entrada</Label>
           <div className="p-4 rounded-[24px] bg-white/[0.03] border border-white/5 flex items-center justify-between group hover:border-primary/40 transition-all">
@@ -224,7 +240,7 @@ export function ProblemDetailsPage() {
               </div>
               <p className="text-xs font-bold text-white uppercase tracking-wider">Input.txt</p>
             </div>
-            <Button onClick={handleDownloadInput} size="sm" className="rounded-xl h-10 px-4 bg-primary transition-all text-white font-bold text-xs">Baixar</Button>
+            <button onClick={handleDownloadInput} className="rounded-xl h-10 px-4 bg-primary transition-all text-white font-bold text-xs hover:bg-primary/80">Baixar</button>
           </div>
         </div>
 
@@ -306,7 +322,6 @@ export function ProblemDetailsPage() {
         </div>
       </div>
 
-      {/* Modais de Feedback */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
         <DialogContent className="bg-[#0a0a0b] border-emerald-500/30 text-white max-w-sm rounded-[32px]">
           <DialogHeader className="flex flex-col items-center gap-4">
