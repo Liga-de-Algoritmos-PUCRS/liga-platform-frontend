@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { RefreshCcw, Edit2, Trash2, Shield, User as UserIcon, AlertTriangle, Search, ImageOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import {toast} from "sonner"
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,9 +35,6 @@ const SEMESTERS = [
 ];
 
 export function UsersTable() {
-  const [users, setUsers] = useState<UserResponseDTO[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const [searchTerm, setSearchTerm] = useState("");
 
   const [editingUser, setEditingUser] = useState<UserResponseDTO | null>(null);
@@ -49,24 +47,18 @@ export function UsersTable() {
   const [deletePassword, setDeletePassword] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await client.user.userControllerGetAllUsers();
-      const sortedUsers = response.data.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      setUsers(sortedUsers);
-    } catch (error) {
-      console.error("Erro ao buscar utilizadores:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // React Query para buscar usuários
+  const { data: response, isLoading: loading, refetch } = useQuery({
+    queryKey: ['adminUsers'],
+    queryFn: () => client.user.userControllerGetAllUsers()
+  });
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const users = useMemo(() => {
+    if (!response?.data) return [];
+    return [...response.data].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [response?.data]);
 
   const filteredUsers = users.filter((user) => {
     const searchLower = searchTerm.toLowerCase();
@@ -76,7 +68,6 @@ export function UsersTable() {
     );
   });
 
- 
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingUser) return;
@@ -105,12 +96,11 @@ export function UsersTable() {
       await client.user.userControllerUpdateUser(editingUser.id, payload);
       
       setEditingUser(null);
-      await fetchUsers(); 
-      toast.success("Usuário atualizado com sucesso!")
+      await refetch();
+      toast.success("Usuário atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar utilizador:", error);
-      toast.error("Erro ao atualizar o usuário!")
-
+      toast.error("Erro ao atualizar o usuário!");
     } finally {
       setActionLoading(false);
     }
@@ -125,10 +115,10 @@ export function UsersTable() {
       await client.user.userControllerDeleteUser(deletingUser.id, { password: deletePassword });
       setDeletingUser(null);
       setDeletePassword("");
-      await fetchUsers();
-      toast.success("Usuário deletado com sucesso!")
-    } catch{
-      toast.error("Erro ao deletar o usuário!")
+      await refetch(); // <-- Atualizado aqui (antigo fetchUsers)
+      toast.success("Usuário deletado com sucesso!");
+    } catch {
+      toast.error("Erro ao deletar o usuário!");
     } finally {
       setActionLoading(false);
     }
@@ -156,7 +146,7 @@ export function UsersTable() {
             />
           </div>
           <button 
-            onClick={fetchUsers}
+            onClick={() => refetch()}
             disabled={loading}
             className="flex items-center justify-center p-2.5 sm:px-4 sm:py-2 bg-secondary/40 hover:bg-secondary/80 border border-white/5 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 shrink-0"
             title="Atualizar lista"
@@ -206,7 +196,7 @@ export function UsersTable() {
                               setSelectedUser(user);
                               setIsInfoModalOpen(true);
                             }}
-                            className="text-left font-semibold  hover:text-primary hover:underline truncate w-full transition-colors"
+                            className="text-left font-semibold hover:text-primary hover:underline truncate w-full transition-colors"
                             title={`Ver perfil de ${user.name}`}
                           >
                             {user.name}

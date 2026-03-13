@@ -1,20 +1,11 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ProblemCard } from "@/components/problems/ProblemCard";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"
 import { 
-  Search, 
-  Sparkles, 
-  Filter, 
-  Terminal, 
-  Hash, 
-  Trophy, 
-  BarChart3,
-  X,
-  Loader2,
-  CheckCircle2,
-  Circle,
-  HelpCircle 
+  Search, Sparkles, Filter, Terminal, Hash, Trophy, BarChart3,
+  X, Loader2, CheckCircle2, Circle, HelpCircle 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import client from "@/api/client";
@@ -22,21 +13,12 @@ import { ProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import { useAuth } from "@/providers/AuthProvider";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 
 export function ProblemsPage() {
   const [, setSelectedProblem] = useState<ProblemResponseDTO | null>(null);
   const { user, isAuthenticated } = useAuth();
-  
-  const [problems, setProblems] = useState<ProblemResponseDTO[]>([]);
-  const [userFinishedIds, setUserFinishedIds] = useState<Set<string>>(new Set());
-  const [isLoading, setIsLoading] = useState(true);
   
   const [nameFilter, setNameFilter] = useState("");
   const [idFilter, setIdFilter] = useState("");
@@ -45,35 +27,32 @@ export function ProblemsPage() {
   const [minPoints, setMinPoints] = useState<number>(0);
   const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  // 1. Busca de Problemas com React Query
+  const { data: problemsResponse, isLoading: isLoadingProblems } = useQuery({
+    queryKey: ['problems'],
+    queryFn: () => client.problem.problemControllerGetAllProblems(),
+    staleTime: 1000 * 60 * 5, // Cache de 5 minutos
+  });
 
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        const probResponse = await client.problem.problemControllerGetAllProblems();
-        
-        if (isAuthenticated && user?.id) {
-          const subResponse = await client.submit.submitControllerGetSubmitByUserId(String(user.id));
-          const finished = (subResponse.data as SubmitResponseDTO[])
-            .filter(s => s.isFinished)
-            .map(s => s.problemId);
-          if (isMounted) setUserFinishedIds(new Set(finished as string[]));
-        }
+  // 2. Busca das Submissões do Usuário (SÓ executa se o usuário estiver logado)
+  const { data: submissionsResponse, isLoading: isLoadingSubmissions } = useQuery({
+    queryKey: ['submissions', user?.id],
+    queryFn: () => client.submit.submitControllerGetSubmitByUserId(String(user?.id)),
+    enabled: !!(isAuthenticated && user?.id),
+    staleTime: 1000 * 60 * 2, // Cache de 2 minutos
+  });
 
-        if (isMounted) {
-          setProblems(probResponse.data as ProblemResponseDTO[]);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar dados:", error);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    }
+  const problems = (problemsResponse?.data as ProblemResponseDTO[]) || [];
+  const isLoading = isLoadingProblems || (isAuthenticated && isLoadingSubmissions);
 
-    fetchData();
-    return () => { isMounted = false; };
-  }, [isAuthenticated, user?.id]);
+  // Deriva o Set de concluídos direto dos dados cacheados
+  const userFinishedIds = useMemo(() => {
+    if (!submissionsResponse?.data) return new Set<string>();
+    const finished = (submissionsResponse.data as SubmitResponseDTO[])
+      .filter(s => s.isFinished)
+      .map(s => s.problemId);
+    return new Set(finished as string[]);
+  }, [submissionsResponse?.data]);
 
   const filteredProblems = useMemo(() => {
     return problems.filter(p => {
@@ -105,8 +84,8 @@ export function ProblemsPage() {
     setMinPoints(0);
   };
 
-  const fixedProblems = filteredProblems.filter((p) => (p as ProblemResponseDTO).fixed);
-  const regularProblems = filteredProblems.filter((p) => !(p as ProblemResponseDTO).fixed);
+  const fixedProblems = filteredProblems.filter((p) => p.fixed);
+  const regularProblems = filteredProblems.filter((p) => !p.fixed);
 
   return (
     <div className="relative min-h-screen bg-background pt-24 pb-20 px-4 md:px-6 overflow-hidden">

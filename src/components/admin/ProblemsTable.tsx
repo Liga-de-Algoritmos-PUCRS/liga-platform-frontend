@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { RefreshCcw, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Search, FileCode2, Star, Pin, PinOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -12,8 +13,6 @@ import { CreateProblemModal } from "@/components/admin/CreateProblemModal";
 import { toast } from "sonner";
 
 export function ProblemsTable() {
-  const [problems, setProblems] = useState<ProblemResponseDTO[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingProblem, setEditingProblem] = useState<ProblemResponseDTO | null>(null);
@@ -21,26 +20,21 @@ export function ProblemsTable() {
   const [editFormData, setEditFormData] = useState<UpdateProblemDTO>({});
   const [actionLoading, setActionLoading] = useState(false);
 
-  const fetchProblems = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await client.problem.problemControllerGetAllAdminProblems("teste");
-      const sortedProblems = response.data.sort((a, b) => {
-        if (a.fixed && !b.fixed) return -1;
-        if (!a.fixed && b.fixed) return 1;
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-      setProblems(sortedProblems);
-    } catch (error) {
-      console.error("Erro ao buscar problemas:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // React Query no lugar do useEffect
+  const { data: response, isLoading: loading, refetch } = useQuery({
+    queryKey: ['adminProblems'],
+    queryFn: () => client.problem.problemControllerGetAllAdminProblems("teste"),
+  });
 
-  useEffect(() => {
-    fetchProblems();
-  }, [fetchProblems]);
+  // Ordenar usando os dados em cache
+  const problems = useMemo(() => {
+    if (!response?.data) return [];
+    return [...response.data].sort((a, b) => {
+      if (a.fixed && !b.fixed) return -1;
+      if (!a.fixed && b.fixed) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [response?.data]);
 
   const filteredProblems = problems.filter((problem) => 
     problem.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -54,7 +48,7 @@ export function ProblemsTable() {
       await client.problem.problemControllerDeleteProblem(deletingProblem.id);
       setDeletingProblem(null);
       toast.success("Problema eliminado com sucesso!");
-      await fetchProblems(); 
+      await refetch(); // Recarrega os dados através do React Query
     } catch {
       toast.error("Falha ao eliminar problema.");
     } finally {
@@ -80,7 +74,7 @@ export function ProblemsTable() {
       await client.problem.problemControllerUpdateProblem(editingProblem.id, payload);
       setEditingProblem(null);
       toast.success("Problema atualizado com sucesso!");
-      await fetchProblems(); 
+      await refetch(); // Recarrega os dados através do React Query
     } catch {
       toast.error("Falha ao atualizar problema.");
     } finally {
@@ -94,7 +88,7 @@ export function ProblemsTable() {
         archived: !problem.archived
       });
       toast.success(problem.archived ? "Problema desarquivado!" : "Problema arquivado!");
-      await fetchProblems();
+      await refetch();
     } catch {
       toast.error("Falha ao atualizar o estado de arquivo.");
     }
@@ -106,7 +100,7 @@ export function ProblemsTable() {
         fixed: !problem.fixed
       });
       toast.success(problem.fixed ? "Problema desafixado!" : "Problema fixado no topo!");
-      await fetchProblems();
+      await refetch();
     } catch {
       toast.error("Falha ao fixar/desafixar o problema.");
     }
@@ -135,7 +129,7 @@ export function ProblemsTable() {
             />
           </div>
           <button 
-            onClick={fetchProblems}
+            onClick={() => refetch()}
             disabled={loading}
             className="flex items-center justify-center p-2.5 sm:px-4 sm:py-2 bg-secondary/40 hover:bg-secondary/80 border border-white/5 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 shrink-0"
             title="Atualizar lista"
@@ -247,9 +241,9 @@ export function ProblemsTable() {
         </div>
       </CardContent>
 
-      <CreateProblemModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={fetchProblems} />
+      <CreateProblemModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={() => refetch()} />
 
-      <Dialog open={!!editingProblem} onOpenChange={(open) => !open && setEditingProblem(null)}>
+     <Dialog open={!!editingProblem} onOpenChange={(open) => !open && setEditingProblem(null)}>
         <DialogContent className="bg-[#0a0a0b] border-white/10 text-white sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Editar Problema</DialogTitle></DialogHeader>
           <form onSubmit={handleUpdateProblem} className="space-y-5 py-4">
@@ -275,7 +269,34 @@ export function ProblemsTable() {
                 <Input type="number" value={editFormData.points || 0} onChange={(e) => setEditFormData({...editFormData, points: Number(e.target.value)})} className="bg-white/5 border-white/10" />
               </div>
             </div>
-            <DialogFooter className="pt-4 border-t border-white/10">
+
+            {/* NOVOS CAMPOS ADICIONADOS AQUI */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-input" className="text-gray-400">Entrada (Input de teste)</Label>
+                <textarea 
+                  id="edit-input" 
+                  rows={3}
+                  value={editFormData.input || ""} 
+                  onChange={(e) => setEditFormData({...editFormData, input: e.target.value})}
+                  className="w-full flex min-h-[80px] font-mono rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-y" 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-answer" className="text-gray-400">Saída Esperada (Answer)</Label>
+                <textarea 
+                  id="edit-answer" 
+                  rows={3}
+                  value={editFormData.answer || ""} 
+                  onChange={(e) => setEditFormData({...editFormData, answer: e.target.value})}
+                  className="w-full flex min-h-[80px] font-mono rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-emerald-400 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors resize-y" 
+                />
+              </div>
+            </div>
+            {/* FIM DOS NOVOS CAMPOS */}
+
+            <DialogFooter className="pt-4 border-t border-white/10 mt-6">
               <Button type="button" variant="ghost" onClick={() => setEditingProblem(null)}>Cancelar</Button>
               <Button type="submit" disabled={actionLoading} className="bg-primary">{actionLoading ? "A guardar..." : "Guardar Alterações"}</Button>
             </DialogFooter>

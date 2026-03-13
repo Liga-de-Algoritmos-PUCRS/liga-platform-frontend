@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Terminal, Star, CheckCircle2,  Check } from "lucide-react";
+import { Terminal, Star, CheckCircle2, Check } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { ProblemResponseDTO } from "@/api/sdk";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,9 @@ export function ProblemCard({ problem, isFinished, onClick }: ProblemCardProps) 
       });
     }
   };
+
+  // Função para remover as tags HTML
+  const cleanDescription = problem.description?.replace(/<[^>]*>?/gm, '') || '';
 
   return (
     <Card 
@@ -73,7 +76,7 @@ export function ProblemCard({ problem, isFinished, onClick }: ProblemCardProps) 
             {problem.title}
           </h3>
           <p className="text-xs sm:text-sm text-gray-400 line-clamp-3 leading-tight font-medium opacity-90">
-            {problem.description}
+            {cleanDescription}
           </p>
         </div>
 
