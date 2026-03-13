@@ -20,13 +20,11 @@ export function ProblemsTable() {
   const [editFormData, setEditFormData] = useState<UpdateProblemDTO>({});
   const [actionLoading, setActionLoading] = useState(false);
 
-  // React Query no lugar do useEffect
   const { data: response, isLoading: loading, refetch } = useQuery({
     queryKey: ['adminProblems'],
     queryFn: () => client.problem.problemControllerGetAllAdminProblems("teste"),
   });
 
-  // Ordenar usando os dados em cache
   const problems = useMemo(() => {
     if (!response?.data) return [];
     return [...response.data].sort((a, b) => {

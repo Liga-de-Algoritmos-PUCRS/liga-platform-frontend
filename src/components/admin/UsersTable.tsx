@@ -115,7 +115,7 @@ export function UsersTable() {
       await client.user.userControllerDeleteUser(deletingUser.id, { password: deletePassword });
       setDeletingUser(null);
       setDeletePassword("");
-      await refetch(); // <-- Atualizado aqui (antigo fetchUsers)
+      await refetch(); 
       toast.success("Usuário deletado com sucesso!");
     } catch {
       toast.error("Erro ao deletar o usuário!");

@@ -208,7 +208,6 @@ export function ProblemDetailsPage() {
                   rehypePlugins={[rehypeRaw]} 
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    // Garante que imagens no Markdown sejam responsivas e bonitas
                     img: ({ node, ...props }) => (
                       <img 
                         {...props} 
@@ -216,7 +215,6 @@ export function ProblemDetailsPage() {
                         alt={props.alt || "Conteúdo do problema"} 
                       />
                     ),
-                    // Ajuste opcional para links abrirem em nova aba
                     a: ({ node, ...props }) => (
                       <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
                     )

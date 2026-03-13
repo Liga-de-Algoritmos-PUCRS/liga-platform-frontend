@@ -31,7 +31,6 @@ export function ProblemCard({ problem, isFinished, onClick }: ProblemCardProps) 
     }
   };
 
-  // Função para remover as tags HTML
   const cleanDescription = problem.description?.replace(/<[^>]*>?/gm, '') || '';
 
   return (

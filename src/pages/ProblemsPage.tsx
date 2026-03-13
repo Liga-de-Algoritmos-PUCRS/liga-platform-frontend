@@ -27,25 +27,22 @@ export function ProblemsPage() {
   const [minPoints, setMinPoints] = useState<number>(0);
   const [showFilters, setShowFilters] = useState(false);
 
-  // 1. Busca de Problemas com React Query
   const { data: problemsResponse, isLoading: isLoadingProblems } = useQuery({
     queryKey: ['problems'],
     queryFn: () => client.problem.problemControllerGetAllProblems(),
-    staleTime: 1000 * 60 * 5, // Cache de 5 minutos
+    staleTime: 1000 * 60 * 5, 
   });
 
-  // 2. Busca das Submissões do Usuário (SÓ executa se o usuário estiver logado)
   const { data: submissionsResponse, isLoading: isLoadingSubmissions } = useQuery({
     queryKey: ['submissions', user?.id],
     queryFn: () => client.submit.submitControllerGetSubmitByUserId(String(user?.id)),
     enabled: !!(isAuthenticated && user?.id),
-    staleTime: 1000 * 60 * 2, // Cache de 2 minutos
+    staleTime: 1000 * 60 * 2,
   });
 
   const problems = (problemsResponse?.data as ProblemResponseDTO[]) || [];
   const isLoading = isLoadingProblems || (isAuthenticated && isLoadingSubmissions);
 
-  // Deriva o Set de concluídos direto dos dados cacheados
   const userFinishedIds = useMemo(() => {
     if (!submissionsResponse?.data) return new Set<string>();
     const finished = (submissionsResponse.data as SubmitResponseDTO[])
