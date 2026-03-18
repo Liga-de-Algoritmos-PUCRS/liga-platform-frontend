@@ -15,14 +15,14 @@ export function HistorySection() {
       title: "Gestão Atual",
       description: "O segundo semestre de 2025 marcou um ponto de virada estratégico com a posse da nova gestão, que assumiu o compromisso de profissionalizar ainda mais os processos internos e ampliar o alcance da plataforma digital. Este período foi focado na transição para um modelo de governança mais ágil, estabelecendo as bases para que a Liga pudesse suportar o crescimento exponencial de membros e a integração total com o ecossistema tecnológico da universidade.",
       icon: <Star size={20} className="text-white" />,
-      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=1200",
+      image: "https://liga-de-algoritmos.s3.us-east-1.amazonaws.com/IMG_8439.jpg",
     },
     {
       year: "2017",
-      title: "Jogos Sulamericanos",
+      title: "Finais Brasileiras da Maratona de Programação",
       image: "https://liga-de-algoritmos.s3.us-east-1.amazonaws.com/WhatsApp+Image+2026-03-10+at+15.08.58.jpeg",
       icon: <Trophy size={20} className="text-white" />,
-      description: "Um dos marcos históricos mais emblemáticos ocorreu em 2017, quando a dedicação dos membros foi recompensada com a classificação para a fase Sul-Americana da Maratona de Programação da SBC. Esse feito não apenas colocou a Liga no mapa das grandes instituições de computação do continente, mas também serviu como a prova que a PUCRS era capaz de competir em altíssimo nível internacional",
+      description: "Em 2017, a Liga de Algoritmos alcançou um marco significativo ao conquistar vaga nas Finais Brasileiras da Maratona de Programação, um dos mais prestigiados eventos de programação competitiva do país. Esta conquista não apenas destacou o talento e a dedicação dos membros da Liga, mas também solidificou sua reputação como uma força emergente no cenário de algoritmos e programação competitiva, inspirando futuras gerações de programadores a se juntarem à comunidade.",
     },
     {
       year: "1990",
