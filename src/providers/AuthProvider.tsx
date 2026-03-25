@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
-import client, { setAccessToken } from "@/api/client"
+import client, { setAccessToken, setUnauthenticatedHandler } from "@/api/client"
 import { LoginRequestDTO } from "@/api/sdk"
 import UserWithAccount from "@/types/user.types"
 
@@ -77,6 +77,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     initAuth()
+
+    setUnauthenticatedHandler(() => {
+      logout()
+    })
+
+    return () => {
+      setUnauthenticatedHandler(() => {})
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) 
 
