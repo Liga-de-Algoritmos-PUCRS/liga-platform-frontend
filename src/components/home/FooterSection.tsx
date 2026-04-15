@@ -58,7 +58,11 @@ export function FooterSection() {
             </a>
           ))}
         </div>
-
+        <div className="flex flex-col items-center gap-2 text-[10px] md:text-xs text-muted-foreground font-mono">
+          <a href="https://cp.nextline.com.br/problem" target="_blank" rel="noopener noreferrer">
+            <p>Para acessar o Site do Brasileirão: <span className="text-primary hover:underline">CLIQUE AQUI!!</span></p>
+          </a>          
+        </div>
         <div className="flex flex-col items-center gap-2 text-[10px] md:text-xs text-muted-foreground font-mono opacity-60">
           <p>© {currentYear} Liga de Algoritmos PUCRS.</p>
           <span className="hover:text-primary transition-colors cursor-default">
