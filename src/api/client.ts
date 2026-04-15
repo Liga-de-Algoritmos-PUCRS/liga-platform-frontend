@@ -1,12 +1,18 @@
 import axios from "axios"
 import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi, ReportBugApi} from "./sdk"
 
-const BASE_URL = import.meta.env.VITE_API || "http://localhost:3000"
+const BASE_URL = import.meta.env.VITE_API || "https://back.ligadealgoritmos.com"
 
 let accessToken: string = ""
 
 export function setAccessToken(token: string) {
   accessToken = token
+}
+
+let onUnauthenticated: (() => void) | null = null
+
+export function setUnauthenticatedHandler(handler: () => void) {
+  onUnauthenticated = handler
 }
 
 const apiConfig = {
@@ -32,7 +38,14 @@ axiosInstance.interceptors.response.use(
   async error => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401) {
+      if (originalRequest._retry) {
+        setAccessToken("")
+        localStorage.removeItem("accessToken")
+        if (onUnauthenticated) onUnauthenticated()
+        return Promise.reject(error)
+      }
+
       originalRequest._retry = true
 
       try {
@@ -41,11 +54,14 @@ axiosInstance.interceptors.response.use(
         const { accessToken: newAccess } = refreshRes.data
 
         setAccessToken(newAccess)
+        localStorage.setItem("accessToken", newAccess)
 
         originalRequest.headers["Authorization"] = `Bearer ${newAccess}`
         return axiosInstance(originalRequest)
       } catch (err) {
         setAccessToken("")
+        localStorage.removeItem("accessToken")
+        if (onUnauthenticated) onUnauthenticated()
         return Promise.reject(err)
       }
     }
