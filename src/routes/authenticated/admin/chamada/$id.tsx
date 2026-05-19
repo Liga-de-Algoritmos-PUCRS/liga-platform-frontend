@@ -20,16 +20,14 @@ export const Route = createFileRoute('/authenticated/admin/chamada/$id')({
   component: AdminChamadaDetails,
 })
 
-interface AttendanceRecord {
+interface UserAttendance {
   id: string
-  userId: string
+  name: string
+  email: string
+  avatarUrl?: string
+  course?: string
+  semester?: string
   isPresent: boolean
-  user: {
-    id: string
-    name: string
-    email: string
-    avatarUrl?: string
-  }
 }
 
 interface RollCallDetail {
@@ -38,7 +36,7 @@ interface RollCallDetail {
   totalUsers: number
   totalPresent: number
   totalAbsent: number
-  attendances: AttendanceRecord[]
+  users: UserAttendance[]
 }
 
 function AdminChamadaDetails() {
@@ -88,8 +86,8 @@ function AdminChamadaDetails() {
           ...old,
           totalPresent: isPresent ? old.totalPresent + 1 : old.totalPresent - 1,
           totalAbsent: isPresent ? old.totalAbsent - 1 : old.totalAbsent + 1,
-          attendances: old.attendances.map((att: AttendanceRecord) =>
-            att.userId === userId ? { ...att, isPresent } : att
+          users: old.users.map((u: UserAttendance) =>
+            u.id === userId ? { ...u, isPresent } : u
           ),
         }
       })
@@ -116,23 +114,20 @@ function AdminChamadaDetails() {
     return <div className="p-6 text-center text-red-400">Sessão não encontrada.</div>
   }
 
-  const filteredAttendances = (rollCall.attendances || []).filter((a) => {
+  const filteredUsers = (rollCall.users || []).filter((u) => {
     const matchesSearch =
       !search ||
-      a.user.name.toLowerCase().includes(search.toLowerCase()) ||
-      a.user.email.toLowerCase().includes(search.toLowerCase())
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase())
     const matchesFilter =
       filter === 'all' ||
-      (filter === 'present' && a.isPresent) ||
-      (filter === 'absent' && !a.isPresent)
+      (filter === 'present' && u.isPresent) ||
+      (filter === 'absent' && !u.isPresent)
     return matchesSearch && matchesFilter
   })
 
-  // Sort: absent first for easier editing
-  const sorted = [...filteredAttendances].sort((a, b) => {
-    if (a.isPresent === b.isPresent) return a.user.name.localeCompare(b.user.name)
-    return a.isPresent ? 1 : -1
-  })
+  // Sort: alphabetically by name for a stable layout and easy searching
+  const sorted = [...filteredUsers].sort((a, b) => a.name.localeCompare(b.name))
 
   const presenceRate =
     rollCall.totalUsers > 0
@@ -140,7 +135,7 @@ function AdminChamadaDetails() {
       : 0
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 pt-20 px-6 pb-6">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link to="/authenticated/admin/chamada/sessoes">
@@ -286,14 +281,14 @@ function AdminChamadaDetails() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8 shrink-0">
-                          <AvatarImage src={record.user.avatarUrl} alt={record.user.name} />
+                          <AvatarImage src={record.avatarUrl} alt={record.name} />
                           <AvatarFallback className="text-xs bg-muted">
-                            {record.user.name.charAt(0).toUpperCase()}
+                            {record.name.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-sm leading-none">{record.user.name}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{record.user.email}</p>
+                          <p className="font-medium text-sm leading-none">{record.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{record.email}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -314,7 +309,7 @@ function AdminChamadaDetails() {
                           size="sm"
                           variant="ghost"
                           disabled={record.isPresent || toggleMutation.isPending}
-                          onClick={() => toggleMutation.mutate({ userId: record.userId, isPresent: true })}
+                          onClick={() => toggleMutation.mutate({ userId: record.id, isPresent: true })}
                           className={cn(
                             "h-8 w-8 p-0 rounded-full",
                             record.isPresent
@@ -329,7 +324,7 @@ function AdminChamadaDetails() {
                           size="sm"
                           variant="ghost"
                           disabled={!record.isPresent || toggleMutation.isPending}
-                          onClick={() => toggleMutation.mutate({ userId: record.userId, isPresent: false })}
+                          onClick={() => toggleMutation.mutate({ userId: record.id, isPresent: false })}
                           className={cn(
                             "h-8 w-8 p-0 rounded-full",
                             !record.isPresent

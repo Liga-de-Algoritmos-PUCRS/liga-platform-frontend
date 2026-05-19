@@ -59,7 +59,7 @@ function UserChamadaComponent() {
   const data = myAttendancesData
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 pt-20 px-6 pb-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Presenças</h1>
         <p className="text-muted-foreground">

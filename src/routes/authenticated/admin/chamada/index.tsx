@@ -84,7 +84,7 @@ export default function AdminChamadaOverview() {
   const critical = users.filter((u) => u.attendanceRate < 75).length
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 pt-20 px-6 pb-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
