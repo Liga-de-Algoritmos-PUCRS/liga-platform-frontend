@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
-import { PlusCircle, Calendar, Eye, CheckCircle2, Users } from 'lucide-react'
+import { PlusCircle, Calendar, Eye, CheckCircle2, Users, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 export const Route = createFileRoute('/authenticated/admin/chamada/sessoes')({
   component: AdminChamadaSessoes,
@@ -46,6 +48,22 @@ function AdminChamadaSessoes() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Erro ao criar sessão de chamada')
+    },
+  })
+
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await client.rollCall.rollCallControllerRemove(id)
+    },
+    onSuccess: () => {
+      toast.success('Chamada excluída com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['admin-roll-calls'] })
+      setDeleteId(null)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Erro ao excluir chamada')
     },
   })
 
@@ -113,19 +131,27 @@ function AdminChamadaSessoes() {
                         <span className="text-muted-foreground text-xs">presentes</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="gap-1.5"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          navigate({ to: `/authenticated/admin/chamada/${rc.id}` })
-                        }}
-                      >
-                        <Eye className="w-4 h-4" />
-                        Editar Presenças
-                      </Button>
+                    <TableCell className="text-right pr-6" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={() => navigate({ to: `/authenticated/admin/chamada/${rc.id}` })}
+                        >
+                          <Eye className="w-4 h-4" />
+                          Editar
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:bg-red-500/10 hover:text-red-400 gap-1.5"
+                          onClick={() => setDeleteId(rc.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Excluir
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -146,6 +172,30 @@ function AdminChamadaSessoes() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir Chamada</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir esta chamada? Esta ação é irreversível e todos os registros de presença associados serão deletados.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteId(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteId && deleteMutation.mutate(deleteId)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Excluindo...' : 'Confirmar Exclusão'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

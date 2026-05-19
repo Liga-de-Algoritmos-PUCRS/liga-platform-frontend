@@ -11,6 +11,7 @@ All URIs are relative to *http://localhost*
 |[**rollCallControllerGenerateQrCode**](#rollcallcontrollergenerateqrcode) | **GET** /roll-calls/{id}/qr-code | |
 |[**rollCallControllerGetMyAttendances**](#rollcallcontrollergetmyattendances) | **GET** /roll-calls/my-attendances | |
 |[**rollCallControllerGetOverview**](#rollcallcontrollergetoverview) | **GET** /roll-calls/overview | |
+|[**rollCallControllerRemove**](#rollcallcontrollerremove) | **DELETE** /roll-calls/{id} | |
 |[**rollCallControllerUpdateAttendance**](#rollcallcontrollerupdateattendance) | **PATCH** /roll-calls/{id}/attendance | |
 
 # **rollCallControllerAttend**
@@ -319,6 +320,56 @@ const { status, data } = await apiInstance.rollCallControllerGetOverview();
 
 ### Parameters
 This endpoint does not have any parameters.
+
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** |  |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **rollCallControllerRemove**
+> rollCallControllerRemove()
+
+
+### Example
+
+```typescript
+import {
+    RollCallApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new RollCallApi(configuration);
+
+let id: string; // (default to undefined)
+
+const { status, data } = await apiInstance.rollCallControllerRemove(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**string**] |  | defaults to undefined|
 
 
 ### Return type

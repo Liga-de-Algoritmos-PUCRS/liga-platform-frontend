@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client from '@/api/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
-import { QrCode, ArrowLeft, CheckCircle2, XCircle, Users, Search, Check, X } from 'lucide-react'
+import { QrCode, ArrowLeft, CheckCircle2, XCircle, Users, Search, Check, X, Trash2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -42,10 +42,26 @@ interface RollCallDetail {
 function AdminChamadaDetails() {
   const { id } = Route.useParams()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const [qrModalOpen, setQrModalOpen] = useState(false)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [qrCodeData, setQrCodeData] = useState<{ currentQrCode: string; qrCodeExpiresAt: string } | null>(null)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'present' | 'absent'>('all')
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await client.rollCall.rollCallControllerRemove(id)
+    },
+    onSuccess: () => {
+      toast.success('Chamada excluída com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['admin-roll-calls'] })
+      navigate({ to: '/authenticated/admin/chamada/sessoes' })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Erro ao excluir chamada')
+    },
+  })
 
   const { data: rollCall, isLoading } = useQuery({
     queryKey: ['admin-roll-call', id],
@@ -172,6 +188,36 @@ function AdminChamadaDetails() {
               )}
             </div>
             <p className="text-sm text-muted-foreground animate-pulse">Atualizando automaticamente a cada 15s...</p>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Button & Dialog */}
+        <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+          <DialogTrigger asChild>
+            <Button size="lg" variant="destructive" className="gap-2 shrink-0">
+              <Trash2 className="w-5 h-5" />
+              Excluir Chamada
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Excluir Chamada</DialogTitle>
+              <DialogDescription>
+                Tem certeza que deseja excluir esta chamada? Esta ação é irreversível e todos os registros de presença associados serão deletados.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? 'Excluindo...' : 'Confirmar Exclusão'}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
