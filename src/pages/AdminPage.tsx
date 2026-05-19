@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, FileCode2, History } from "lucide-react";
+import { Users, FileCode2, History, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { SubmissionsTable } from "@/components/admin/SubmissionsTable";
@@ -8,7 +8,10 @@ import { ProblemsTable } from "@/components/admin/ProblemsTable";
 
 type TabType = 'submissions' | 'users' | 'problems';
 
+import { useNavigate } from "@tanstack/react-router";
+
 export default function AdminPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('submissions');
 
   return (
@@ -58,6 +61,14 @@ export default function AdminPage() {
         >
           <FileCode2 size={18} />
           Gerenciar Problemas
+        </button>
+
+        <button
+          onClick={() => navigate({ to: '/authenticated/admin/chamada' })}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-gray-400 hover:text-white hover:bg-white/5"
+        >
+          <CheckCircle2 size={18} />
+          Gerenciar Chamadas
         </button>
       </div>
 
