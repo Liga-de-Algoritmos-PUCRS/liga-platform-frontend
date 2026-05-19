@@ -1,97 +1,101 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client from '@/api/client'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Input } from '@/components/ui/input'
 import { QRCodeSVG } from 'qrcode.react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
-import { QrCode, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { QrCode, ArrowLeft, CheckCircle2, XCircle, Users, Search, Check, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/authenticated/admin/chamada/$id')({
   component: AdminChamadaDetails,
 })
+
+interface AttendanceRecord {
+  id: string
+  userId: string
+  isPresent: boolean
+  user: {
+    id: string
+    name: string
+    email: string
+    avatarUrl?: string
+  }
+}
+
+interface RollCallDetail {
+  id: string
+  date: string
+  totalUsers: number
+  totalPresent: number
+  totalAbsent: number
+  attendances: AttendanceRecord[]
+}
 
 function AdminChamadaDetails() {
   const { id } = Route.useParams()
   const queryClient = useQueryClient()
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [qrCodeData, setQrCodeData] = useState<{ currentQrCode: string; qrCodeExpiresAt: string } | null>(null)
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState<'all' | 'present' | 'absent'>('all')
 
   const { data: rollCall, isLoading } = useQuery({
     queryKey: ['admin-roll-call', id],
     queryFn: async () => {
       const response = await client.rollCall.rollCallControllerFindOne(id)
-      return response.data as unknown as {
-        id: string
-        date: string
-        attendances: {
-          id: string
-          userId: string
-          isPresent: boolean
-          user: {
-            id: string
-            name: string
-            email: string
-          }
-        }[]
-      }
+      return response.data as unknown as RollCallDetail
     },
   })
 
-  // Start polling when modal is open
+  // QR Code polling when modal is open
   useEffect(() => {
-    let interval: NodeJS.Timeout
+    if (!qrModalOpen) return
+    let interval: ReturnType<typeof setInterval>
 
     const fetchQr = async () => {
       try {
         const res = await client.rollCall.rollCallControllerGenerateQrCode(id)
-        setQrCodeData(res.data as any)
-      } catch (err) {
-        console.error('Failed to fetch QR code', err)
-      }
+        setQrCodeData(res.data as unknown as { currentQrCode: string; qrCodeExpiresAt: string })
+      } catch { /* ignore */ }
     }
 
-    if (qrModalOpen) {
-      fetchQr() // fetch immediately
-      interval = setInterval(fetchQr, 15000) // update every 15s
-    }
-
-    return () => {
-      if (interval) clearInterval(interval)
-    }
+    fetchQr()
+    interval = setInterval(fetchQr, 15000)
+    return () => clearInterval(interval)
   }, [qrModalOpen, id])
 
-  const toggleAttendanceMutation = useMutation({
+  const toggleMutation = useMutation({
     mutationFn: async ({ userId, isPresent }: { userId: string; isPresent: boolean }) => {
-      const response = await client.rollCall.rollCallControllerUpdateAttendance(id, { userId, isPresent })
-      return response.data
+      await client.rollCall.rollCallControllerUpdateAttendance(id, { userId, isPresent })
     },
-    onMutate: async (variables) => {
-      // Optimistic update
+    onMutate: async ({ userId, isPresent }) => {
       await queryClient.cancelQueries({ queryKey: ['admin-roll-call', id] })
       const previous = queryClient.getQueryData(['admin-roll-call', id])
-      
+
       queryClient.setQueryData(['admin-roll-call', id], (old: any) => {
         if (!old) return old
-        const updatedAttendances = old.attendances.map((att: any) => {
-          if (att.userId === variables.userId) {
-            return { ...att, isPresent: variables.isPresent }
-          }
-          return att
-        })
-        return { ...old, attendances: updatedAttendances }
+        return {
+          ...old,
+          totalPresent: isPresent ? old.totalPresent + 1 : old.totalPresent - 1,
+          totalAbsent: isPresent ? old.totalAbsent - 1 : old.totalAbsent + 1,
+          attendances: old.attendances.map((att: AttendanceRecord) =>
+            att.userId === userId ? { ...att, isPresent } : att
+          ),
+        }
       })
-
       return { previous }
     },
-    onError: (_err, _newTodo, context: any) => {
+    onError: (_err, _vars, context: any) => {
       queryClient.setQueryData(['admin-roll-call', id], context.previous)
       toast.error('Erro ao atualizar presença.')
     },
@@ -100,134 +104,250 @@ function AdminChamadaDetails() {
     },
   })
 
-  const handleToggle = (userId: string, currentStatus: boolean) => {
-    toggleAttendanceMutation.mutate({ userId, isPresent: !currentStatus })
-  }
-
   if (isLoading) {
-    return <div className="p-6 text-center text-muted-foreground">Carregando detalhes da sessão...</div>
+    return (
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
+        Carregando chamada...
+      </div>
+    )
   }
 
   if (!rollCall) {
-    return <div className="p-6 text-center text-red-500">Sessão não encontrada.</div>
+    return <div className="p-6 text-center text-red-400">Sessão não encontrada.</div>
   }
 
-  const presences = rollCall.attendances.filter(a => a.isPresent).length
-  const total = rollCall.attendances.length
+  const filteredAttendances = (rollCall.attendances || []).filter((a) => {
+    const matchesSearch =
+      !search ||
+      a.user.name.toLowerCase().includes(search.toLowerCase()) ||
+      a.user.email.toLowerCase().includes(search.toLowerCase())
+    const matchesFilter =
+      filter === 'all' ||
+      (filter === 'present' && a.isPresent) ||
+      (filter === 'absent' && !a.isPresent)
+    return matchesSearch && matchesFilter
+  })
+
+  // Sort: absent first for easier editing
+  const sorted = [...filteredAttendances].sort((a, b) => {
+    if (a.isPresent === b.isPresent) return a.user.name.localeCompare(b.user.name)
+    return a.isPresent ? 1 : -1
+  })
+
+  const presenceRate =
+    rollCall.totalUsers > 0
+      ? Math.round((rollCall.totalPresent / rollCall.totalUsers) * 100)
+      : 0
 
   return (
     <div className="flex flex-col gap-6 p-6">
+      {/* Header */}
       <div className="flex items-center gap-4">
         <Link to="/authenticated/admin/chamada/sessoes">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </Button>
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Detalhes da Chamada</h1>
-          <p className="text-muted-foreground">
-            {format(new Date(rollCall.date), "dd 'de' MMMM 'de' yyyy, 'às' HH:mm", { locale: ptBR })}
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold tracking-tight">Lista de Chamada</h1>
+          <p className="text-muted-foreground capitalize">
+            {format(new Date(rollCall.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
           </p>
         </div>
+
+        {/* QR Code Button */}
+        <Dialog open={qrModalOpen} onOpenChange={setQrModalOpen}>
+          <DialogTrigger asChild>
+            <Button size="lg" className="gap-2 shrink-0">
+              <QrCode className="w-5 h-5" />
+              Exibir QR Code
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-lg flex flex-col items-center p-10 gap-6">
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl">Escaneie para registrar presença</DialogTitle>
+            </DialogHeader>
+            <div className="bg-white p-6 rounded-2xl shadow-lg">
+              {qrCodeData ? (
+                <QRCodeSVG value={qrCodeData.currentQrCode} size={280} level="H" />
+              ) : (
+                <div className="w-[280px] h-[280px] flex items-center justify-center animate-pulse bg-slate-100 rounded-xl">
+                  <QrCode className="w-16 h-16 text-slate-300" />
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground animate-pulse">Atualizando automaticamente a cada 15s...</p>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Presenças / Total</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
+            <Users className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{presences} / {total}</div>
+            <div className="text-2xl font-bold">{rollCall.totalUsers}</div>
           </CardContent>
         </Card>
-
-        <Card className="col-span-1 md:col-span-2 flex flex-row justify-between items-center px-6">
-           <div className="flex flex-col gap-1">
-             <CardTitle className="text-lg">Projetar QR Code</CardTitle>
-             <CardDescription>
-               Abra o QR Code para que os alunos possam escanear e registrar presença. 
-               Ele atualiza automaticamente.
-             </CardDescription>
-           </div>
-           
-           <Dialog open={qrModalOpen} onOpenChange={setQrModalOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg" className="gap-2">
-                <QrCode className="w-5 h-5" />
-                Exibir QR Code
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-2xl flex flex-col items-center justify-center p-12">
-              <DialogHeader>
-                <DialogTitle className="text-center text-2xl mb-4">Escaneie para registrar presença</DialogTitle>
-              </DialogHeader>
-              
-              <div className="bg-white p-8 rounded-xl shadow-inner border">
-                {qrCodeData ? (
-                  <QRCodeSVG 
-                    value={qrCodeData.currentQrCode} 
-                    size={350}
-                    level="H"
-                    includeMargin={false}
-                  />
-                ) : (
-                  <div className="w-[350px] h-[350px] flex items-center justify-center animate-pulse bg-slate-100 rounded-lg">
-                    <QrCode className="w-16 h-16 text-slate-300" />
-                  </div>
-                )}
-              </div>
-              
-              <p className="text-sm text-muted-foreground mt-6 text-center animate-pulse">
-                Atualizando automaticamente...
-              </p>
-            </DialogContent>
-          </Dialog>
+        <Card>
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Presentes</CardTitle>
+            <CheckCircle2 className="w-4 h-4 text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-400">{rollCall.totalPresent}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ausentes</CardTitle>
+            <XCircle className="w-4 h-4 text-red-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-400">{rollCall.totalAbsent}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Frequência</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={cn("text-2xl font-bold", presenceRate >= 75 ? "text-green-400" : presenceRate >= 50 ? "text-yellow-400" : "text-red-400")}>
+              {presenceRate}%
+            </div>
+          </CardContent>
         </Card>
       </div>
 
+      {/* Attendance list */}
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Alunos</CardTitle>
-          <CardDescription>
-            Ative ou desative manualmente a presença dos alunos nesta sessão.
-          </CardDescription>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <CardTitle>Alunos</CardTitle>
+              <CardDescription>Clique em ✓ ou ✗ para alterar a presença manualmente.</CardDescription>
+            </div>
+            {/* Filters */}
+            <div className="flex flex-wrap gap-2">
+              {(['all', 'absent', 'present'] as const).map((f) => (
+                <Button
+                  key={f}
+                  size="sm"
+                  variant={filter === f ? 'default' : 'outline'}
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    "text-xs",
+                    filter === f && f === 'present' && "bg-green-600 hover:bg-green-700 border-green-600",
+                    filter === f && f === 'absent' && "bg-red-600 hover:bg-red-700 border-red-600",
+                  )}
+                >
+                  {f === 'all' ? 'Todos' : f === 'present' ? 'Presentes' : 'Ausentes'}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="relative mt-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Buscar aluno por nome ou e-mail..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Ação</TableHead>
+                <TableHead className="pl-6 w-12">#</TableHead>
+                <TableHead>Aluno</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center w-40">Ação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rollCall.attendances.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell className="font-medium">{record.user.name}</TableCell>
-                  <TableCell>{record.user.email}</TableCell>
-                  <TableCell>
-                    {record.isPresent ? (
-                      <Badge variant="default" className="bg-green-500 hover:bg-green-600">Presente</Badge>
-                    ) : (
-                      <Badge variant="destructive">Ausente</Badge>
+              {sorted.length > 0 ? (
+                sorted.map((record, index) => (
+                  <TableRow
+                    key={record.id}
+                    className={cn(
+                      "transition-colors",
+                      record.isPresent ? "bg-green-500/5" : "bg-red-500/5 hover:bg-red-500/10"
                     )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Switch 
-                      checked={record.isPresent}
-                      onCheckedChange={() => handleToggle(record.userId, record.isPresent)}
-                      aria-label="Toggle presence"
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-              {rollCall.attendances.length === 0 && (
+                  >
+                    <TableCell className="pl-6 text-muted-foreground text-sm">{index + 1}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8 shrink-0">
+                          <AvatarImage src={record.user.avatarUrl} alt={record.user.name} />
+                          <AvatarFallback className="text-xs bg-muted">
+                            {record.user.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium text-sm leading-none">{record.user.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{record.user.email}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {record.isPresent ? (
+                        <Badge className="bg-green-500/20 text-green-400 border border-green-500/30 gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Presente
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 gap-1">
+                          <XCircle className="w-3 h-3" /> Ausente
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled={record.isPresent || toggleMutation.isPending}
+                          onClick={() => toggleMutation.mutate({ userId: record.userId, isPresent: true })}
+                          className={cn(
+                            "h-8 w-8 p-0 rounded-full",
+                            record.isPresent
+                              ? "text-green-500 bg-green-500/20 cursor-default"
+                              : "hover:bg-green-500/20 hover:text-green-400"
+                          )}
+                          title="Marcar como presente"
+                        >
+                          <Check className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          disabled={!record.isPresent || toggleMutation.isPending}
+                          onClick={() => toggleMutation.mutate({ userId: record.userId, isPresent: false })}
+                          className={cn(
+                            "h-8 w-8 p-0 rounded-full",
+                            !record.isPresent
+                              ? "text-red-500 bg-red-500/20 cursor-default"
+                              : "hover:bg-red-500/20 hover:text-red-400"
+                          )}
+                          title="Marcar como ausente"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                    Nenhum aluno cadastrado/encontrado.
+                  <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
+                    Nenhum aluno encontrado.
                   </TableCell>
                 </TableRow>
               )}
