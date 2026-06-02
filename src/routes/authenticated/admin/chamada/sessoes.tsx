@@ -15,12 +15,6 @@ export const Route = createFileRoute('/authenticated/admin/chamada/sessoes')({
   component: AdminChamadaSessoes,
 })
 
-interface RollCallSummary {
-  id: string
-  date: string
-  _count: { attendances: number }
-}
-
 function AdminChamadaSessoes() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -29,7 +23,7 @@ function AdminChamadaSessoes() {
     queryKey: ['admin-roll-calls'],
     queryFn: async () => {
       const response = await client.rollCall.rollCallControllerFindAll()
-      return response.data as unknown as RollCallSummary[]
+      return response.data
     },
   })
 
