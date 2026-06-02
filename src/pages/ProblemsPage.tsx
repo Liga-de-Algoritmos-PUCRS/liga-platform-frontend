@@ -40,7 +40,7 @@ export function ProblemsPage() {
     staleTime: 1000 * 60 * 2,
   });
 
-  const problems = (problemsResponse?.data as ProblemResponseDTO[]) || [];
+  const problems = useMemo(() => (problemsResponse?.data as ProblemResponseDTO[]) || [], [problemsResponse?.data]);
   const isLoading = isLoadingProblems || (isAuthenticated && isLoadingSubmissions);
 
   const userFinishedIds = useMemo(() => {

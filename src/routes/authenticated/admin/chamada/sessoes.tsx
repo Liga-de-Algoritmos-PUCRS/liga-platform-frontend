@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { PlusCircle, Calendar, Eye, CheckCircle2, Users, Trash2, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import type { AxiosError } from 'axios'
 
 export const Route = createFileRoute('/authenticated/admin/chamada/sessoes')({
   component: AdminChamadaSessoes,
@@ -49,7 +50,7 @@ function AdminChamadaSessoes() {
         queryClient.invalidateQueries({ queryKey: ['admin-roll-calls'] })
       }
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message?: string }>) => {
       toast.error(error.response?.data?.message || 'Erro ao criar sessão de chamada')
     },
   })
@@ -65,7 +66,7 @@ function AdminChamadaSessoes() {
       queryClient.invalidateQueries({ queryKey: ['admin-roll-calls'] })
       setDeleteId(null)
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message?: string }>) => {
       toast.error(error.response?.data?.message || 'Erro ao excluir chamada')
     },
   })

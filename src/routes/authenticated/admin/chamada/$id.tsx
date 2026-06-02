@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import { QrCode, ArrowLeft, CheckCircle2, XCircle, Users, Search, Check, X, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import type { AxiosError } from 'axios'
 
 const PAGE_SIZE = 10
 
@@ -61,7 +62,7 @@ function AdminChamadaDetails() {
       queryClient.invalidateQueries({ queryKey: ['admin-roll-calls'] })
       navigate({ to: '/authenticated/admin/chamada/sessoes' })
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message?: string }>) => {
       toast.error(error.response?.data?.message || 'Erro ao excluir chamada')
     },
   })
@@ -77,7 +78,6 @@ function AdminChamadaDetails() {
   // QR Code polling when modal is open
   useEffect(() => {
     if (!qrModalOpen) return
-    let interval: ReturnType<typeof setInterval>
 
     const fetchQr = async () => {
       try {
@@ -87,7 +87,7 @@ function AdminChamadaDetails() {
     }
 
     fetchQr()
-    interval = setInterval(fetchQr, 15000)
+    const interval = setInterval(fetchQr, 15000)
     return () => clearInterval(interval)
   }, [qrModalOpen, id])
 
@@ -99,7 +99,7 @@ function AdminChamadaDetails() {
       await queryClient.cancelQueries({ queryKey: ['admin-roll-call', id] })
       const previous = queryClient.getQueryData(['admin-roll-call', id])
 
-      queryClient.setQueryData(['admin-roll-call', id], (old: any) => {
+      queryClient.setQueryData(['admin-roll-call', id], (old: RollCallDetail | undefined) => {
         if (!old) return old
         return {
           ...old,
@@ -112,8 +112,8 @@ function AdminChamadaDetails() {
       })
       return { previous }
     },
-    onError: (_err, _vars, context: any) => {
-      queryClient.setQueryData(['admin-roll-call', id], context.previous)
+    onError: (_err, _vars, context: { previous: unknown } | undefined) => {
+      queryClient.setQueryData(['admin-roll-call', id], context?.previous)
       toast.error('Erro ao atualizar presença.')
     },
     onSettled: () => {

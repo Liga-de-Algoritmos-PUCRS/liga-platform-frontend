@@ -9,6 +9,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { CheckCircle2, XCircle, BookOpen } from 'lucide-react'
+import type { AxiosError } from 'axios'
 
 export const Route = createFileRoute('/authenticated/chamada/')({
   component: UserChamadaComponent,
@@ -43,7 +44,7 @@ function UserChamadaComponent() {
       toast.success('Presença registrada com sucesso!')
       queryClient.invalidateQueries({ queryKey: ['my-attendances'] })
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message?: string }>) => {
       toast.error(error.response?.data?.message || 'Erro ao registrar presença')
     },
   })
