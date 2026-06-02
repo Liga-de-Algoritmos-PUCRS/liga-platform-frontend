@@ -162,7 +162,7 @@ function AdminChamadaDetails() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link to="/authenticated/admin/chamada/sessoes">
-          <Button variant="ghost" size="icon" className="shrink-0">
+          <Button variant="ghost" size="icon" className="shrink-0" aria-label="Voltar" title="Voltar">
             <ArrowLeft className="w-5 h-5" />
           </Button>
         </Link>

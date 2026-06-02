@@ -29,15 +29,24 @@ function AdminChamadaSessoes() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const response = await client.rollCall.rollCallControllerCreate({ date: new Date().toISOString() })
-      return response.data
+      // `rollCallControllerCreate` responds with no body (AxiosPromise<void>), so we
+      // can't read the new ID from it. Snapshot the existing IDs, create, then re-fetch
+      // the list and diff to find the session that was just created.
+      const before = new Set((rollCalls ?? []).map((rc) => rc.id))
+      await client.rollCall.rollCallControllerCreate({ date: new Date().toISOString() })
+      const response = await client.rollCall.rollCallControllerFindAll()
+      const list = response.data
+      const created = list.find((rc) => !before.has(rc.id))
+      return { list, createdId: created?.id }
     },
-    onSuccess: (data: any) => {
+    onSuccess: ({ list, createdId }) => {
       toast.success('Nova chamada iniciada!')
-      queryClient.invalidateQueries({ queryKey: ['admin-roll-calls'] })
+      queryClient.setQueryData(['admin-roll-calls'], list)
       // Navigate to the new session immediately
-      if (data?.id) {
-        navigate({ to: `/authenticated/admin/chamada/${data.id}` })
+      if (createdId) {
+        navigate({ to: `/authenticated/admin/chamada/${createdId}` })
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['admin-roll-calls'] })
       }
     },
     onError: (error: any) => {
@@ -74,7 +83,7 @@ function AdminChamadaSessoes() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link to="/authenticated/admin/chamada">
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0" aria-label="Voltar" title="Voltar">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
@@ -114,8 +123,17 @@ function AdminChamadaSessoes() {
                 rollCalls.map((rc) => (
                   <TableRow
                     key={rc.id}
-                    className="cursor-pointer hover:bg-white/5"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Abrir chamada de ${format(new Date(rc.date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}`}
+                    className="cursor-pointer hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     onClick={() => navigate({ to: `/authenticated/admin/chamada/${rc.id}` })}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        navigate({ to: `/authenticated/admin/chamada/${rc.id}` })
+                      }
+                    }}
                   >
                     <TableCell className="pl-6">
                       <div className="flex items-center gap-2">
