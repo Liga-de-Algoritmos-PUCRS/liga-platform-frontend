@@ -1,12 +1,16 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import client from '@/api/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { List, Users, BookOpen, TrendingUp } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { List, Users, BookOpen, TrendingUp, Search, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const PAGE_SIZE = 10
 
 export const Route = createFileRoute('/authenticated/admin/chamada/')({
   component: AdminChamadaOverview,
@@ -59,6 +63,9 @@ function AttendanceBar({ rate }: { rate: number }) {
 }
 
 export default function AdminChamadaOverview() {
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+
   const { data, isLoading } = useQuery({
     queryKey: ['admin-chamada-overview'],
     queryFn: async () => {
@@ -82,6 +89,19 @@ export default function AdminChamadaOverview() {
       ? Math.round(users.reduce((acc, u) => acc + u.attendanceRate, 0) / users.length)
       : 0
   const critical = users.filter((u) => u.attendanceRate < 75).length
+
+  const filtered = [...users]
+    .sort((a, b) => a.attendanceRate - b.attendanceRate)
+    .filter(
+      (u) =>
+        !search ||
+        u.name.toLowerCase().includes(search.toLowerCase()) ||
+        u.email.toLowerCase().includes(search.toLowerCase()),
+    )
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   return (
     <div className="flex flex-col gap-6 pt-20 px-6 pb-6">
@@ -147,6 +167,19 @@ export default function AdminChamadaOverview() {
       <Card>
         <CardHeader>
           <CardTitle>Frequência por Aluno</CardTitle>
+          {/* Search */}
+          <div className="relative mt-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Buscar aluno por nome ou e-mail..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              className="pl-9"
+            />
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
@@ -160,10 +193,8 @@ export default function AdminChamadaOverview() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.length > 0 ? (
-                [...users]
-                  .sort((a, b) => a.attendanceRate - b.attendanceRate)
-                  .map((user) => (
+              {paged.length > 0 ? (
+                paged.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
@@ -211,6 +242,31 @@ export default function AdminChamadaOverview() {
               )}
             </TableBody>
           </Table>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t">
+              <p className="text-xs text-muted-foreground">
+                Página {currentPage} de {totalPages} · {filtered.length} alunos
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  <ChevronLeft className="w-4 h-4" /> Anterior
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  Próxima <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

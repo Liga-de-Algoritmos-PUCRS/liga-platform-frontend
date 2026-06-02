@@ -12,9 +12,11 @@ import { QRCodeSVG } from 'qrcode.react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
-import { QrCode, ArrowLeft, CheckCircle2, XCircle, Users, Search, Check, X, Trash2 } from 'lucide-react'
+import { QrCode, ArrowLeft, CheckCircle2, XCircle, Users, Search, Check, X, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+
+const PAGE_SIZE = 10
 
 export const Route = createFileRoute('/authenticated/admin/chamada/$id')({
   component: AdminChamadaDetails,
@@ -48,6 +50,7 @@ function AdminChamadaDetails() {
   const [qrCodeData, setQrCodeData] = useState<{ currentQrCode: string; qrCodeExpiresAt: string } | null>(null)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'present' | 'absent'>('all')
+  const [page, setPage] = useState(1)
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -144,6 +147,10 @@ function AdminChamadaDetails() {
 
   // Sort: alphabetically by name for a stable layout and easy searching
   const sorted = [...filteredUsers].sort((a, b) => a.name.localeCompare(b.name))
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paged = sorted.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   const presenceRate =
     rollCall.totalUsers > 0
@@ -278,7 +285,10 @@ function AdminChamadaDetails() {
                   key={f}
                   size="sm"
                   variant={filter === f ? 'default' : 'outline'}
-                  onClick={() => setFilter(f)}
+                  onClick={() => {
+                    setFilter(f)
+                    setPage(1)
+                  }}
                   className={cn(
                     "text-xs",
                     filter === f && f === 'present' && "bg-green-600 hover:bg-green-700 border-green-600",
@@ -297,7 +307,10 @@ function AdminChamadaDetails() {
             <Input
               placeholder="Buscar aluno por nome ou e-mail..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
               className="pl-9"
             />
           </div>
@@ -314,8 +327,8 @@ function AdminChamadaDetails() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sorted.length > 0 ? (
-                sorted.map((record, index) => (
+              {paged.length > 0 ? (
+                paged.map((record, index) => (
                   <TableRow
                     key={record.id}
                     className={cn(
@@ -323,7 +336,7 @@ function AdminChamadaDetails() {
                       record.isPresent ? "bg-green-500/5" : "bg-red-500/5 hover:bg-red-500/10"
                     )}
                   >
-                    <TableCell className="pl-6 text-muted-foreground text-sm">{index + 1}</TableCell>
+                    <TableCell className="pl-6 text-muted-foreground text-sm">{(currentPage - 1) * PAGE_SIZE + index + 1}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8 shrink-0">
@@ -394,6 +407,31 @@ function AdminChamadaDetails() {
               )}
             </TableBody>
           </Table>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t">
+              <p className="text-xs text-muted-foreground">
+                Página {currentPage} de {totalPages} · {sorted.length} alunos
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  <ChevronLeft className="w-4 h-4" /> Anterior
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  Próxima <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client from '@/api/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { toast } from 'sonner'
-import { PlusCircle, Calendar, Eye, CheckCircle2, Users, Trash2 } from 'lucide-react'
+import { PlusCircle, Calendar, Eye, CheckCircle2, Users, Trash2, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
@@ -72,11 +72,18 @@ function AdminChamadaSessoes() {
   return (
     <div className="flex flex-col gap-6 pt-20 px-6 pb-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sessões de Chamada</h1>
-          <p className="text-muted-foreground">
-            Gerencie e crie novas sessões de chamada.
-          </p>
+        <div className="flex items-center gap-4">
+          <Link to="/authenticated/admin/chamada">
+            <Button variant="ghost" size="icon" className="shrink-0">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Sessões de Chamada</h1>
+            <p className="text-muted-foreground">
+              Gerencie e crie novas sessões de chamada.
+            </p>
+          </div>
         </div>
         <Button onClick={() => createMutation.mutate()} disabled={createMutation.isPending} className="gap-2">
           <PlusCircle className="w-4 h-4" />
