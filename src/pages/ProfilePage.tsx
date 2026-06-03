@@ -63,6 +63,7 @@ export function ProfilePage() {
         semester: user.semester,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   useEffect(() => {

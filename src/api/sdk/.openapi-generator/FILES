@@ -4,7 +4,9 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/AttendRollCallDto.md
 docs/CreateProblemDTO.md
+docs/CreateRollCallDto.md
 docs/CreateSubmitDTO.md
 docs/DeleteUserDTO.md
 docs/FileApi.md
@@ -20,11 +22,15 @@ docs/ResetPasswordApi.md
 docs/ResetPasswordDTO.md
 docs/ResetPasswordRequestDTO.md
 docs/ResetPasswordRequestResponseDTO.md
+docs/RollCallApi.md
+docs/RollCallCountResponseDto.md
+docs/RollCallSummaryResponseDto.md
 docs/SignupApi.md
 docs/SignupRequestDTO.md
 docs/SignupRequestResponseDTO.md
 docs/SubmitApi.md
 docs/SubmitResponseDTO.md
+docs/UpdateAttendanceDto.md
 docs/UpdateFileDTO.md
 docs/UpdateProblemDTO.md
 docs/UpdateUserDTO.md

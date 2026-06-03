@@ -20,6 +20,11 @@ import { Route as ProblemasProblemIdRouteImport } from './routes/problemas/$prob
 import { Route as AuthenticatedProfileRouteImport } from './routes/authenticated/profile'
 import { Route as AuthenticatedIntegrantesRouteImport } from './routes/authenticated/integrantes'
 import { Route as AuthenticatedAdminRouteImport } from './routes/authenticated/admin'
+import { Route as AuthenticatedChamadaIndexRouteImport } from './routes/authenticated/chamada/index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/authenticated/admin/index'
+import { Route as AuthenticatedAdminChamadaIndexRouteImport } from './routes/authenticated/admin/chamada/index'
+import { Route as AuthenticatedAdminChamadaSessoesRouteImport } from './routes/authenticated/admin/chamada/sessoes'
+import { Route as AuthenticatedAdminChamadaIdRouteImport } from './routes/authenticated/admin/chamada/$id'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/authenticated',
@@ -77,10 +82,39 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedChamadaIndexRoute =
+  AuthenticatedChamadaIndexRouteImport.update({
+    id: '/chamada/',
+    path: '/chamada/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminChamadaIndexRoute =
+  AuthenticatedAdminChamadaIndexRouteImport.update({
+    id: '/chamada/',
+    path: '/chamada/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminChamadaSessoesRoute =
+  AuthenticatedAdminChamadaSessoesRouteImport.update({
+    id: '/chamada/sessoes',
+    path: '/chamada/sessoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminChamadaIdRoute =
+  AuthenticatedAdminChamadaIdRouteImport.update({
+    id: '/chamada/$id',
+    path: '/chamada/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/authenticated': typeof AuthenticatedRouteWithChildren
-  '/authenticated/admin': typeof AuthenticatedAdminRoute
+  '/authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
   '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
@@ -90,10 +124,14 @@ export interface FileRoutesByFullPath {
   '/problemas/': typeof ProblemasIndexRoute
   '/ranking/': typeof RankingIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/authenticated/chamada/': typeof AuthenticatedChamadaIndexRoute
+  '/authenticated/admin/chamada/$id': typeof AuthenticatedAdminChamadaIdRoute
+  '/authenticated/admin/chamada/sessoes': typeof AuthenticatedAdminChamadaSessoesRoute
+  '/authenticated/admin/chamada/': typeof AuthenticatedAdminChamadaIndexRoute
 }
 export interface FileRoutesByTo {
   '/authenticated': typeof AuthenticatedRouteWithChildren
-  '/authenticated/admin': typeof AuthenticatedAdminRoute
   '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
   '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
@@ -103,11 +141,16 @@ export interface FileRoutesByTo {
   '/problemas': typeof ProblemasIndexRoute
   '/ranking': typeof RankingIndexRoute
   '/signup': typeof SignupIndexRoute
+  '/authenticated/admin': typeof AuthenticatedAdminIndexRoute
+  '/authenticated/chamada': typeof AuthenticatedChamadaIndexRoute
+  '/authenticated/admin/chamada/$id': typeof AuthenticatedAdminChamadaIdRoute
+  '/authenticated/admin/chamada/sessoes': typeof AuthenticatedAdminChamadaSessoesRoute
+  '/authenticated/admin/chamada': typeof AuthenticatedAdminChamadaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/authenticated': typeof AuthenticatedRouteWithChildren
-  '/authenticated/admin': typeof AuthenticatedAdminRoute
+  '/authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/authenticated/integrantes': typeof AuthenticatedIntegrantesRoute
   '/authenticated/profile': typeof AuthenticatedProfileRoute
   '/problemas/$problemId': typeof ProblemasProblemIdRoute
@@ -117,6 +160,11 @@ export interface FileRoutesById {
   '/problemas/': typeof ProblemasIndexRoute
   '/ranking/': typeof RankingIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/authenticated/chamada/': typeof AuthenticatedChamadaIndexRoute
+  '/authenticated/admin/chamada/$id': typeof AuthenticatedAdminChamadaIdRoute
+  '/authenticated/admin/chamada/sessoes': typeof AuthenticatedAdminChamadaSessoesRoute
+  '/authenticated/admin/chamada/': typeof AuthenticatedAdminChamadaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,10 +180,14 @@ export interface FileRouteTypes {
     | '/problemas/'
     | '/ranking/'
     | '/signup/'
+    | '/authenticated/admin/'
+    | '/authenticated/chamada/'
+    | '/authenticated/admin/chamada/$id'
+    | '/authenticated/admin/chamada/sessoes'
+    | '/authenticated/admin/chamada/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/authenticated'
-    | '/authenticated/admin'
     | '/authenticated/integrantes'
     | '/authenticated/profile'
     | '/problemas/$problemId'
@@ -145,6 +197,11 @@ export interface FileRouteTypes {
     | '/problemas'
     | '/ranking'
     | '/signup'
+    | '/authenticated/admin'
+    | '/authenticated/chamada'
+    | '/authenticated/admin/chamada/$id'
+    | '/authenticated/admin/chamada/sessoes'
+    | '/authenticated/admin/chamada'
   id:
     | '__root__'
     | '/authenticated'
@@ -158,6 +215,11 @@ export interface FileRouteTypes {
     | '/problemas/'
     | '/ranking/'
     | '/signup/'
+    | '/authenticated/admin/'
+    | '/authenticated/chamada/'
+    | '/authenticated/admin/chamada/$id'
+    | '/authenticated/admin/chamada/sessoes'
+    | '/authenticated/admin/chamada/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -250,19 +312,73 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/authenticated/chamada/': {
+      id: '/authenticated/chamada/'
+      path: '/chamada'
+      fullPath: '/authenticated/chamada/'
+      preLoaderRoute: typeof AuthenticatedChamadaIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/authenticated/admin/': {
+      id: '/authenticated/admin/'
+      path: '/'
+      fullPath: '/authenticated/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/authenticated/admin/chamada/': {
+      id: '/authenticated/admin/chamada/'
+      path: '/chamada'
+      fullPath: '/authenticated/admin/chamada/'
+      preLoaderRoute: typeof AuthenticatedAdminChamadaIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/authenticated/admin/chamada/sessoes': {
+      id: '/authenticated/admin/chamada/sessoes'
+      path: '/chamada/sessoes'
+      fullPath: '/authenticated/admin/chamada/sessoes'
+      preLoaderRoute: typeof AuthenticatedAdminChamadaSessoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/authenticated/admin/chamada/$id': {
+      id: '/authenticated/admin/chamada/$id'
+      path: '/chamada/$id'
+      fullPath: '/authenticated/admin/chamada/$id'
+      preLoaderRoute: typeof AuthenticatedAdminChamadaIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminChamadaIdRoute: typeof AuthenticatedAdminChamadaIdRoute
+  AuthenticatedAdminChamadaSessoesRoute: typeof AuthenticatedAdminChamadaSessoesRoute
+  AuthenticatedAdminChamadaIndexRoute: typeof AuthenticatedAdminChamadaIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminChamadaIdRoute: AuthenticatedAdminChamadaIdRoute,
+  AuthenticatedAdminChamadaSessoesRoute: AuthenticatedAdminChamadaSessoesRoute,
+  AuthenticatedAdminChamadaIndexRoute: AuthenticatedAdminChamadaIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedIntegrantesRoute: typeof AuthenticatedIntegrantesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedChamadaIndexRoute: typeof AuthenticatedChamadaIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedIntegrantesRoute: AuthenticatedIntegrantesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedChamadaIndexRoute: AuthenticatedChamadaIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

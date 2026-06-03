@@ -208,14 +208,14 @@ export function ProblemDetailsPage() {
                   rehypePlugins={[rehypeRaw]} 
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    img: ({ node, ...props }) => (
+                    img: ({ node: _node, ...props }) => (
                       <img 
                         {...props} 
                         className="max-w-full h-auto rounded-2xl my-8 border border-white/5" 
                         alt={props.alt || "Conteúdo do problema"} 
                       />
                     ),
-                    a: ({ node, ...props }) => (
+                    a: ({ node: _node, ...props }) => (
                       <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
                     )
                   }}

@@ -1,5 +1,5 @@
 import axios from "axios"
-import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi, ReportBugApi} from "./sdk"
+import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi, ReportBugApi, RollCallApi} from "./sdk"
 
 const BASE_URL = import.meta.env.VITE_API || "https://back.ligadealgoritmos.com"
 
@@ -80,6 +80,7 @@ const userApi = new UserApi(config, undefined, axiosInstance)
 const problemApi = new ProblemsApi(config, undefined, axiosInstance)
 const submitApi = new SubmitApi(config, undefined, axiosInstance)
 const reportBugApi = new ReportBugApi(config, undefined, axiosInstance)
+const rollCallApi = new RollCallApi(config, undefined, axiosInstance)
 export class ApiClient {
   user = userApi
   file = fileApi
@@ -89,6 +90,7 @@ export class ApiClient {
   problem = problemApi
   reportBug = reportBugApi
   submit = submitApi
+  rollCall = rollCallApi
 }
 
 const client = new ApiClient()

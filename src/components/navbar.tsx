@@ -10,7 +10,8 @@ import {
   LogOut,
   History,  
   Users,
-  Bug
+  Bug,
+  CheckCircle
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -53,6 +54,7 @@ export function Navbar() {
     { name: "Problemas", path: "/problemas", icon: Terminal },
     { name: "Ranking", path: "/ranking", icon: Trophy },
     ...(user ? [{ name: "Integrantes", path: "/authenticated/integrantes", icon: Users }] : []),
+    ...(user ? [{ name: "Chamadas", path: "/authenticated/chamada", icon: CheckCircle }] : []),
   ];
 
   const handleNavigation = (path: string) => {

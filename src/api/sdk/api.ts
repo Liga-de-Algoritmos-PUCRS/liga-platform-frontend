@@ -26,6 +26,19 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AttendRollCallDto
+ */
+export interface AttendRollCallDto {
+    /**
+     * UUID do QR Code gerado para a chamada
+     * @type {string}
+     * @memberof AttendRollCallDto
+     */
+    'uuid': string;
+}
+/**
+ * 
+ * @export
  * @interface CreateProblemDTO
  */
 export interface CreateProblemDTO {
@@ -83,6 +96,19 @@ export interface CreateProblemDTO {
      * @memberof CreateProblemDTO
      */
     'fixed'?: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface CreateRollCallDto
+ */
+export interface CreateRollCallDto {
+    /**
+     * Data da chamada no formato ISO 8601
+     * @type {string}
+     * @memberof CreateRollCallDto
+     */
+    'date': string;
 }
 /**
  * 
@@ -379,6 +405,44 @@ export interface ResetPasswordRequestResponseDTO {
 /**
  * 
  * @export
+ * @interface RollCallCountResponseDto
+ */
+export interface RollCallCountResponseDto {
+    /**
+     * Total de presenças registradas na chamada
+     * @type {number}
+     * @memberof RollCallCountResponseDto
+     */
+    'attendances': number;
+}
+/**
+ * 
+ * @export
+ * @interface RollCallSummaryResponseDto
+ */
+export interface RollCallSummaryResponseDto {
+    /**
+     * ID da chamada
+     * @type {string}
+     * @memberof RollCallSummaryResponseDto
+     */
+    'id': string;
+    /**
+     * Data da chamada no formato ISO 8601
+     * @type {string}
+     * @memberof RollCallSummaryResponseDto
+     */
+    'date': string;
+    /**
+     * Contagens agregadas da chamada
+     * @type {RollCallCountResponseDto}
+     * @memberof RollCallSummaryResponseDto
+     */
+    '_count': RollCallCountResponseDto;
+}
+/**
+ * 
+ * @export
  * @interface SignupRequestDTO
  */
 export interface SignupRequestDTO {
@@ -486,6 +550,25 @@ export interface SubmitResponseDTO {
      * @memberof SubmitResponseDTO
      */
     'createdAt': string;
+}
+/**
+ * 
+ * @export
+ * @interface UpdateAttendanceDto
+ */
+export interface UpdateAttendanceDto {
+    /**
+     * ID do usuário cuja presença será atualizada
+     * @type {string}
+     * @memberof UpdateAttendanceDto
+     */
+    'userId': string;
+    /**
+     * true para marcar como presente, false para marcar como ausente
+     * @type {boolean}
+     * @memberof UpdateAttendanceDto
+     */
+    'isPresent': boolean;
 }
 /**
  * 
@@ -2317,6 +2400,658 @@ export class ResetPasswordApi extends BaseAPI {
      */
     public resetPasswordControllerValidateResetPassword(validateResetPasswordDTO: ValidateResetPasswordDTO, options?: RawAxiosRequestConfig) {
         return ResetPasswordApiFp(this.configuration).resetPasswordControllerValidateResetPassword(validateResetPasswordDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * RollCallApi - axios parameter creator
+ * @export
+ */
+export const RollCallApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Registra a presença do usuário autenticado via QR Code.
+         * @summary Registrar presença
+         * @param {AttendRollCallDto} attendRollCallDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerAttend: async (attendRollCallDto: AttendRollCallDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'attendRollCallDto' is not null or undefined
+            assertParamExists('rollCallControllerAttend', 'attendRollCallDto', attendRollCallDto)
+            const localVarPath = `/roll-calls/attend`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(attendRollCallDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Cria uma nova chamada com a data informada. Acesso restrito a administradores.
+         * @summary Criar chamada
+         * @param {CreateRollCallDto} createRollCallDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerCreate: async (createRollCallDto: CreateRollCallDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createRollCallDto' is not null or undefined
+            assertParamExists('rollCallControllerCreate', 'createRollCallDto', createRollCallDto)
+            const localVarPath = `/roll-calls`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createRollCallDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retorna todas as chamadas com o total de presenças de cada uma. Acesso restrito a administradores.
+         * @summary Listar chamadas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerFindAll: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/roll-calls`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retorna os detalhes de uma chamada específica com a lista de presença de todos os usuários. Acesso restrito a administradores.
+         * @summary Detalhes de uma chamada
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerFindOne: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollCallControllerFindOne', 'id', id)
+            const localVarPath = `/roll-calls/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+         * @summary Gerar QR Code
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerGenerateQrCode: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollCallControllerGenerateQrCode', 'id', id)
+            const localVarPath = `/roll-calls/{id}/qr-code`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retorna o histórico de presenças do usuário autenticado.
+         * @summary Meu histórico de presenças
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerGetMyAttendances: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/roll-calls/my-attendances`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retorna estatísticas de presença de todos os usuários em todas as chamadas. Acesso restrito a administradores.
+         * @summary Visão geral de frequência
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerGetOverview: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/roll-calls/overview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Remove uma chamada e todas as presenças associadas. Acesso restrito a administradores.
+         * @summary Remover chamada
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerRemove: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollCallControllerRemove', 'id', id)
+            const localVarPath = `/roll-calls/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Permite que um administrador marque ou desmarque a presença de um usuário em uma chamada.
+         * @summary Atualizar presença manualmente
+         * @param {string} id 
+         * @param {UpdateAttendanceDto} updateAttendanceDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerUpdateAttendance: async (id: string, updateAttendanceDto: UpdateAttendanceDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollCallControllerUpdateAttendance', 'id', id)
+            // verify required parameter 'updateAttendanceDto' is not null or undefined
+            assertParamExists('rollCallControllerUpdateAttendance', 'updateAttendanceDto', updateAttendanceDto)
+            const localVarPath = `/roll-calls/{id}/attendance`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateAttendanceDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RollCallApi - functional programming interface
+ * @export
+ */
+export const RollCallApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RollCallApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Registra a presença do usuário autenticado via QR Code.
+         * @summary Registrar presença
+         * @param {AttendRollCallDto} attendRollCallDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerAttend(attendRollCallDto: AttendRollCallDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerAttend(attendRollCallDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerAttend']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Cria uma nova chamada com a data informada. Acesso restrito a administradores.
+         * @summary Criar chamada
+         * @param {CreateRollCallDto} createRollCallDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerCreate(createRollCallDto: CreateRollCallDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerCreate(createRollCallDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retorna todas as chamadas com o total de presenças de cada uma. Acesso restrito a administradores.
+         * @summary Listar chamadas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerFindAll(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RollCallSummaryResponseDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerFindAll(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerFindAll']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retorna os detalhes de uma chamada específica com a lista de presença de todos os usuários. Acesso restrito a administradores.
+         * @summary Detalhes de uma chamada
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerFindOne(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerFindOne(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerFindOne']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+         * @summary Gerar QR Code
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerGenerateQrCode(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerGenerateQrCode(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerGenerateQrCode']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retorna o histórico de presenças do usuário autenticado.
+         * @summary Meu histórico de presenças
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerGetMyAttendances(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerGetMyAttendances(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerGetMyAttendances']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retorna estatísticas de presença de todos os usuários em todas as chamadas. Acesso restrito a administradores.
+         * @summary Visão geral de frequência
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerGetOverview(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerGetOverview(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerGetOverview']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Remove uma chamada e todas as presenças associadas. Acesso restrito a administradores.
+         * @summary Remover chamada
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerRemove(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerRemove(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerRemove']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Permite que um administrador marque ou desmarque a presença de um usuário em uma chamada.
+         * @summary Atualizar presença manualmente
+         * @param {string} id 
+         * @param {UpdateAttendanceDto} updateAttendanceDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollCallControllerUpdateAttendance(id: string, updateAttendanceDto: UpdateAttendanceDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerUpdateAttendance(id, updateAttendanceDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerUpdateAttendance']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * RollCallApi - factory interface
+ * @export
+ */
+export const RollCallApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RollCallApiFp(configuration)
+    return {
+        /**
+         * Registra a presença do usuário autenticado via QR Code.
+         * @summary Registrar presença
+         * @param {AttendRollCallDto} attendRollCallDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerAttend(attendRollCallDto: AttendRollCallDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerAttend(attendRollCallDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Cria uma nova chamada com a data informada. Acesso restrito a administradores.
+         * @summary Criar chamada
+         * @param {CreateRollCallDto} createRollCallDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerCreate(createRollCallDto: CreateRollCallDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerCreate(createRollCallDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retorna todas as chamadas com o total de presenças de cada uma. Acesso restrito a administradores.
+         * @summary Listar chamadas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerFindAll(options?: RawAxiosRequestConfig): AxiosPromise<Array<RollCallSummaryResponseDto>> {
+            return localVarFp.rollCallControllerFindAll(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retorna os detalhes de uma chamada específica com a lista de presença de todos os usuários. Acesso restrito a administradores.
+         * @summary Detalhes de uma chamada
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerFindOne(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerFindOne(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+         * @summary Gerar QR Code
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerGenerateQrCode(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerGenerateQrCode(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retorna o histórico de presenças do usuário autenticado.
+         * @summary Meu histórico de presenças
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerGetMyAttendances(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerGetMyAttendances(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retorna estatísticas de presença de todos os usuários em todas as chamadas. Acesso restrito a administradores.
+         * @summary Visão geral de frequência
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerGetOverview(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerGetOverview(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Remove uma chamada e todas as presenças associadas. Acesso restrito a administradores.
+         * @summary Remover chamada
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerRemove(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerRemove(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Permite que um administrador marque ou desmarque a presença de um usuário em uma chamada.
+         * @summary Atualizar presença manualmente
+         * @param {string} id 
+         * @param {UpdateAttendanceDto} updateAttendanceDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollCallControllerUpdateAttendance(id: string, updateAttendanceDto: UpdateAttendanceDto, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.rollCallControllerUpdateAttendance(id, updateAttendanceDto, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RollCallApi - object-oriented interface
+ * @export
+ * @class RollCallApi
+ * @extends {BaseAPI}
+ */
+export class RollCallApi extends BaseAPI {
+    /**
+     * Registra a presença do usuário autenticado via QR Code.
+     * @summary Registrar presença
+     * @param {AttendRollCallDto} attendRollCallDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerAttend(attendRollCallDto: AttendRollCallDto, options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerAttend(attendRollCallDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Cria uma nova chamada com a data informada. Acesso restrito a administradores.
+     * @summary Criar chamada
+     * @param {CreateRollCallDto} createRollCallDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerCreate(createRollCallDto: CreateRollCallDto, options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerCreate(createRollCallDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retorna todas as chamadas com o total de presenças de cada uma. Acesso restrito a administradores.
+     * @summary Listar chamadas
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerFindAll(options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerFindAll(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retorna os detalhes de uma chamada específica com a lista de presença de todos os usuários. Acesso restrito a administradores.
+     * @summary Detalhes de uma chamada
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerFindOne(id: string, options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerFindOne(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+     * @summary Gerar QR Code
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerGenerateQrCode(id: string, options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerGenerateQrCode(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retorna o histórico de presenças do usuário autenticado.
+     * @summary Meu histórico de presenças
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerGetMyAttendances(options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerGetMyAttendances(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retorna estatísticas de presença de todos os usuários em todas as chamadas. Acesso restrito a administradores.
+     * @summary Visão geral de frequência
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerGetOverview(options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerGetOverview(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Remove uma chamada e todas as presenças associadas. Acesso restrito a administradores.
+     * @summary Remover chamada
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerRemove(id: string, options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerRemove(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Permite que um administrador marque ou desmarque a presença de um usuário em uma chamada.
+     * @summary Atualizar presença manualmente
+     * @param {string} id 
+     * @param {UpdateAttendanceDto} updateAttendanceDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollCallApi
+     */
+    public rollCallControllerUpdateAttendance(id: string, updateAttendanceDto: UpdateAttendanceDto, options?: RawAxiosRequestConfig) {
+        return RollCallApiFp(this.configuration).rollCallControllerUpdateAttendance(id, updateAttendanceDto, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
