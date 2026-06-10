@@ -1,9 +1,12 @@
 import axios from "axios"
+import { jwtDecode } from "jwt-decode"
 import { Configuration, UserApi, FileApi, LoginApi, ResetPasswordApi, SignupApi, ProblemsApi, SubmitApi, ReportBugApi, RollCallApi} from "./sdk"
 
 const BASE_URL = import.meta.env.VITE_API || "https://back.ligadealgoritmos.com"
 
-let accessToken: string = ""
+const TOKEN_STORAGE_KEY = "accessToken"
+
+let accessToken: string = localStorage.getItem(TOKEN_STORAGE_KEY) || ""
 
 export function setAccessToken(token: string) {
   accessToken = token
@@ -15,15 +18,72 @@ export function setUnauthenticatedHandler(handler: () => void) {
   onUnauthenticated = handler
 }
 
+export function isAuthError(error: unknown): boolean {
+  return (
+    axios.isAxiosError(error) &&
+    (error.response?.status === 401 || error.response?.status === 403)
+  )
+}
+
+const EXP_MARGIN_SECONDS = 30
+
+export function isTokenExpired(token: string): boolean {
+  try {
+    const { exp } = jwtDecode<{ exp?: number }>(token)
+    if (!exp) return false
+    return exp <= Date.now() / 1000 + EXP_MARGIN_SECONDS
+  } catch {
+    return true
+  }
+}
+
 const apiConfig = {
   baseURL: BASE_URL,
-  withCredentials: true, 
+  withCredentials: true,
 }
 
 const axiosInstance = axios.create(apiConfig)
 export const api = axiosInstance;
 
 export const rawAxios = axios.create(apiConfig)
+
+function clearSession() {
+  const hadToken = !!accessToken
+  setAccessToken("")
+  localStorage.removeItem(TOKEN_STORAGE_KEY)
+  if (hadToken && onUnauthenticated) onUnauthenticated()
+}
+
+let refreshPromise: Promise<string> | null = null
+
+// Single-flight: requisições concorrentes que tomaram 401 compartilham o mesmo
+// refresh — o backend rotaciona o token, então refreshes paralelos com o mesmo
+// cookie derrubariam a sessão.
+export function refreshAccessToken(): Promise<string> {
+  if (!refreshPromise) {
+    refreshPromise = rawAxios
+      .post("/auth/refresh")
+      .then(res => {
+        const { accessToken: newAccess } = res.data
+
+        setAccessToken(newAccess)
+        localStorage.setItem(TOKEN_STORAGE_KEY, newAccess)
+        return newAccess as string
+      })
+      .catch(err => {
+        // Só rejeição real do refresh token encerra a sessão; erro de
+        // rede/5xx não desloga.
+        if (isAuthError(err)) {
+          clearSession()
+        }
+        throw err
+      })
+      .finally(() => {
+        refreshPromise = null
+      })
+  }
+  return refreshPromise
+}
 
 axiosInstance.interceptors.request.use(config => {
   if (accessToken) {
@@ -38,31 +98,21 @@ axiosInstance.interceptors.response.use(
   async error => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && originalRequest) {
       if (originalRequest._retry) {
-        setAccessToken("")
-        localStorage.removeItem("accessToken")
-        if (onUnauthenticated) onUnauthenticated()
+        clearSession()
         return Promise.reject(error)
       }
 
       originalRequest._retry = true
 
       try {
-        const refreshRes = await rawAxios.post("/auth/refresh")
-        
-        const { accessToken: newAccess } = refreshRes.data
-
-        setAccessToken(newAccess)
-        localStorage.setItem("accessToken", newAccess)
+        const newAccess = await refreshAccessToken()
 
         originalRequest.headers["Authorization"] = `Bearer ${newAccess}`
         return axiosInstance(originalRequest)
-      } catch (err) {
-        setAccessToken("")
-        localStorage.removeItem("accessToken")
-        if (onUnauthenticated) onUnauthenticated()
-        return Promise.reject(err)
+      } catch {
+        return Promise.reject(error)
       }
     }
 

@@ -105,8 +105,13 @@ export function ProfilePage() {
       });
       toast.success("Perfil atualizado com sucesso!");
       setIsEditing(false);
-      await refetchUser();
-    } catch (error) { 
+      try {
+        await refetchUser();
+      } catch (refetchError) {
+        // O update já foi salvo; falha só na re-sincronização do perfil
+        console.error(refetchError);
+      }
+    } catch (error) {
       toast.error("Erro ao guardar as alterações.");
       console.error(error);
     } finally {
