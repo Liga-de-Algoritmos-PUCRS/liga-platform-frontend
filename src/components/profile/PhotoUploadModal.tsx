@@ -33,8 +33,13 @@ export function PhotoUploadModal({ isOpen, onClose, type, user }: PhotoUploadMod
         : { bannerUrl: imageUrl };
       
       await client.user.userControllerUpdateUser(user.id, updatePayload);
-      
-      await refetchUser();
+
+      try {
+        await refetchUser();
+      } catch (refetchError) {
+        // O upload já foi salvo; falha só na re-sincronização do perfil
+        console.error(refetchError);
+      }
 
       toast.success(`${type === 'avatar' ? 'Foto de perfil' : 'Banner'} atualizado!`);
       onClose();
