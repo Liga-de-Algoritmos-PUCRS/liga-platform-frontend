@@ -66,7 +66,7 @@ export function FooterSection() {
         <div className="flex flex-col items-center gap-2 text-[10px] md:text-xs text-muted-foreground font-mono opacity-60">
           <p>© {currentYear} Liga de Algoritmos PUCRS.</p>
           <span className="hover:text-primary transition-colors cursor-default">
-            Desenvolvido com 💜 por Bernardo Kirsch e Guilherme Cassol
+          Desenvolvido com 💜 por Bernardo Kirsch, Guilherme Cassol e Renan Bernardo
           </span>
         </div>
         
