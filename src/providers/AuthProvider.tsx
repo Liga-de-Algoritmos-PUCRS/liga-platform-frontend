@@ -47,35 +47,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
   }, [])
 
+  // Encerra a sessão só nesta aba. Usado quando o backend já rejeitou as
+  // credenciais: não há o que revogar, e chamar /auth/logout aqui revogaria os
+  // refresh tokens do usuário em todos os dispositivos.
+  const clearLocalSession = useCallback(() => {
+    setAccessToken("")
+    localStorage.removeItem(TOKEN_STORAGE_KEY)
+    localStorage.removeItem(USER_STORAGE_KEY)
+    setUser(null)
+  }, [])
+
   const logout = useCallback(async () => {
     try {
       await client.login.loginControllerLogout()
     } catch (err) {
       console.error("Erro no logout backend:", err)
     } finally {
-      setAccessToken("")
-      localStorage.removeItem(TOKEN_STORAGE_KEY)
-      localStorage.removeItem(USER_STORAGE_KEY)
-      setUser(null)
+      clearLocalSession()
     }
-  }, [])
+  }, [clearLocalSession])
 
   const syncUser = useCallback(async () => {
     try {
       await fetchUserWithAccount()
     } catch (error) {
       if (isAuthError(error)) {
-        await logout()
+        clearLocalSession()
       } else {
         // Erro de rede/5xx: mantém o usuário do cache
         console.error("Falha ao sincronizar usuário:", error)
       }
     }
-  }, [fetchUserWithAccount, logout])
+  }, [fetchUserWithAccount, clearLocalSession])
 
   useEffect(() => {
+    // Dispara quando o refresh token é rejeitado pelo backend. Limpa só esta
+    // aba: um /auth/logout aqui derrubaria as outras abas e dispositivos.
     setUnauthenticatedHandler(() => {
-      logout()
+      clearLocalSession()
     })
 
     const initAuth = async () => {
