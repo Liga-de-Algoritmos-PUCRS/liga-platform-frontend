@@ -189,6 +189,8 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
                 <Input
                   id="initialPoints"
                   type="number"
+                  min="0"
+                  step="1"
                   value={formData.initialPoints}
                   onChange={(e) => setFormData({...formData, initialPoints: Number(e.target.value)})}
                   className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"
@@ -204,6 +206,8 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
                 <Input
                   id="floorPoints"
                   type="number"
+                  min="0"
+                  step="1"
                   value={formData.floorPoints}
                   onChange={(e) => setFormData({...formData, floorPoints: Number(e.target.value)})}
                   className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"
@@ -219,6 +223,8 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
                 <Input
                   id="decrement"
                   type="number"
+                  min="0"
+                  step="1"
                   value={formData.decrement}
                   onChange={(e) => setFormData({...formData, decrement: Number(e.target.value)})}
                   className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"

@@ -61,6 +61,6 @@ export function hasScoringErrors(errors: ScoringErrors): boolean {
   return Object.keys(errors).length > 0;
 }
 
-/** Texto do `?` na tela do problema e do hover da coluna do catálogo admin. */
+/** Texto do `?` na tela do problema e do hover do valor corrente no card. */
 export const CURRENT_VALUE_HINT =
   "Este é o valor de agora: o próximo aluno a resolver leva esses pontos, e o problema vale menos a cada aluno que resolve.";

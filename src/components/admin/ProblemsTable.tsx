@@ -66,10 +66,13 @@ export function ProblemsTable() {
 
   // O valor corrente (`points`) não é editável no formulário: só o botão
   // "Reiniciar corrida" mexe nele. Mandá-lo junto brigaria com o clamp do back.
+  // O fallback sai do problema que está aberto, não dos defaults: cair nos
+  // defaults gravaria 100/70/5 em cima da configuração real do problema.
   const editScoring = {
-    initialPoints: editFormData.initialPoints ?? DEFAULT_INITIAL_POINTS,
-    floorPoints: editFormData.floorPoints ?? DEFAULT_FLOOR_POINTS,
-    decrement: editFormData.decrement ?? DEFAULT_DECREMENT,
+    initialPoints:
+      editFormData.initialPoints ?? editingProblem?.initialPoints ?? DEFAULT_INITIAL_POINTS,
+    floorPoints: editFormData.floorPoints ?? editingProblem?.floorPoints ?? DEFAULT_FLOOR_POINTS,
+    decrement: editFormData.decrement ?? editingProblem?.decrement ?? DEFAULT_DECREMENT,
   };
 
   const handleUpdateProblem = async (e: React.FormEvent) => {
@@ -337,6 +340,8 @@ export function ProblemsTable() {
                   <Input
                     id="edit-initialPoints"
                     type="number"
+                    min="0"
+                    step="1"
                     value={editScoring.initialPoints}
                     onChange={(e) => setEditFormData({...editFormData, initialPoints: Number(e.target.value)})}
                     className="bg-white/5 border-white/10"
@@ -350,6 +355,8 @@ export function ProblemsTable() {
                   <Input
                     id="edit-floorPoints"
                     type="number"
+                    min="0"
+                    step="1"
                     value={editScoring.floorPoints}
                     onChange={(e) => setEditFormData({...editFormData, floorPoints: Number(e.target.value)})}
                     className="bg-white/5 border-white/10"
@@ -363,6 +370,8 @@ export function ProblemsTable() {
                   <Input
                     id="edit-decrement"
                     type="number"
+                    min="0"
+                    step="1"
                     value={editScoring.decrement}
                     onChange={(e) => setEditFormData({...editFormData, decrement: Number(e.target.value)})}
                     className="bg-white/5 border-white/10"

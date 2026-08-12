@@ -21,6 +21,30 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm"; 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
+/**
+ * Por que o envio falhou — nunca por que a resposta está errada. Os três casos
+ * pedem textos diferentes: falar de ligação num 401 é mentir para o aluno.
+ */
+type SubmitFailure = 'network' | 'expired' | 'rejected';
+
+function classifySubmitFailure(error: unknown): SubmitFailure {
+  if (!isAxiosError(error)) return 'network';
+  const status = error.response?.status;
+  // Sem `response` é rede caída/timeout; 5xx é o servidor de pé mas quebrado.
+  if (status === undefined || status >= 500) return 'network';
+  if (status === 401) return 'expired';
+  return 'rejected';
+}
+
+const SUBMIT_FAILURE_MESSAGE: Record<SubmitFailure, string> = {
+  network:
+    "Não conseguimos enviar a sua resposta. Isto não é um erro na resposta — verifique a ligação e tente de novo.",
+  expired:
+    "A sua sessão expirou antes de o envio chegar. Isto não é um erro na resposta — entre de novo e reenvie.",
+  rejected:
+    "O servidor recusou o envio. Isto não é um erro na resposta — recarregue a página e tente de novo.",
+};
+
 export function ProblemDetailsPage() {
   const { problemId } = useParams({ strict: false });
   const navigate = useNavigate();
@@ -39,7 +63,7 @@ export function ProblemDetailsPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showAlreadySolvedModal, setShowAlreadySolvedModal] = useState(false);
-  const [showNetworkErrorModal, setShowNetworkErrorModal] = useState(false);
+  const [submitFailure, setSubmitFailure] = useState<SubmitFailure | null>(null);
   const [earnedPoints, setEarnedPoints] = useState(0);
 
   // O admin recebe um superconjunto do payload público, então a mesma variável
@@ -144,7 +168,7 @@ export function ProblemDetailsPage() {
         setUserAnswer("");
         invalidateAfterSubmit();
       } else {
-        setShowNetworkErrorModal(true);
+        setSubmitFailure(classifySubmitFailure(error));
       }
     } finally {
       setIsSubmitting(false);
@@ -369,7 +393,7 @@ export function ProblemDetailsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showNetworkErrorModal} onOpenChange={setShowNetworkErrorModal}>
+      <Dialog open={!!submitFailure} onOpenChange={(open) => !open && setSubmitFailure(null)}>
         <DialogContent className="bg-[#0a0a0b] border-amber-500/30 text-white max-w-sm rounded-[32px]">
           <DialogHeader className="flex flex-col items-center gap-4">
             <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-2xl shadow-amber-500/20">
@@ -377,11 +401,11 @@ export function ProblemDetailsPage() {
             </div>
             <DialogTitle className="text-2xl font-black tracking-tighter text-amber-400 text-center">FALHA AO ENVIAR</DialogTitle>
             <DialogDescription className="text-center text-gray-400 font-medium">
-              Não conseguimos enviar a sua resposta. Isto não é um erro na resposta — verifique a ligação e tente de novo.
+              {submitFailure ? SUBMIT_FAILURE_MESSAGE[submitFailure] : ""}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
-            <Button onClick={() => setShowNetworkErrorModal(false)} className="w-full rounded-2xl bg-amber-600 hover:bg-amber-500 font-bold">Tentar de Novo</Button>
+            <Button onClick={() => setSubmitFailure(null)} className="w-full rounded-2xl bg-amber-600 hover:bg-amber-500 font-bold">Tentar de Novo</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
