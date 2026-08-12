@@ -26,25 +26,20 @@ export function RankingPage() {
 
   const fetchRankings = useCallback(async () => {
     setIsLoading(true);
-    let isMounted = true;
-    
+
     try {
       const [monthlyResponse, allTimeResponse] = await Promise.all([
         client.user.userControllerGetMonthlyTopUsers(),
         client.user.userControllerGetTopUsers(),
       ]);
 
-      if (isMounted) {
-        setMonthlyUsers(monthlyResponse.data as PublicUserResponseDTO[]);
-        setAllTimeUsers(allTimeResponse.data as PublicUserResponseDTO[]);
-      }
+      setMonthlyUsers(monthlyResponse.data);
+      setAllTimeUsers(allTimeResponse.data);
     } catch (error) {
-      if (isMounted) console.error("Erro ao buscar dados do ranking:", error);
+      console.error("Erro ao buscar dados do ranking:", error);
     } finally {
-      if (isMounted) setIsLoading(false);
+      setIsLoading(false);
     }
-
-    return () => { isMounted = false };
   }, []);
 
   useEffect(() => {
@@ -146,8 +141,9 @@ export function RankingPage() {
                <Loader2 className="animate-spin text-primary" size={48} />
              </div>
           ) : (
-            <RankingTable 
-              data={currentData} 
+            <RankingTable
+              data={currentData}
+              pointsField={view === "monthly" ? "monthlyPoints" : "allTimePoints"}
               onUserClick={handleUserClick}
             />
           )}

@@ -4,11 +4,15 @@ import { cn } from "@/lib/utils"
 import { PublicUserResponseDTO } from "@/api/sdk";
 
 interface RankingTableProps {
-  data: Partial<PublicUserResponseDTO>[]; 
+  data: PublicUserResponseDTO[];
+  // Qual pontuação a coluna mostra. O back ordena a aba mensal por
+  // monthlyPoints e a geral por allTimePoints: sem escolher o campo aqui, a aba
+  // mensal exibia o total de quem tivesse allTimePoints > 0.
+  pointsField: "monthlyPoints" | "allTimePoints";
   onUserClick: (user: PublicUserResponseDTO) => void;
 }
 
-export function RankingTable({ data, onUserClick }: RankingTableProps) {
+export function RankingTable({ data, pointsField, onUserClick }: RankingTableProps) {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1: return <Trophy className="text-yellow-400" size={20} />;
@@ -47,13 +51,13 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
                   </td>
                   <td 
                     className="px-6 py-4 cursor-pointer"
-                    onClick={() => onUserClick(user as PublicUserResponseDTO)}
+                    onClick={() => onUserClick(user)}
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 border border-white/10 group-hover:border-primary/50 transition-colors">
                         <AvatarImage src={user.avatarUrl || ""}  className="object-cover"/>
                         <AvatarFallback className="bg-secondary text-[10px]">
-                          {user.name?.substring(0, 2).toUpperCase()}
+                          {user.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
@@ -66,7 +70,7 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <span className="font-mono font-bold text-primary text-lg">
-                      {(user.allTimePoints || user.monthlyPoints || 0).toLocaleString()}
+                      {(user[pointsField] ?? 0).toLocaleString()}
                     </span>
                   </td>
                 </tr>
