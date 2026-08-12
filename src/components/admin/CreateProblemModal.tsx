@@ -8,6 +8,14 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import client from "@/api/client";
 import { CreateProblemDTO } from "@/api/sdk";
+import {
+  DEFAULT_DECREMENT,
+  DEFAULT_FLOOR_POINTS,
+  DEFAULT_INITIAL_POINTS,
+  hasScoringErrors,
+  validateScoring,
+  type ScoringErrors,
+} from "@/lib/problem-scoring";
 
 interface CreateProblemModalProps {
   isOpen: boolean;
@@ -19,22 +27,32 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   
-  const [formData, setFormData] = useState({
+  const [scoringErrors, setScoringErrors] = useState<ScoringErrors>({});
+
+  const emptyForm = {
     title: "",
     description: "",
     difficulty: "EASY",
-    points: 0,
+    initialPoints: DEFAULT_INITIAL_POINTS,
+    floorPoints: DEFAULT_FLOOR_POINTS,
+    decrement: DEFAULT_DECREMENT,
     input: "",
     answer: ""
-  });
+  };
+
+  const [formData, setFormData] = useState(emptyForm);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.description || !formData.input || !formData.answer) {
       toast.error("Por favor, preenche todos os campos obrigatórios.");
       return;
     }
+
+    const errors = validateScoring(formData);
+    setScoringErrors(errors);
+    if (hasScoringErrors(errors)) return;
 
     setIsSubmitting(true);
     try {
@@ -51,7 +69,9 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
         title: formData.title,
         description: formData.description,
         difficulty: formData.difficulty,
-        points: Number(formData.points),
+        initialPoints: formData.initialPoints,
+        floorPoints: formData.floorPoints,
+        decrement: formData.decrement,
         input: formData.input,
         answer: formData.answer,
         bannerUrl: bannerUrl, 
@@ -65,7 +85,8 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
       
       toast.success("Problema criado com sucesso!");
       
-      setFormData({ title: "", description: "", difficulty: "EASY", points: 0, input: "", answer: "" });
+      setFormData(emptyForm);
+      setScoringErrors({});
       setBannerFile(null);
       
       onSuccess(); 
@@ -140,32 +161,79 @@ export function CreateProblemModal({ isOpen, onClose, onSuccess }: CreateProblem
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="difficulty" className="text-gray-400">Dificuldade *</Label>
-              <select
-                id="difficulty"
-                value={formData.difficulty}
-                onChange={(e) => setFormData({...formData, difficulty: e.target.value})}
-                className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-              >
-                <option value="EASY" className="bg-[#0a0a0b] text-emerald-400">Fácil</option>
-                <option value="MEDIUM" className="bg-[#0a0a0b] text-amber-400">Médio</option>
-                <option value="HARD" className="bg-[#0a0a0b] text-red-400">Difícil</option>
-              </select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="difficulty" className="text-gray-400">Dificuldade *</Label>
+            <select
+              id="difficulty"
+              value={formData.difficulty}
+              onChange={(e) => setFormData({...formData, difficulty: e.target.value})}
+              className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+            >
+              <option value="EASY" className="bg-[#0a0a0b] text-emerald-400">Fácil</option>
+              <option value="MEDIUM" className="bg-[#0a0a0b] text-amber-400">Médio</option>
+              <option value="HARD" className="bg-[#0a0a0b] text-red-400">Difícil</option>
+            </select>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="points" className="text-gray-400">Pontuação *</Label>
-              <Input 
-                id="points" 
-                type="number"
-                min="0"
-                value={formData.points} 
-                onChange={(e) => setFormData({...formData, points: Number(e.target.value)})}
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-primary" 
-                required
-              />
+          <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div>
+              <Label className="text-gray-300 font-bold">Pontuação da corrida</Label>
+              <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+                O problema começa valendo o valor inicial e perde o decremento a cada aluno
+                que o resolve, até parar no piso.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="initialPoints" className="text-gray-400 text-xs">Valor inicial *</Label>
+                <Input
+                  id="initialPoints"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.initialPoints}
+                  onChange={(e) => setFormData({...formData, initialPoints: Number(e.target.value)})}
+                  className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"
+                  required
+                />
+                {scoringErrors.initialPoints && (
+                  <p className="text-[11px] text-red-400 font-medium">{scoringErrors.initialPoints}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="floorPoints" className="text-gray-400 text-xs">Piso *</Label>
+                <Input
+                  id="floorPoints"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.floorPoints}
+                  onChange={(e) => setFormData({...formData, floorPoints: Number(e.target.value)})}
+                  className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"
+                  required
+                />
+                {scoringErrors.floorPoints && (
+                  <p className="text-[11px] text-red-400 font-medium">{scoringErrors.floorPoints}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="decrement" className="text-gray-400 text-xs">Decremento *</Label>
+                <Input
+                  id="decrement"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.decrement}
+                  onChange={(e) => setFormData({...formData, decrement: Number(e.target.value)})}
+                  className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"
+                  required
+                />
+                {scoringErrors.decrement && (
+                  <p className="text-[11px] text-red-400 font-medium">{scoringErrors.decrement}</p>
+                )}
+              </div>
             </div>
           </div>
 

@@ -9,15 +9,17 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import client from "@/api/client";
-import { ProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
+import { PublicProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import { useAuth } from "@/providers/AuthProvider";
 
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 
+const POINTS_SLIDER_STEP = 10;
+
 export function ProblemsPage() {
-  const [, setSelectedProblem] = useState<ProblemResponseDTO | null>(null);
+  const [, setSelectedProblem] = useState<PublicProblemResponseDTO | null>(null);
   const { user, isAuthenticated } = useAuth();
   
   const [nameFilter, setNameFilter] = useState("");
@@ -40,16 +42,34 @@ export function ProblemsPage() {
     staleTime: 1000 * 60 * 2,
   });
 
-  const problems = useMemo(() => (problemsResponse?.data as ProblemResponseDTO[]) || [], [problemsResponse?.data]);
+  const problems = useMemo(() => (problemsResponse?.data as PublicProblemResponseDTO[]) || [], [problemsResponse?.data]);
   const isLoading = isLoadingProblems || (isAuthenticated && isLoadingSubmissions);
 
-  const userFinishedIds = useMemo(() => {
-    if (!submissionsResponse?.data) return new Set<string>();
-    const finished = (submissionsResponse.data as SubmitResponseDTO[])
-      .filter(s => s.isFinished)
-      .map(s => s.problemId);
-    return new Set(finished as string[]);
-  }, [submissionsResponse?.data]);
+  // Mapa em vez de conjunto: o card do problema resolvido mostra os pontos que o
+  // aluno congelou no acerto, não o valor corrente.
+  const userEarnedByProblem = useMemo(
+    () =>
+      new Map<string, number>(
+        ((submissionsResponse?.data as SubmitResponseDTO[]) || [])
+          .filter(s => s.isFinished && s.problemId)
+          .map(s => [String(s.problemId), s.pointsEarned ?? 0])
+      ),
+    [submissionsResponse?.data]
+  );
+
+  // O teto do filtro sai do próprio catálogo: com um número fixo, um problema
+  // que valha mais do que ele fica fora do alcance do slider.
+  const pointsSliderMax = useMemo(() => {
+    const highest = problems.reduce((max, p) => Math.max(max, p.points || 0), 0);
+    return Math.max(
+      POINTS_SLIDER_STEP,
+      Math.ceil(highest / POINTS_SLIDER_STEP) * POINTS_SLIDER_STEP
+    );
+  }, [problems]);
+
+  // O catálogo pode encolher depois de o aluno arrastar o slider; sem o clamp,
+  // um mínimo acima do teto novo esconderia todos os problemas.
+  const effectiveMinPoints = Math.min(minPoints, pointsSliderMax);
 
   const filteredProblems = useMemo(() => {
     return problems.filter(p => {
@@ -57,13 +77,13 @@ export function ProblemsPage() {
       const id = p.id || "";
       const diff = p.difficulty || "MEDIUM";
       const pts = p.points || 0;
-      const isDone = userFinishedIds.has(id);
+      const isDone = userEarnedByProblem.has(id);
 
       const matchesName = title.toLowerCase().includes(nameFilter.toLowerCase());
       const matchesId = id.toLowerCase().includes(idFilter.toLowerCase()) || 
                         id.toLowerCase().includes(`#${idFilter.toLowerCase()}`);
       const matchesDifficulty = difficultyFilter === "ALL" || diff === difficultyFilter;
-      const matchesPoints = pts >= minPoints;
+      const matchesPoints = pts >= effectiveMinPoints;
       const matchesStatus = 
         statusFilter === "ALL" || 
         (statusFilter === "DONE" && isDone) || 
@@ -71,7 +91,7 @@ export function ProblemsPage() {
 
       return matchesName && matchesId && matchesDifficulty && matchesPoints && matchesStatus;
     });
-  }, [problems, nameFilter, idFilter, difficultyFilter, minPoints, statusFilter, userFinishedIds]);
+  }, [problems, nameFilter, idFilter, difficultyFilter, effectiveMinPoints, statusFilter, userEarnedByProblem]);
 
   const clearFilters = () => {
     setNameFilter("");
@@ -117,7 +137,7 @@ export function ProblemsPage() {
                   <Terminal className="text-primary mt-0.5 shrink-0" size={20} />
                   <div>
                     <h4 className="font-bold text-white">Desafios de Código</h4>
-                    <p className="text-gray-400 mt-1 leading-relaxed">Explore nossa biblioteca de problemas. Eles variam em dificuldade (EASY, MEDIUM, HARD) e pontuação.</p>
+                    <p className="text-gray-400 mt-1 leading-relaxed">Explore nossa biblioteca de problemas. Eles variam em dificuldade (EASY, MEDIUM, HARD) e no quanto valem agora.</p>
                   </div>
                 </div>
                 <div className="flex gap-4 items-start">
@@ -130,8 +150,13 @@ export function ProblemsPage() {
                 <div className="flex gap-4 items-start">
                   <Trophy className="text-primary mt-0.5 shrink-0" size={20} />
                   <div>
-                    <h4 className="font-bold text-white">Pontuação e Ranking</h4>
-                    <p className="text-gray-400 mt-1 leading-relaxed">Resolva os algoritmos, submeta o seu código e acumule pontos para subir posições no ranking geral da plataforma.</p>
+                    <h4 className="font-bold text-white">Corrida por Pontos</h4>
+                    <p className="text-gray-400 mt-1 leading-relaxed">
+                      O número no card é quanto o problema vale <strong className="text-white">agora</strong>: quem resolver
+                      primeiro leva mais. A cada aluno que acerta, o problema passa a valer menos, até parar num valor
+                      mínimo. Você fica com a pontuação do momento em que acertou, e ela não muda depois.
+                      Errar não custa pontos — pode tentar quantas vezes precisar. Cada desafio conta uma vez só.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -239,14 +264,14 @@ export function ProblemsPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">
                   <Trophy size={12} />
-                  Mínimo de Pontos: <span className="text-primary">{minPoints}</span>
+                  Mínimo de Pontos: <span className="text-primary">{effectiveMinPoints}</span>
                 </div>
-                <input 
+                <input
                   type="range"
-                  min="0"
-                  max="500"
-                  step="50"
-                  value={minPoints}
+                  min={0}
+                  max={pointsSliderMax}
+                  step={POINTS_SLIDER_STEP}
+                  value={effectiveMinPoints}
                   onChange={(e) => setMinPoints(Number(e.target.value))}
                   className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
                 />
@@ -293,7 +318,8 @@ export function ProblemsPage() {
                     <ProblemCard 
                       key={problem.id} 
                       problem={problem} 
-                      isFinished={userFinishedIds.has(problem.id || "")}
+                      isFinished={userEarnedByProblem.has(problem.id || "")}
+                      pointsEarned={userEarnedByProblem.get(problem.id || "")}
                       onClick={setSelectedProblem} 
                     />
                   ))}
@@ -315,7 +341,8 @@ export function ProblemsPage() {
                     <ProblemCard 
                       key={problem.id} 
                       problem={problem} 
-                      isFinished={userFinishedIds.has(problem.id || "")}
+                      isFinished={userEarnedByProblem.has(problem.id || "")}
+                      pointsEarned={userEarnedByProblem.get(problem.id || "")}
                       onClick={setSelectedProblem} 
                     />
                   ))}

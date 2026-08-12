@@ -1,4 +1,4 @@
-# ProblemResponseDTO
+# PublicProblemResponseDTO
 
 
 ## Properties
@@ -19,16 +19,13 @@ Name | Type | Description | Notes
 **submissions** | **number** | Number of submissions for the problem | [default to undefined]
 **fixed** | **boolean** | Problem fixed | [default to undefined]
 **archived** | **boolean** | Problem archived | [optional] [default to undefined]
-**initialPoints** | **number** | Value the problem starts at, and the ceiling of the current value. | [default to undefined]
-**floorPoints** | **number** | Floor of the current value: solving never lowers the problem below it. | [default to undefined]
-**decrement** | **number** | How much the current value drops for each distinct student who solves it. | [default to undefined]
 
 ## Example
 
 ```typescript
-import { ProblemResponseDTO } from './api';
+import { PublicProblemResponseDTO } from './api';
 
-const instance: ProblemResponseDTO = {
+const instance: PublicProblemResponseDTO = {
     id,
     title,
     description,
@@ -43,9 +40,6 @@ const instance: ProblemResponseDTO = {
     submissions,
     fixed,
     archived,
-    initialPoints,
-    floorPoints,
-    decrement,
 };
 ```
 

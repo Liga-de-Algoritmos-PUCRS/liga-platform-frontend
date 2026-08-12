@@ -220,7 +220,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **problemControllerGetAllProblems**
-> Array<ProblemResponseDTO> problemControllerGetAllProblems()
+> Array<PublicProblemResponseDTO> problemControllerGetAllProblems()
 
 This endpoint retrieves a list of all problems in the system.
 
@@ -244,7 +244,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**Array<ProblemResponseDTO>**
+**Array<PublicProblemResponseDTO>**
 
 ### Authorization
 
@@ -264,7 +264,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **problemControllerGetProblemById**
-> ProblemResponseDTO problemControllerGetProblemById()
+> PublicProblemResponseDTO problemControllerGetProblemById()
 
 This endpoint retrieves a problem by its ID.
 
@@ -295,7 +295,7 @@ const { status, data } = await apiInstance.problemControllerGetProblemById(
 
 ### Return type
 
-**ProblemResponseDTO**
+**PublicProblemResponseDTO**
 
 ### Authorization
 

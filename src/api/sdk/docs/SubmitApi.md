@@ -13,7 +13,7 @@ All URIs are relative to *http://localhost*
 # **submitControllerCreateSubmit**
 > SubmitResponseDTO submitControllerCreateSubmit(createSubmitDTO)
 
-This endpoint allows you to create a new submit
+Submits an answer to a problem. A wrong answer only counts an attempt and costs nothing. A right answer earns the current value of the problem, frozen at that instant, and lowers that value for the next solver. Each student can only solve a given problem once.
 
 ### Example
 
@@ -60,6 +60,7 @@ No authorization required
 |-------------|-------------|------------------|
 |**201** | Submit created successfully |  -  |
 |**400** | Bad Request. The input data is invalid or missing. |  -  |
+|**409** | Conflict. The requester has already solved this problem, so nothing is credited. |  -  |
 |**500** | Internal Server Error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

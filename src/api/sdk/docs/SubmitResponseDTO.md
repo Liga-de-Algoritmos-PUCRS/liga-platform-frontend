@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **id** | **string** | Submit ID | [default to undefined]
 **problemId** | **string** | Problem ID | [default to undefined]
 **userId** | **string** | User ID | [default to undefined]
-**pointsEarned** | **number** | Points Earned | [default to undefined]
+**pointsEarned** | **number** | Points earned, frozen at the instant the problem was solved. Stays &#x60;0&#x60; while the problem has not been solved. | [default to undefined]
 **attempts** | **number** | Attempts | [default to undefined]
 **isFinished** | **boolean** | Is Finished | [default to undefined]
 **updatedAt** | **string** | Updated At | [optional] [default to undefined]

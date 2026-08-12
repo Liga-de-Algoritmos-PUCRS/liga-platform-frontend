@@ -73,11 +73,29 @@ export interface CreateProblemDTO {
      */
     'input': string;
     /**
-     * Problem points
+     * Current value of the problem: how many points the next solver earns. Optional — defaults to `initialPoints`. When sent, it is clamped to [floorPoints, initialPoints].
      * @type {number}
      * @memberof CreateProblemDTO
      */
-    'points': number;
+    'points'?: number;
+    /**
+     * Value the problem starts at, and the ceiling of the current value.
+     * @type {number}
+     * @memberof CreateProblemDTO
+     */
+    'initialPoints'?: number;
+    /**
+     * Floor of the current value: once it is reached, solving no longer lowers the problem. Must be less than or equal to `initialPoints`.
+     * @type {number}
+     * @memberof CreateProblemDTO
+     */
+    'floorPoints'?: number;
+    /**
+     * How much the current value drops for each distinct student who solves it.
+     * @type {number}
+     * @memberof CreateProblemDTO
+     */
+    'decrement'?: number;
     /**
      * Problem banner URL
      * @type {string}
@@ -278,7 +296,7 @@ export interface ProblemResponseDTO {
      */
     'input': string;
     /**
-     * Problem points
+     * Current value of the problem: how many points the next solver earns.
      * @type {number}
      * @memberof ProblemResponseDTO
      */
@@ -323,6 +341,115 @@ export interface ProblemResponseDTO {
      * Problem archived
      * @type {boolean}
      * @memberof ProblemResponseDTO
+     */
+    'archived'?: boolean;
+    /**
+     * Value the problem starts at, and the ceiling of the current value.
+     * @type {number}
+     * @memberof ProblemResponseDTO
+     */
+    'initialPoints': number;
+    /**
+     * Floor of the current value: solving never lowers the problem below it.
+     * @type {number}
+     * @memberof ProblemResponseDTO
+     */
+    'floorPoints': number;
+    /**
+     * How much the current value drops for each distinct student who solves it.
+     * @type {number}
+     * @memberof ProblemResponseDTO
+     */
+    'decrement': number;
+}
+/**
+ * 
+ * @export
+ * @interface PublicProblemResponseDTO
+ */
+export interface PublicProblemResponseDTO {
+    /**
+     * Problem ID
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'id': string;
+    /**
+     * Problem title
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'title': string;
+    /**
+     * Problem description
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'description': string;
+    /**
+     * Problem difficulty
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'difficulty': string;
+    /**
+     * Problem answer
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'answer': string;
+    /**
+     * Problem input
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'input': string;
+    /**
+     * Current value of the problem: how many points the next solver earns.
+     * @type {number}
+     * @memberof PublicProblemResponseDTO
+     */
+    'points': number;
+    /**
+     * Problem banner URL
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'bannerUrl'?: string;
+    /**
+     * Problem creation date
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'updatedAt': string;
+    /**
+     * Problem creation date
+     * @type {string}
+     * @memberof PublicProblemResponseDTO
+     */
+    'createdAt': string;
+    /**
+     * Number of users who have resolved the problem
+     * @type {number}
+     * @memberof PublicProblemResponseDTO
+     */
+    'resolved': number;
+    /**
+     * Number of submissions for the problem
+     * @type {number}
+     * @memberof PublicProblemResponseDTO
+     */
+    'submissions': number;
+    /**
+     * Problem fixed
+     * @type {boolean}
+     * @memberof PublicProblemResponseDTO
+     */
+    'fixed': boolean;
+    /**
+     * Problem archived
+     * @type {boolean}
+     * @memberof PublicProblemResponseDTO
      */
     'archived'?: boolean;
 }
@@ -620,7 +747,7 @@ export interface SubmitResponseDTO {
      */
     'userId': string;
     /**
-     * Points Earned
+     * Points earned, frozen at the instant the problem was solved. Stays `0` while the problem has not been solved.
      * @type {number}
      * @memberof SubmitResponseDTO
      */
@@ -743,11 +870,29 @@ export interface UpdateProblemDTO {
      */
     'input'?: string;
     /**
-     * Problem points
+     * Current value of the problem: how many points the next solver earns. Optional — defaults to `initialPoints`. When sent, it is clamped to [floorPoints, initialPoints].
      * @type {number}
      * @memberof UpdateProblemDTO
      */
     'points'?: number;
+    /**
+     * Value the problem starts at, and the ceiling of the current value.
+     * @type {number}
+     * @memberof UpdateProblemDTO
+     */
+    'initialPoints'?: number;
+    /**
+     * Floor of the current value: once it is reached, solving no longer lowers the problem. Must be less than or equal to `initialPoints`.
+     * @type {number}
+     * @memberof UpdateProblemDTO
+     */
+    'floorPoints'?: number;
+    /**
+     * How much the current value drops for each distinct student who solves it.
+     * @type {number}
+     * @memberof UpdateProblemDTO
+     */
+    'decrement'?: number;
     /**
      * Problem banner URL
      * @type {string}
@@ -1933,7 +2078,7 @@ export const ProblemsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async problemControllerGetAllProblems(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProblemResponseDTO>>> {
+        async problemControllerGetAllProblems(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PublicProblemResponseDTO>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerGetAllProblems(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerGetAllProblems']?.[localVarOperationServerIndex]?.url;
@@ -1946,7 +2091,7 @@ export const ProblemsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async problemControllerGetProblemById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProblemResponseDTO>> {
+        async problemControllerGetProblemById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PublicProblemResponseDTO>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerGetProblemById(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerGetProblemById']?.[localVarOperationServerIndex]?.url;
@@ -2021,7 +2166,7 @@ export const ProblemsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        problemControllerGetAllProblems(options?: RawAxiosRequestConfig): AxiosPromise<Array<ProblemResponseDTO>> {
+        problemControllerGetAllProblems(options?: RawAxiosRequestConfig): AxiosPromise<Array<PublicProblemResponseDTO>> {
             return localVarFp.problemControllerGetAllProblems(options).then((request) => request(axios, basePath));
         },
         /**
@@ -2031,7 +2176,7 @@ export const ProblemsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        problemControllerGetProblemById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<ProblemResponseDTO> {
+        problemControllerGetProblemById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<PublicProblemResponseDTO> {
             return localVarFp.problemControllerGetProblemById(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3343,7 +3488,7 @@ export class SignupApi extends BaseAPI {
 export const SubmitApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * This endpoint allows you to create a new submit
+         * Submits an answer to a problem. A wrong answer only counts an attempt and costs nothing. A right answer earns the current value of the problem, frozen at that instant, and lowers that value for the next solver. Each student can only solve a given problem once.
          * @summary Create Submit
          * @param {CreateSubmitDTO} createSubmitDTO 
          * @param {*} [options] Override http request option.
@@ -3521,7 +3666,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = SubmitApiAxiosParamCreator(configuration)
     return {
         /**
-         * This endpoint allows you to create a new submit
+         * Submits an answer to a problem. A wrong answer only counts an attempt and costs nothing. A right answer earns the current value of the problem, frozen at that instant, and lowers that value for the next solver. Each student can only solve a given problem once.
          * @summary Create Submit
          * @param {CreateSubmitDTO} createSubmitDTO 
          * @param {*} [options] Override http request option.
@@ -3595,7 +3740,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
     const localVarFp = SubmitApiFp(configuration)
     return {
         /**
-         * This endpoint allows you to create a new submit
+         * Submits an answer to a problem. A wrong answer only counts an attempt and costs nothing. A right answer earns the current value of the problem, frozen at that instant, and lowers that value for the next solver. Each student can only solve a given problem once.
          * @summary Create Submit
          * @param {CreateSubmitDTO} createSubmitDTO 
          * @param {*} [options] Override http request option.
@@ -3654,7 +3799,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
  */
 export class SubmitApi extends BaseAPI {
     /**
-     * This endpoint allows you to create a new submit
+     * Submits an answer to a problem. A wrong answer only counts an attempt and costs nothing. A right answer earns the current value of the problem, frozen at that instant, and lowers that value for the next solver. Each student can only solve a given problem once.
      * @summary Create Submit
      * @param {CreateSubmitDTO} createSubmitDTO 
      * @param {*} [options] Override http request option.

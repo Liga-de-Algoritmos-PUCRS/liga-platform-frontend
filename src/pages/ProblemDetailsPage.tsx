@@ -1,22 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { 
-   Download, Send, FileText, 
+import {
+   Download, Send, FileText,
   Users, Trophy, Activity, CheckCircle2, ArrowLeft, Loader2, Eye, EyeOff,
-  XCircle, PartyPopper, CheckCircle, Hash
+  XCircle, PartyPopper, CheckCircle, Hash, WifiOff
 } from "lucide-react";
 import { Link, useParams, useNavigate } from "@tanstack/react-router";
+import { isAxiosError } from "axios";
 import { useAuth } from "@/providers/AuthProvider";
 import client from "@/api/client";
-import { ProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
+import { PublicProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
+import { CURRENT_VALUE_HINT } from "@/lib/problem-scoring";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw"; 
 import remarkGfm from "remark-gfm"; 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+
+/**
+ * Por que o envio falhou — nunca por que a resposta está errada. Os três casos
+ * pedem textos diferentes: falar de ligação num 401 é mentir para o aluno.
+ */
+type SubmitFailure = 'network' | 'expired' | 'rejected';
+
+function classifySubmitFailure(error: unknown): SubmitFailure {
+  if (!isAxiosError(error)) return 'network';
+  const status = error.response?.status;
+  // Sem `response` é rede caída/timeout; 5xx é o servidor de pé mas quebrado.
+  if (status === undefined || status >= 500) return 'network';
+  if (status === 401) return 'expired';
+  return 'rejected';
+}
+
+const SUBMIT_FAILURE_MESSAGE: Record<SubmitFailure, string> = {
+  network:
+    "Não conseguimos enviar a sua resposta. Isto não é um erro na resposta — verifique a ligação e tente de novo.",
+  expired:
+    "A sua sessão expirou antes de o envio chegar. Isto não é um erro na resposta — entre de novo e reenvie.",
+  rejected:
+    "O servidor recusou o envio. Isto não é um erro na resposta — recarregue a página e tente de novo.",
+};
 
 export function ProblemDetailsPage() {
   const { problemId } = useParams({ strict: false });
@@ -25,64 +52,50 @@ export function ProblemDetailsPage() {
   
   const isAdmin = user?.role === 'ADMIN';
 
-  const [problem, setProblem] = useState<ProblemResponseDTO & { isFinished?: boolean } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const cleanId = problemId?.replace('%23', '').replace('#', '');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [userAnswer, setUserAnswer] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showAlreadySolvedModal, setShowAlreadySolvedModal] = useState(false);
+  const [submitFailure, setSubmitFailure] = useState<SubmitFailure | null>(null);
   const [earnedPoints, setEarnedPoints] = useState(0);
 
-  useEffect(() => {
-    let isMounted = true;
-    
-    async function fetchProblemData() {
-      const cleanId = problemId?.replace('%23', '').replace('#', ''); 
-      if (!cleanId) return;
-      
-      setIsLoading(true);
+  // O admin recebe um superconjunto do payload público, então a mesma variável
+  // serve às duas rotas sem cast.
+  const { data: problemResponse, isLoading } = useQuery({
+    queryKey: ['problem', cleanId, isAdmin],
+    queryFn: (): Promise<{ data: PublicProblemResponseDTO }> =>
+      isAdmin
+        ? client.problem.problemControllerGetAdminProblemById(String(cleanId))
+        : client.problem.problemControllerGetProblemById(String(cleanId)),
+    enabled: !!cleanId,
+  });
 
-      try {
-        let problemResponse;
-        if (isAdmin) {
-          problemResponse = await client.problem.problemControllerGetAdminProblemById(cleanId);
-        } else {
-          problemResponse = await client.problem.problemControllerGetProblemById(cleanId);
-        }
+  // Mesma chave da listagem de problemas: invalidar aqui tem de alcançar as duas telas.
+  const { data: submissionsResponse } = useQuery({
+    queryKey: ['submissions', user?.id],
+    queryFn: () => client.submit.submitControllerGetSubmitByUserId(String(user?.id)),
+    enabled: !!(isAuthenticated && user?.id),
+  });
 
-        let finished = false;
+  const problem = problemResponse?.data ?? null;
 
-        if (isAuthenticated && user?.id) {
-          try {
-            const submitsResponse = await client.submit.submitControllerGetSubmitByUserId(String(user.id));
-            const submissoes = submitsResponse.data as SubmitResponseDTO[];
-            finished = submissoes.some(
-              (s) => s.problemId === cleanId && s.isFinished === true
-            );
-          } catch (e) {
-            console.error("Erro ao validar submissões prévias:", e);
-          }
-        }
+  const userSubmission = ((submissionsResponse?.data as SubmitResponseDTO[]) || []).find(
+    (s) => s.problemId === cleanId && s.isFinished === true
+  );
+  const isFinished = !!userSubmission;
 
-        if (isMounted) {
-          setProblem({
-            ...(problemResponse.data as ProblemResponseDTO),
-            isFinished: finished
-          });
-        }
-      } catch (error: unknown) {
-        console.error("Erro ao buscar detalhes do problema:", error);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    }
-
-    fetchProblemData();
-    return () => { isMounted = false; };
-  }, [problemId, isAdmin, isAuthenticated, user?.id]);
+  const invalidateAfterSubmit = () => {
+    queryClient.invalidateQueries({ queryKey: ['problem', cleanId] });
+    queryClient.invalidateQueries({ queryKey: ['problems'] });
+    queryClient.invalidateQueries({ queryKey: ['submissions', user?.id] });
+  };
 
   if (isLoading) {
     return (
@@ -136,19 +149,27 @@ export function ProblemDetailsPage() {
         answer: userAnswer
       });
 
-      const { isFinished, pointsEarned } = response.data;
+      const { isFinished: solved, pointsEarned } = response.data;
 
-      if (isFinished) {
+      if (solved) {
         setEarnedPoints(pointsEarned || 0);
         setShowSuccessModal(true);
-        setUserAnswer(""); 
-        setProblem(prev => prev ? { ...prev, isFinished: true } : null);
+        setUserAnswer("");
+        invalidateAfterSubmit();
       } else {
         setShowErrorModal(true);
       }
     } catch (error) {
       console.error("Erro ao submeter resposta:", error);
-      setShowErrorModal(true);
+      // Ramifica pelo status, nunca pela mensagem: o corpo do 409 traz texto
+      // interno do back.
+      if (isAxiosError(error) && error.response?.status === 409) {
+        setShowAlreadySolvedModal(true);
+        setUserAnswer("");
+        invalidateAfterSubmit();
+      } else {
+        setSubmitFailure(classifySubmitFailure(error));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -177,11 +198,26 @@ export function ProblemDetailsPage() {
                <Badge className={cn("px-4 py-1.5 font-bold text-[10px] tracking-widest uppercase rounded-xl border-2 shadow-lg", currentDiffStyle)}>
                   {problemDifficulty}
                </Badge>
-               <div className="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-primary/20 border border-primary/30 text-sm font-bold text-white backdrop-blur-md">
-                  <Trophy size={14} className="text-primary" />
-                  {problem.points} <span className="text-[10px] opacity-60 ml-0.5">PONTOS</span>
-               </div>
-               {problem.isFinished && (
+               {isFinished ? (
+                 <div className="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-white backdrop-blur-md">
+                    <Trophy size={14} className="text-emerald-400" />
+                    {userSubmission?.pointsEarned ?? 0}{" "}
+                    <span className="text-[10px] opacity-60 ml-0.5">PONTOS QUE VOCÊ GANHOU</span>
+                 </div>
+               ) : (
+                 <div className="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-primary/20 border border-primary/30 text-sm font-bold text-white backdrop-blur-md">
+                    <Trophy size={14} className="text-primary" />
+                    {problem.points} <span className="text-[10px] opacity-60 ml-0.5">PONTOS</span>
+                    <span
+                      title={CURRENT_VALUE_HINT}
+                      aria-label={CURRENT_VALUE_HINT}
+                      className="ml-1 h-4 w-4 shrink-0 flex items-center justify-center rounded-full border border-white/30 text-[9px] font-black text-white/70 cursor-help"
+                    >
+                      ?
+                    </span>
+                 </div>
+               )}
+               {isFinished && (
                  <Badge className="px-4 py-1.5 font-bold text-[10px] tracking-widest uppercase rounded-xl border-2 border-emerald-500/50 bg-emerald-500/20 text-emerald-400 shadow-lg animate-in zoom-in duration-300">
                    <CheckCircle size={12} className="mr-1.5" />
                    Resolvido
@@ -285,12 +321,15 @@ export function ProblemDetailsPage() {
         <div className="mt-auto pt-6 space-y-4">
           {!isAuthenticated ? (
              <Button onClick={() => navigate({ to: '/login' })} className="w-full h-16 rounded-[24px] bg-primary/20 hover:bg-primary border border-primary/50 text-white font-bold">Faça Login para Enviar</Button>
-          ) : problem.isFinished ? (
+          ) : isFinished ? (
             <div className="p-6 rounded-[32px] border-2 border-emerald-500/20 bg-emerald-500/5 flex flex-col items-center text-center space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                 <CheckCircle size={28} />
               </div>
               <h4 className="text-base font-black text-white uppercase tracking-tight">Desafio Resolvido</h4>
+              <p className="text-xs text-gray-400 font-medium">
+                Você ganhou <span className="text-emerald-400 font-black font-mono">{userSubmission?.pointsEarned ?? 0}</span> pontos neste desafio.
+              </p>
               <Button onClick={() => navigate({ to: '/problemas' })} variant="outline" className="w-full rounded-2xl border-white/10 hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest h-12">Próximo Desafio</Button>
             </div>
           ) : (
@@ -333,6 +372,40 @@ export function ProblemDetailsPage() {
           </DialogHeader>
           <DialogFooter className="mt-4">
             <Button onClick={() => setShowSuccessModal(false)} className="w-full rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-bold">Uhuul!</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showAlreadySolvedModal} onOpenChange={setShowAlreadySolvedModal}>
+        <DialogContent className="bg-[#0a0a0b] border-primary/30 text-white max-w-sm rounded-[32px]">
+          <DialogHeader className="flex flex-col items-center gap-4">
+            <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/20">
+              <CheckCircle size={40} />
+            </div>
+            <DialogTitle className="text-2xl font-black tracking-tighter text-primary text-center">VOCÊ JÁ RESOLVEU ESTE PROBLEMA</DialogTitle>
+            <DialogDescription className="text-center text-gray-400 font-medium">
+              Cada desafio conta uma vez só. Os pontos que você ganhou continuam valendo — escolha outro problema para somar mais.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button onClick={() => setShowAlreadySolvedModal(false)} className="w-full rounded-2xl bg-primary hover:bg-primary/90 font-bold">Entendi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!submitFailure} onOpenChange={(open) => !open && setSubmitFailure(null)}>
+        <DialogContent className="bg-[#0a0a0b] border-amber-500/30 text-white max-w-sm rounded-[32px]">
+          <DialogHeader className="flex flex-col items-center gap-4">
+            <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-2xl shadow-amber-500/20">
+              <WifiOff size={40} />
+            </div>
+            <DialogTitle className="text-2xl font-black tracking-tighter text-amber-400 text-center">FALHA AO ENVIAR</DialogTitle>
+            <DialogDescription className="text-center text-gray-400 font-medium">
+              {submitFailure ? SUBMIT_FAILURE_MESSAGE[submitFailure] : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button onClick={() => setSubmitFailure(null)} className="w-full rounded-2xl bg-amber-600 hover:bg-amber-500 font-bold">Tentar de Novo</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
