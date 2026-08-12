@@ -61,6 +61,10 @@ let refreshPromise: Promise<string> | null = null
 // cookie derrubariam a sessão.
 export function refreshAccessToken(): Promise<string> {
   if (!refreshPromise) {
+    // O single-flight é por aba. Guardamos o token com que ESTA aba entrou na
+    // corrida para saber, num 401, se outra aba renovou nesse meio-tempo.
+    const tokenBeforeRefresh = accessToken
+
     refreshPromise = rawAxios
       .post("/auth/refresh")
       .then(res => {
@@ -74,6 +78,18 @@ export function refreshAccessToken(): Promise<string> {
         // Só rejeição real do refresh token encerra a sessão; erro de
         // rede/5xx não desloga.
         if (isAuthError(err)) {
+          const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
+
+          // Outra aba renovou enquanto esta esperava a resposta. Como o backend
+          // rotaciona o refresh token, o 401 aqui só significa que perdemos a
+          // corrida — não que a sessão morreu. Adota o token da outra aba: sem
+          // isso, o clearSession() apagaria do localStorage o token que ela
+          // acabou de gravar e o evento `storage` derrubaria todas as abas.
+          if (storedToken && storedToken !== tokenBeforeRefresh) {
+            setAccessToken(storedToken)
+            return storedToken
+          }
+
           clearSession()
         }
         throw err
