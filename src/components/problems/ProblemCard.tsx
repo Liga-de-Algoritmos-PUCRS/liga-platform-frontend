@@ -3,15 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { Terminal, Star, CheckCircle2, Check } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { PublicProblemResponseDTO } from "@/api/sdk";
+import { CURRENT_VALUE_HINT } from "@/lib/problem-scoring";
 import { cn } from "@/lib/utils";
 
 interface ProblemCardProps {
   problem: PublicProblemResponseDTO;
-  isFinished?: boolean;  
-  onClick?: (problem: PublicProblemResponseDTO) => void; 
+  isFinished?: boolean;
+  /** Pontos que o aluno congelou ao acertar. Só faz sentido com `isFinished`. */
+  pointsEarned?: number;
+  onClick?: (problem: PublicProblemResponseDTO) => void;
 }
 
-export function ProblemCard({ problem, isFinished, onClick }: ProblemCardProps) {
+export function ProblemCard({ problem, isFinished, pointsEarned, onClick }: ProblemCardProps) {
   const navigate = useNavigate();
   const difficultyLevel = problem.difficulty || "MEDIUM";
   
@@ -62,10 +65,25 @@ export function ProblemCard({ problem, isFinished, onClick }: ProblemCardProps) 
           <Badge className={cn("px-2.5 py-0.5 font-bold text-[9px] tracking-widest uppercase rounded-lg border shadow-lg", difficultyStyles)}>
             {problem.difficulty}
           </Badge>
-          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-black/60 border border-white/10 text-[10px] font-bold text-primary backdrop-blur-md">
-            <Star size={10} fill="currentColor" />
-            {problem.points} <span className="text-[8px] opacity-50">PTS</span>
-          </div>
+          {isFinished ? (
+            // Quem já resolveu vê o que ganhou, não o valor de agora: o card e a
+            // tela do problema têm de mostrar o mesmo número.
+            <div
+              title={`Você ganhou ${pointsEarned ?? 0} pontos neste desafio.`}
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-black/60 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 backdrop-blur-md"
+            >
+              <Star size={10} fill="currentColor" />
+              {pointsEarned ?? 0} <span className="text-[8px] opacity-50">GANHOS</span>
+            </div>
+          ) : (
+            <div
+              title={CURRENT_VALUE_HINT}
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-black/60 border border-white/10 text-[10px] font-bold text-primary backdrop-blur-md"
+            >
+              <Star size={10} fill="currentColor" />
+              {problem.points} <span className="text-[8px] opacity-50">PTS</span>
+            </div>
+          )}
         </div>
       </div>
 
