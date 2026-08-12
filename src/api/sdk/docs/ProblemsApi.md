@@ -7,7 +7,7 @@ All URIs are relative to *http://localhost*
 |[**problemControllerCreateProblem**](#problemcontrollercreateproblem) | **POST** /problems | Create a new problem|
 |[**problemControllerDeleteProblem**](#problemcontrollerdeleteproblem) | **DELETE** /problems/{id} | Delete a problem|
 |[**problemControllerGetAdminProblemById**](#problemcontrollergetadminproblembyid) | **GET** /problems/{id}/admin | Get problem by ID|
-|[**problemControllerGetAllAdminProblems**](#problemcontrollergetalladminproblems) | **GET** /problems/{id}/admin/all | List all problems|
+|[**problemControllerGetAllAdminProblems**](#problemcontrollergetalladminproblems) | **GET** /problems/admin/all | List all problems (admin)|
 |[**problemControllerGetAllProblems**](#problemcontrollergetallproblems) | **GET** /problems | List all problems|
 |[**problemControllerGetProblemById**](#problemcontrollergetproblembyid) | **GET** /problems/{id} | Get problem by ID|
 |[**problemControllerUpdateProblem**](#problemcontrollerupdateproblem) | **PATCH** /problems/{id} | Update an existing problem|
@@ -176,7 +176,7 @@ No authorization required
 # **problemControllerGetAllAdminProblems**
 > Array<ProblemResponseDTO> problemControllerGetAllAdminProblems()
 
-This endpoint retrieves a list of all problems in the system.
+Admin only. Retrieves every problem, including archived ones, with the `answer` field filled in.
 
 ### Example
 
@@ -189,18 +189,11 @@ import {
 const configuration = new Configuration();
 const apiInstance = new ProblemsApi(configuration);
 
-let id: string; // (default to undefined)
-
-const { status, data } = await apiInstance.problemControllerGetAllAdminProblems(
-    id
-);
+const { status, data } = await apiInstance.problemControllerGetAllAdminProblems();
 ```
 
 ### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**string**] |  | defaults to undefined|
+This endpoint does not have any parameters.
 
 
 ### Return type
