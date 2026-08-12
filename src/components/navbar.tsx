@@ -182,7 +182,7 @@ export function Navbar() {
                   <span>Reportar Bug</span>
                 </DropdownMenuItem>
 
-                {(user.role === 'ADMIN' || user.role === 'ROOT') && (
+                {user.role === 'ADMIN' && (
                   <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white" onClick={() => navigate({ to: '/authenticated/admin' })}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Gerenciar</span>

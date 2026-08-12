@@ -13,7 +13,7 @@ export function RankingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROOT';
+  const isAdmin = user?.role === 'ADMIN';
 
   const [view, setView] = useState<"monthly" | "alltime">("monthly");
   const [selectedUser, setSelectedUser] = useState<PublicUserResponseDTO | null>(null);
