@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy, Medal, Award } from "lucide-react";
 import { cn } from "@/lib/utils"
-import { UserResponseDTO } from "@/api/sdk";
+import { PublicUserResponseDTO } from "@/api/sdk";
 
 interface RankingTableProps {
-  data: Partial<UserResponseDTO>[]; 
-  onUserClick: (user: UserResponseDTO) => void;
+  data: Partial<PublicUserResponseDTO>[]; 
+  onUserClick: (user: PublicUserResponseDTO) => void;
 }
 
 export function RankingTable({ data, onUserClick }: RankingTableProps) {
@@ -34,7 +34,7 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
               const rank = index + 1;
               return (
                 <tr 
-                  key={user.email} 
+                  key={user.id} 
                   className={cn(
                     "transition-colors hover:bg-white/5 group",
                     rank <= 3 && "bg-primary/5"
@@ -47,7 +47,7 @@ export function RankingTable({ data, onUserClick }: RankingTableProps) {
                   </td>
                   <td 
                     className="px-6 py-4 cursor-pointer"
-                    onClick={() => onUserClick(user as UserResponseDTO)}
+                    onClick={() => onUserClick(user as PublicUserResponseDTO)}
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 border border-white/10 group-hover:border-primary/50 transition-colors">

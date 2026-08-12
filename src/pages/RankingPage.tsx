@@ -4,7 +4,7 @@ import { RankingTable } from "@/components/ranking/RankingTable";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import { Button } from "@/components/ui/button";
 import { Calendar, Globe2, Trophy, Sparkles, Loader2, AlertTriangle } from "lucide-react";
-import { UserResponseDTO } from "@/api/sdk";
+import { PublicUserResponseDTO } from "@/api/sdk";
 import client from "@/api/client";
 import { toast } from "sonner"
 import { useAuth } from "@/providers/AuthProvider";
@@ -16,10 +16,10 @@ export function RankingPage() {
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROOT';
 
   const [view, setView] = useState<"monthly" | "alltime">("monthly");
-  const [selectedUser, setSelectedUser] = useState<UserResponseDTO | null>(null);
+  const [selectedUser, setSelectedUser] = useState<PublicUserResponseDTO | null>(null);
   
-  const [monthlyUsers, setMonthlyUsers] = useState<UserResponseDTO[]>([]);
-  const [allTimeUsers, setAllTimeUsers] = useState<UserResponseDTO[]>([]);
+  const [monthlyUsers, setMonthlyUsers] = useState<PublicUserResponseDTO[]>([]);
+  const [allTimeUsers, setAllTimeUsers] = useState<PublicUserResponseDTO[]>([]);
   
   const [isLoading, setIsLoading] = useState(true);
   const [isResetting, setIsResetting] = useState(false);
@@ -35,8 +35,8 @@ export function RankingPage() {
       ]);
 
       if (isMounted) {
-        setMonthlyUsers(monthlyResponse.data as UserResponseDTO[]);
-        setAllTimeUsers(allTimeResponse.data as UserResponseDTO[]);
+        setMonthlyUsers(monthlyResponse.data as PublicUserResponseDTO[]);
+        setAllTimeUsers(allTimeResponse.data as PublicUserResponseDTO[]);
       }
     } catch (error) {
       if (isMounted) console.error("Erro ao buscar dados do ranking:", error);
@@ -51,7 +51,7 @@ export function RankingPage() {
     fetchRankings();
   }, [fetchRankings]);
 
-  const handleUserClick = (user: UserResponseDTO) => {
+  const handleUserClick = (user: PublicUserResponseDTO) => {
     setSelectedUser(user);
   };
 

@@ -4,25 +4,33 @@ import {
   Search, 
   Loader2, 
   Trophy, 
-  Mail
+  GraduationCap
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import client from "@/api/client";
-import { UserResponseDTO } from "@/api/sdk";
+import { PublicUserResponseDTO } from "@/api/sdk";
+
+const COURSE_LABELS: Record<string, string> = {
+  SOFTWARE_ENGINEERING: "Eng. de Software",
+  DATA_SCIENCE: "Ciência de Dados",
+  COMPUTING_SCIENCE: "Ciência da Comp.",
+  INFORMATION_SYSTEMS: "Sist. Informação",
+  COMPUTING_ENGINEERING: "Eng. Computação",
+};
 
 export function MembersPage() {
-  const [members, setMembers] = useState<UserResponseDTO[]>([]);
+  const [members, setMembers] = useState<PublicUserResponseDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedUser, setSelectedUser] = useState<UserResponseDTO | null>(null);
+  const [selectedUser, setSelectedUser] = useState<PublicUserResponseDTO | null>(null);
 
   useEffect(() => {
     async function fetchMembers() {
       try {
-        const response = await client.user.userControllerGetAllUsers();
-        setMembers(response.data as UserResponseDTO[]);
+        const response = await client.user.userControllerGetMembers();
+        setMembers(response.data as PublicUserResponseDTO[]);
       } catch (error) {
         console.error("Erro ao carregar integrantes:", error);
       } finally {
@@ -33,8 +41,7 @@ export function MembersPage() {
   }, []);
 
   const filteredMembers = members.filter(member => 
-    member.name.toLowerCase().includes(search.toLowerCase()) ||
-    member.email.toLowerCase().includes(search.toLowerCase())
+    member.name.toLowerCase().includes(search.toLowerCase())
   );
 
   if (isLoading) {
@@ -66,7 +73,7 @@ export function MembersPage() {
             <div className="relative w-full md:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <Input 
-                placeholder="Buscar por nome ou email..." 
+                placeholder="Buscar por nome..." 
                 className="pl-12 h-12 bg-white/5 border-white/10 rounded-2xl text-white focus:ring-primary shadow-2xl"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -83,7 +90,7 @@ export function MembersPage() {
               <thead className="sticky top-0 z-20 bg-[#121214]">
                 <tr className="border-b border-white/5">
                   <th className="px-6 py-5 text-[10px] font-black text-fuchsia-500 uppercase tracking-[0.2em]">Nome</th>
-                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500">E-mail</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500">Curso</th>
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500 text-center">Total Points</th>
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500 text-center">Submissões</th>
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500 text-center">Acertos</th>
@@ -109,8 +116,8 @@ export function MembersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-300 font-mono">
-                        <Mail size={14} className="text-gray-300" />
-                        {member.email}
+                        <GraduationCap size={14} className="text-gray-300" />
+                        {member.course ? COURSE_LABELS[member.course] ?? member.course : "-"}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">

@@ -30,7 +30,9 @@ const SEMESTER_LABELS: Record<string, string> = {
 
 export interface UserInterface {
   name: string;
-  email: string;
+  // As rotas de ranking e a listagem de membros nao devolvem email: o back so
+  // entrega dados pessoais em rota admin ou para o proprio usuario.
+  email?: string;
   createdAt?: string;
   course?: string;
   semester?: string;
@@ -105,12 +107,14 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
           </h2>
           
           <div className="mt-3 flex flex-col gap-2">
-            <div className="flex items-center gap-2.5 group">
-              <Mail size={14} className="text-primary/70 shrink-0" />
-              <span className="text-xs sm:text-sm text-gray-400 font-medium truncate group-hover:text-gray-200 transition-colors">
-                {user.email}
-              </span>
-            </div>
+            {user.email && (
+              <div className="flex items-center gap-2.5 group">
+                <Mail size={14} className="text-primary/70 shrink-0" />
+                <span className="text-xs sm:text-sm text-gray-400 font-medium truncate group-hover:text-gray-200 transition-colors">
+                  {user.email}
+                </span>
+              </div>
+            )}
 
             <div className="flex items-center gap-2.5 group">
               <CalendarDays size={14} className="text-primary/70 shrink-0" />
