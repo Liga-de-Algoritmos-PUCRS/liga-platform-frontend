@@ -1,33 +1,12 @@
 import { useState } from "react";
 import { Camera } from "lucide-react";
 import UserWithAccount from "@/types/user.types";
-import { UserResponseDTOCourseEnum, UserResponseDTOSemesterEnum, UserResponseDTORoleEnum } from "@/api/sdk";
+import { UserResponseDTOCourseEnum, UserResponseDTORoleEnum } from "@/api/sdk";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { PhotoUploadModal } from "./PhotoUploadModal";
 import { cn } from "@/lib/utils";
-
-const COURSE_LABELS: Record<string, string> = {
-  [UserResponseDTOCourseEnum.SoftwareEngineering]: "Engenharia de Software",
-  [UserResponseDTOCourseEnum.DataScience]: "Ciência de Dados",
-  [UserResponseDTOCourseEnum.ComputingScience]: "Ciência da Computação",
-  [UserResponseDTOCourseEnum.InformationSystems]: "Sistemas de Informação",
-  [UserResponseDTOCourseEnum.ComputingEngineering]: "Engenharia de Computação",
-};
-
-const SEMESTER_LABELS: Record<string, string> = {
-  [UserResponseDTOSemesterEnum.First]: "1º Semestre",
-  [UserResponseDTOSemesterEnum.Second]: "2º Semestre",
-  [UserResponseDTOSemesterEnum.Third]: "3º Semestre",
-  [UserResponseDTOSemesterEnum.Fourth]: "4º Semestre",
-  [UserResponseDTOSemesterEnum.Fifth]: "5º Semestre",
-  [UserResponseDTOSemesterEnum.Sixth]: "6º Semestre",
-  [UserResponseDTOSemesterEnum.Seventh]: "7º Semestre",
-  [UserResponseDTOSemesterEnum.Eighth]: "8º Semestre",
-  [UserResponseDTOSemesterEnum.Ninth]: "9º Semestre",
-  [UserResponseDTOSemesterEnum.Tenth]: "10º Semestre",
-  [UserResponseDTOSemesterEnum.Graduated]: "Graduado",
-};
+import { COURSE_LABELS, SEMESTER_LABELS } from "@/lib/user-labels";
 
 const COURSE_COLORS: Record<string, string> = {
   [UserResponseDTOCourseEnum.SoftwareEngineering]: "bg-blue-500/10 text-blue-400 border-blue-500/20",

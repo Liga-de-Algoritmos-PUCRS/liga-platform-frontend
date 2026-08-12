@@ -1,4 +1,4 @@
-# UserResponseDTO
+# PublicUserResponseDTO
 
 
 ## Properties
@@ -17,15 +17,13 @@ Name | Type | Description | Notes
 **allTimePoints** | **number** | User\&#39;s all-time points | [optional] [default to undefined]
 **submissions** | **number** | User\&#39;s all-time submission | [optional] [default to undefined]
 **problemsResolved** | **number** | Problems resolve by an user | [optional] [default to undefined]
-**email** | **string** | User email | [default to undefined]
-**role** | **string** | User role | [default to undefined]
 
 ## Example
 
 ```typescript
-import { UserResponseDTO } from './api';
+import { PublicUserResponseDTO } from './api';
 
-const instance: UserResponseDTO = {
+const instance: PublicUserResponseDTO = {
     id,
     name,
     createdAt,
@@ -38,8 +36,6 @@ const instance: UserResponseDTO = {
     allTimePoints,
     submissions,
     problemsResolved,
-    email,
-    role,
 };
 ```
 

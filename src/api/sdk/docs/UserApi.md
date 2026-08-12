@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost*
 |[**userControllerDeleteUser**](#usercontrollerdeleteuser) | **DELETE** /user/{id} | Delete a user|
 |[**userControllerGetAllUsers**](#usercontrollergetallusers) | **GET** /user | List all users|
 |[**userControllerGetMe**](#usercontrollergetme) | **GET** /user/me/{id} | Get a user|
+|[**userControllerGetMembers**](#usercontrollergetmembers) | **GET** /user/members | List all members|
 |[**userControllerGetMonthlyTopUsers**](#usercontrollergetmonthlytopusers) | **GET** /user/top/monthly | Get monthly top users|
 |[**userControllerGetTopUsers**](#usercontrollergettopusers) | **GET** /user/top/all-time | Get top users|
 |[**userControllerGetUserById**](#usercontrollergetuserbyid) | **GET** /user/{id} | Get a user by ID|
@@ -75,7 +76,7 @@ No authorization required
 # **userControllerGetAllUsers**
 > Array<UserResponseDTO> userControllerGetAllUsers()
 
-This endpoint retrieves a list of all users in the system.
+Admin only. This endpoint retrieves a list of all users in the system, with the full payload.
 
 ### Example
 
@@ -164,8 +165,54 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **userControllerGetMembers**
+> Array<PublicUserResponseDTO> userControllerGetMembers()
+
+This endpoint retrieves the list of members for any authenticated user. The payload omits email and role.
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+const { status, data } = await apiInstance.userControllerGetMembers();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**Array<PublicUserResponseDTO>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Members retrieved successfully. |  -  |
+|**401** | Unauthorized. A valid access token is required. |  -  |
+|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **userControllerGetMonthlyTopUsers**
-> Array<UserResponseDTO> userControllerGetMonthlyTopUsers()
+> Array<PublicUserResponseDTO> userControllerGetMonthlyTopUsers()
 
 This endpoint retrieves the top users of the month based on their performance.
 
@@ -189,7 +236,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**Array<UserResponseDTO>**
+**Array<PublicUserResponseDTO>**
 
 ### Authorization
 
@@ -211,7 +258,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userControllerGetTopUsers**
-> Array<UserResponseDTO> userControllerGetTopUsers()
+> Array<PublicUserResponseDTO> userControllerGetTopUsers()
 
 This endpoint retrieves the top users based on their performance.
 
@@ -235,7 +282,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**Array<UserResponseDTO>**
+**Array<PublicUserResponseDTO>**
 
 ### Authorization
 
@@ -257,9 +304,9 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userControllerGetUserById**
-> UserResponseDTO userControllerGetUserById()
+> PublicUserResponseDTO userControllerGetUserById()
 
-This endpoint retrieves a user by their unique ID.
+This endpoint retrieves a user by their unique ID. Public route: the payload omits email and role.
 
 ### Example
 
@@ -288,7 +335,7 @@ const { status, data } = await apiInstance.userControllerGetUserById(
 
 ### Return type
 
-**UserResponseDTO**
+**PublicUserResponseDTO**
 
 ### Authorization
 

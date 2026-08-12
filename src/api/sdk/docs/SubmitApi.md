@@ -67,7 +67,7 @@ No authorization required
 # **submitControllerDeleteSubmit**
 > submitControllerDeleteSubmit()
 
-This endpoint allows you to delete a submit
+Admin only. This endpoint allows you to delete a submit
 
 ### Example
 
@@ -113,6 +113,7 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | Submit deleted successfully |  -  |
 |**400** | Bad Request. The input data is invalid or missing. |  -  |
+|**403** | Forbidden. This endpoint requires an admin account. |  -  |
 |**404** | Submit not found. The submit with the specified ID does not exist. |  -  |
 |**500** | Internal Server Error. An unexpected error occurred while processing the request. |  -  |
 
@@ -121,7 +122,7 @@ No authorization required
 # **submitControllerGetAllSubmits**
 > SubmitResponseDTO submitControllerGetAllSubmits()
 
-This endpoint allows you to get all submits
+Admin only. This endpoint allows you to get all submits
 
 ### Example
 
@@ -160,6 +161,7 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | Submits retrieved successfully |  -  |
 |**400** | Bad Request. The input data is invalid or missing. |  -  |
+|**403** | Forbidden. This endpoint requires an admin account. |  -  |
 |**500** | Internal Server Error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -167,7 +169,7 @@ No authorization required
 # **submitControllerGetSubmitByProblemId**
 > SubmitResponseDTO submitControllerGetSubmitByProblemId()
 
-This endpoint allows you to get a submit by its problem ID
+Admin only. This endpoint allows you to get a submit by its problem ID
 
 ### Example
 
@@ -213,6 +215,7 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | Submit retrieved successfully |  -  |
 |**400** | Bad Request. The input data is invalid or missing. |  -  |
+|**403** | Forbidden. This endpoint requires an admin account. |  -  |
 |**404** | Submit not found. The submit with the specified ID does not exist. |  -  |
 |**500** | Internal Server Error. An unexpected error occurred while processing the request. |  -  |
 
@@ -221,7 +224,7 @@ No authorization required
 # **submitControllerGetSubmitByUserId**
 > Array<SubmitResponseDTO> submitControllerGetSubmitByUserId()
 
-This endpoint allows you to get a submit by its user ID
+This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
 
 ### Example
 
@@ -267,6 +270,7 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | Submit retrieved successfully |  -  |
 |**400** | Bad Request. The input data is invalid or missing. |  -  |
+|**403** | Forbidden. The submissions belong to another user and the requester is not admin. |  -  |
 |**404** | Submit not found. The submit with the specified ID does not exist. |  -  |
 |**500** | Internal Server Error. An unexpected error occurred while processing the request. |  -  |
 

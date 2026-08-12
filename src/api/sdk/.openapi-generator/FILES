@@ -16,6 +16,7 @@ docs/LoginRequestDTO.md
 docs/LoginResponseDTO.md
 docs/ProblemResponseDTO.md
 docs/ProblemsApi.md
+docs/PublicUserResponseDTO.md
 docs/ReportBugApi.md
 docs/ReportBugServiceDTO.md
 docs/ResetPasswordApi.md

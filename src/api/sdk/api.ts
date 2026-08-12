@@ -329,6 +329,111 @@ export interface ProblemResponseDTO {
 /**
  * 
  * @export
+ * @interface PublicUserResponseDTO
+ */
+export interface PublicUserResponseDTO {
+    /**
+     * User ID
+     * @type {string}
+     * @memberof PublicUserResponseDTO
+     */
+    'id': string;
+    /**
+     * User name
+     * @type {string}
+     * @memberof PublicUserResponseDTO
+     */
+    'name': string;
+    /**
+     * User creation date
+     * @type {string}
+     * @memberof PublicUserResponseDTO
+     */
+    'createdAt': string;
+    /**
+     * User avatar URL
+     * @type {string}
+     * @memberof PublicUserResponseDTO
+     */
+    'avatarUrl'?: string | null;
+    /**
+     * User banner URL
+     * @type {string}
+     * @memberof PublicUserResponseDTO
+     */
+    'bannerUrl'?: string | null;
+    /**
+     * User course
+     * @type {string}
+     * @memberof PublicUserResponseDTO
+     */
+    'course'?: PublicUserResponseDTOCourseEnum;
+    /**
+     * User semester
+     * @type {string}
+     * @memberof PublicUserResponseDTO
+     */
+    'semester'?: PublicUserResponseDTOSemesterEnum;
+    /**
+     * User\'s historical submissions
+     * @type {number}
+     * @memberof PublicUserResponseDTO
+     */
+    'historycalSubmissions'?: number;
+    /**
+     * User\'s monthly points
+     * @type {number}
+     * @memberof PublicUserResponseDTO
+     */
+    'monthlyPoints'?: number;
+    /**
+     * User\'s all-time points
+     * @type {number}
+     * @memberof PublicUserResponseDTO
+     */
+    'allTimePoints'?: number;
+    /**
+     * User\'s all-time submission
+     * @type {number}
+     * @memberof PublicUserResponseDTO
+     */
+    'submissions'?: number;
+    /**
+     * Problems resolve by an user
+     * @type {number}
+     * @memberof PublicUserResponseDTO
+     */
+    'problemsResolved'?: number;
+}
+
+export const PublicUserResponseDTOCourseEnum = {
+    SoftwareEngineering: 'SOFTWARE_ENGINEERING',
+    DataScience: 'DATA_SCIENCE',
+    ComputingScience: 'COMPUTING_SCIENCE',
+    InformationSystems: 'INFORMATION_SYSTEMS',
+    ComputingEngineering: 'COMPUTING_ENGINEERING'
+} as const;
+
+export type PublicUserResponseDTOCourseEnum = typeof PublicUserResponseDTOCourseEnum[keyof typeof PublicUserResponseDTOCourseEnum];
+export const PublicUserResponseDTOSemesterEnum = {
+    First: 'FIRST',
+    Second: 'SECOND',
+    Third: 'THIRD',
+    Fourth: 'FOURTH',
+    Fifth: 'FIFTH',
+    Sixth: 'SIXTH',
+    Seventh: 'SEVENTH',
+    Eighth: 'EIGHTH',
+    Ninth: 'NINTH',
+    Tenth: 'TENTH',
+    Graduated: 'GRADUATED'
+} as const;
+
+export type PublicUserResponseDTOSemesterEnum = typeof PublicUserResponseDTOSemesterEnum[keyof typeof PublicUserResponseDTOSemesterEnum];
+
+/**
+ * 
+ * @export
  * @interface ReportBugServiceDTO
  */
 export interface ReportBugServiceDTO {
@@ -718,23 +823,11 @@ export interface UserResponseDTO {
      */
     'name': string;
     /**
-     * User email
-     * @type {string}
-     * @memberof UserResponseDTO
-     */
-    'email': string;
-    /**
      * User creation date
      * @type {string}
      * @memberof UserResponseDTO
      */
     'createdAt': string;
-    /**
-     * User role
-     * @type {string}
-     * @memberof UserResponseDTO
-     */
-    'role': UserResponseDTORoleEnum;
     /**
      * User avatar URL
      * @type {string}
@@ -789,14 +882,20 @@ export interface UserResponseDTO {
      * @memberof UserResponseDTO
      */
     'problemsResolved'?: number;
+    /**
+     * User email
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'email': string;
+    /**
+     * User role
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'role': UserResponseDTORoleEnum;
 }
 
-export const UserResponseDTORoleEnum = {
-    User: 'USER',
-    Admin: 'ADMIN'
-} as const;
-
-export type UserResponseDTORoleEnum = typeof UserResponseDTORoleEnum[keyof typeof UserResponseDTORoleEnum];
 export const UserResponseDTOCourseEnum = {
     SoftwareEngineering: 'SOFTWARE_ENGINEERING',
     DataScience: 'DATA_SCIENCE',
@@ -821,6 +920,12 @@ export const UserResponseDTOSemesterEnum = {
 } as const;
 
 export type UserResponseDTOSemesterEnum = typeof UserResponseDTOSemesterEnum[keyof typeof UserResponseDTOSemesterEnum];
+export const UserResponseDTORoleEnum = {
+    User: 'USER',
+    Admin: 'ADMIN'
+} as const;
+
+export type UserResponseDTORoleEnum = typeof UserResponseDTORoleEnum[keyof typeof UserResponseDTORoleEnum];
 
 /**
  * 
@@ -1594,8 +1699,8 @@ export const ProblemsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * This endpoint retrieves a problem by its ID.
-         * @summary Get problem by ID
+         * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+         * @summary Get problem by ID (admin)
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1628,17 +1733,13 @@ export const ProblemsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * This endpoint retrieves a list of all problems in the system.
-         * @summary List all problems
-         * @param {string} id 
+         * Admin only. Retrieves every problem, including archived ones, with the `answer` field filled in.
+         * @summary List all problems (admin)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        problemControllerGetAllAdminProblems: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('problemControllerGetAllAdminProblems', 'id', id)
-            const localVarPath = `/problems/{id}/admin/all`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+        problemControllerGetAllAdminProblems: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/problems/admin/all`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1802,8 +1903,8 @@ export const ProblemsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint retrieves a problem by its ID.
-         * @summary Get problem by ID
+         * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+         * @summary Get problem by ID (admin)
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1815,14 +1916,13 @@ export const ProblemsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint retrieves a list of all problems in the system.
-         * @summary List all problems
-         * @param {string} id 
+         * Admin only. Retrieves every problem, including archived ones, with the `answer` field filled in.
+         * @summary List all problems (admin)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async problemControllerGetAllAdminProblems(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProblemResponseDTO>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerGetAllAdminProblems(id, options);
+        async problemControllerGetAllAdminProblems(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProblemResponseDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.problemControllerGetAllAdminProblems(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProblemsApi.problemControllerGetAllAdminProblems']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1897,8 +1997,8 @@ export const ProblemsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.problemControllerDeleteProblem(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint retrieves a problem by its ID.
-         * @summary Get problem by ID
+         * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+         * @summary Get problem by ID (admin)
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1907,14 +2007,13 @@ export const ProblemsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.problemControllerGetAdminProblemById(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint retrieves a list of all problems in the system.
-         * @summary List all problems
-         * @param {string} id 
+         * Admin only. Retrieves every problem, including archived ones, with the `answer` field filled in.
+         * @summary List all problems (admin)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        problemControllerGetAllAdminProblems(id: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<ProblemResponseDTO>> {
-            return localVarFp.problemControllerGetAllAdminProblems(id, options).then((request) => request(axios, basePath));
+        problemControllerGetAllAdminProblems(options?: RawAxiosRequestConfig): AxiosPromise<Array<ProblemResponseDTO>> {
+            return localVarFp.problemControllerGetAllAdminProblems(options).then((request) => request(axios, basePath));
         },
         /**
          * This endpoint retrieves a list of all problems in the system.
@@ -1981,8 +2080,8 @@ export class ProblemsApi extends BaseAPI {
     }
 
     /**
-     * This endpoint retrieves a problem by its ID.
-     * @summary Get problem by ID
+     * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+     * @summary Get problem by ID (admin)
      * @param {string} id 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1993,15 +2092,14 @@ export class ProblemsApi extends BaseAPI {
     }
 
     /**
-     * This endpoint retrieves a list of all problems in the system.
-     * @summary List all problems
-     * @param {string} id 
+     * Admin only. Retrieves every problem, including archived ones, with the `answer` field filled in.
+     * @summary List all problems (admin)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProblemsApi
      */
-    public problemControllerGetAllAdminProblems(id: string, options?: RawAxiosRequestConfig) {
-        return ProblemsApiFp(this.configuration).problemControllerGetAllAdminProblems(id, options).then((request) => request(this.axios, this.basePath));
+    public problemControllerGetAllAdminProblems(options?: RawAxiosRequestConfig) {
+        return ProblemsApiFp(this.configuration).problemControllerGetAllAdminProblems(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3281,7 +3379,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to delete a submit
+         * Admin only. This endpoint allows you to delete a submit
          * @summary Delete Submit
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3315,7 +3413,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to get all submits
+         * Admin only. This endpoint allows you to get all submits
          * @summary Get All Submits
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3345,7 +3443,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to get a submit by its problem ID
+         * Admin only. This endpoint allows you to get a submit by its problem ID
          * @summary Get Submit by Problem ID
          * @param {string} problemId 
          * @param {*} [options] Override http request option.
@@ -3379,7 +3477,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to get a submit by its user ID
+         * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
          * @summary Get Submit by User ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -3436,7 +3534,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to delete a submit
+         * Admin only. This endpoint allows you to delete a submit
          * @summary Delete Submit
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3449,7 +3547,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to get all submits
+         * Admin only. This endpoint allows you to get all submits
          * @summary Get All Submits
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3461,7 +3559,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to get a submit by its problem ID
+         * Admin only. This endpoint allows you to get a submit by its problem ID
          * @summary Get Submit by Problem ID
          * @param {string} problemId 
          * @param {*} [options] Override http request option.
@@ -3474,7 +3572,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to get a submit by its user ID
+         * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
          * @summary Get Submit by User ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -3507,7 +3605,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerCreateSubmit(createSubmitDTO, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to delete a submit
+         * Admin only. This endpoint allows you to delete a submit
          * @summary Delete Submit
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3517,7 +3615,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerDeleteSubmit(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to get all submits
+         * Admin only. This endpoint allows you to get all submits
          * @summary Get All Submits
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3526,7 +3624,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerGetAllSubmits(options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to get a submit by its problem ID
+         * Admin only. This endpoint allows you to get a submit by its problem ID
          * @summary Get Submit by Problem ID
          * @param {string} problemId 
          * @param {*} [options] Override http request option.
@@ -3536,7 +3634,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerGetSubmitByProblemId(problemId, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to get a submit by its user ID
+         * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
          * @summary Get Submit by User ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -3568,7 +3666,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to delete a submit
+     * Admin only. This endpoint allows you to delete a submit
      * @summary Delete Submit
      * @param {string} id 
      * @param {*} [options] Override http request option.
@@ -3580,7 +3678,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to get all submits
+     * Admin only. This endpoint allows you to get all submits
      * @summary Get All Submits
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3591,7 +3689,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to get a submit by its problem ID
+     * Admin only. This endpoint allows you to get a submit by its problem ID
      * @summary Get Submit by Problem ID
      * @param {string} problemId 
      * @param {*} [options] Override http request option.
@@ -3603,7 +3701,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to get a submit by its user ID
+     * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
      * @summary Get Submit by User ID
      * @param {string} userId 
      * @param {*} [options] Override http request option.
@@ -3664,7 +3762,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * This endpoint retrieves a list of all users in the system.
+         * Admin only. This endpoint retrieves a list of all users in the system, with the full payload.
          * @summary List all users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3701,6 +3799,36 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
          */
         userControllerGetMe: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/user/me/{id}`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This endpoint retrieves the list of members for any authenticated user. The payload omits email and role.
+         * @summary List all members
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerGetMembers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user/members`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3784,7 +3912,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * This endpoint retrieves a user by their unique ID.
+         * This endpoint retrieves a user by their unique ID. Public route: the payload omits email and role.
          * @summary Get a user by ID
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3912,7 +4040,7 @@ export const UserApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint retrieves a list of all users in the system.
+         * Admin only. This endpoint retrieves a list of all users in the system, with the full payload.
          * @summary List all users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3936,12 +4064,24 @@ export const UserApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * This endpoint retrieves the list of members for any authenticated user. The payload omits email and role.
+         * @summary List all members
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userControllerGetMembers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PublicUserResponseDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetMembers(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetMembers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * This endpoint retrieves the top users of the month based on their performance.
          * @summary Get monthly top users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async userControllerGetMonthlyTopUsers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UserResponseDTO>>> {
+        async userControllerGetMonthlyTopUsers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PublicUserResponseDTO>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetMonthlyTopUsers(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetMonthlyTopUsers']?.[localVarOperationServerIndex]?.url;
@@ -3953,20 +4093,20 @@ export const UserApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async userControllerGetTopUsers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UserResponseDTO>>> {
+        async userControllerGetTopUsers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PublicUserResponseDTO>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetTopUsers(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetTopUsers']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint retrieves a user by their unique ID.
+         * This endpoint retrieves a user by their unique ID. Public route: the payload omits email and role.
          * @summary Get a user by ID
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async userControllerGetUserById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponseDTO>> {
+        async userControllerGetUserById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PublicUserResponseDTO>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerGetUserById(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerGetUserById']?.[localVarOperationServerIndex]?.url;
@@ -4020,7 +4160,7 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.userControllerDeleteUser(id, deleteUserDTO, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint retrieves a list of all users in the system.
+         * Admin only. This endpoint retrieves a list of all users in the system, with the full payload.
          * @summary List all users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4038,12 +4178,21 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.userControllerGetMe(options).then((request) => request(axios, basePath));
         },
         /**
+         * This endpoint retrieves the list of members for any authenticated user. The payload omits email and role.
+         * @summary List all members
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerGetMembers(options?: RawAxiosRequestConfig): AxiosPromise<Array<PublicUserResponseDTO>> {
+            return localVarFp.userControllerGetMembers(options).then((request) => request(axios, basePath));
+        },
+        /**
          * This endpoint retrieves the top users of the month based on their performance.
          * @summary Get monthly top users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerGetMonthlyTopUsers(options?: RawAxiosRequestConfig): AxiosPromise<Array<UserResponseDTO>> {
+        userControllerGetMonthlyTopUsers(options?: RawAxiosRequestConfig): AxiosPromise<Array<PublicUserResponseDTO>> {
             return localVarFp.userControllerGetMonthlyTopUsers(options).then((request) => request(axios, basePath));
         },
         /**
@@ -4052,17 +4201,17 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerGetTopUsers(options?: RawAxiosRequestConfig): AxiosPromise<Array<UserResponseDTO>> {
+        userControllerGetTopUsers(options?: RawAxiosRequestConfig): AxiosPromise<Array<PublicUserResponseDTO>> {
             return localVarFp.userControllerGetTopUsers(options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint retrieves a user by their unique ID.
+         * This endpoint retrieves a user by their unique ID. Public route: the payload omits email and role.
          * @summary Get a user by ID
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userControllerGetUserById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<UserResponseDTO> {
+        userControllerGetUserById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<PublicUserResponseDTO> {
             return localVarFp.userControllerGetUserById(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4109,7 +4258,7 @@ export class UserApi extends BaseAPI {
     }
 
     /**
-     * This endpoint retrieves a list of all users in the system.
+     * Admin only. This endpoint retrieves a list of all users in the system, with the full payload.
      * @summary List all users
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4128,6 +4277,17 @@ export class UserApi extends BaseAPI {
      */
     public userControllerGetMe(options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).userControllerGetMe(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This endpoint retrieves the list of members for any authenticated user. The payload omits email and role.
+     * @summary List all members
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userControllerGetMembers(options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userControllerGetMembers(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4153,7 +4313,7 @@ export class UserApi extends BaseAPI {
     }
 
     /**
-     * This endpoint retrieves a user by their unique ID.
+     * This endpoint retrieves a user by their unique ID. Public route: the payload omits email and role.
      * @summary Get a user by ID
      * @param {string} id 
      * @param {*} [options] Override http request option.

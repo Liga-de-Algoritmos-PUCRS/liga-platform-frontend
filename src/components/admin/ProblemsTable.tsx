@@ -22,7 +22,7 @@ export function ProblemsTable() {
 
   const { data: response, isLoading: loading, refetch } = useQuery({
     queryKey: ['adminProblems'],
-    queryFn: () => client.problem.problemControllerGetAllAdminProblems("teste"),
+    queryFn: () => client.problem.problemControllerGetAllAdminProblems(),
   });
 
   const problems = useMemo(() => {

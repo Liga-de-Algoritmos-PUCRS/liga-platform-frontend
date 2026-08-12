@@ -1,41 +1,62 @@
 import { useState, useEffect } from "react";
-import { 
-  Users, 
-  Search, 
-  Loader2, 
-  Trophy, 
-  Mail
+import {
+  Users,
+  Search,
+  Loader2,
+  Trophy,
+  Mail,
+  GraduationCap
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import client from "@/api/client";
-import { UserResponseDTO } from "@/api/sdk";
+import { PublicUserResponseDTO } from "@/api/sdk";
+import { COURSE_SHORT_LABELS } from "@/lib/user-labels";
+import { useAuth } from "@/providers/AuthProvider";
+import { toast } from "sonner";
+
+// A listagem pública não traz e-mail; a de admin traz. O tipo cobre as duas
+// para a tela poder alternar entre elas.
+type Member = PublicUserResponseDTO & { email?: string };
 
 export function MembersPage() {
-  const [members, setMembers] = useState<UserResponseDTO[]>([]);
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
+
+  const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedUser, setSelectedUser] = useState<UserResponseDTO | null>(null);
+  const [selectedUser, setSelectedUser] = useState<Member | null>(null);
 
   useEffect(() => {
     async function fetchMembers() {
+      setIsLoading(true);
       try {
-        const response = await client.user.userControllerGetAllUsers();
-        setMembers(response.data as UserResponseDTO[]);
+        // GET /user é admin-only e devolve o payload completo; o usuário comum
+        // usa GET /user/members, que não expõe dados pessoais.
+        const response = isAdmin
+          ? await client.user.userControllerGetAllUsers()
+          : await client.user.userControllerGetMembers();
+
+        setMembers(response.data);
       } catch (error) {
         console.error("Erro ao carregar integrantes:", error);
+        toast.error("Não foi possível carregar os integrantes.");
       } finally {
         setIsLoading(false);
       }
     }
     fetchMembers();
-  }, []);
+  }, [isAdmin]);
 
-  const filteredMembers = members.filter(member => 
-    member.name.toLowerCase().includes(search.toLowerCase()) ||
-    member.email.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredMembers = members.filter(member => {
+    const term = search.toLowerCase();
+    return (
+      member.name.toLowerCase().includes(term) ||
+      !!member.email?.toLowerCase().includes(term)
+    );
+  });
 
   if (isLoading) {
     return (
@@ -66,7 +87,7 @@ export function MembersPage() {
             <div className="relative w-full md:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <Input 
-                placeholder="Buscar por nome ou email..." 
+                placeholder={isAdmin ? "Buscar por nome ou email..." : "Buscar por nome..."}
                 className="pl-12 h-12 bg-white/5 border-white/10 rounded-2xl text-white focus:ring-primary shadow-2xl"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -83,7 +104,9 @@ export function MembersPage() {
               <thead className="sticky top-0 z-20 bg-[#121214]">
                 <tr className="border-b border-white/5">
                   <th className="px-6 py-5 text-[10px] font-black text-fuchsia-500 uppercase tracking-[0.2em]">Nome</th>
-                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500">E-mail</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500">
+                    {isAdmin ? "E-mail" : "Curso"}
+                  </th>
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500 text-center">Total Points</th>
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500 text-center">Submissões</th>
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-500 text-center">Acertos</th>
@@ -109,8 +132,17 @@ export function MembersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-300 font-mono">
-                        <Mail size={14} className="text-gray-300" />
-                        {member.email}
+                        {isAdmin ? (
+                          <>
+                            <Mail size={14} className="text-gray-300" />
+                            {member.email}
+                          </>
+                        ) : (
+                          <>
+                            <GraduationCap size={14} className="text-gray-300" />
+                            {member.course ? COURSE_SHORT_LABELS[member.course] ?? member.course : "-"}
+                          </>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">

@@ -32,7 +32,7 @@ export function SubmissionsTable() {
       const [subsRes, usersRes, probsRes] = await Promise.all([
         client.submit.submitControllerGetAllSubmits(),
         client.user.userControllerGetAllUsers(),
-        client.problem.problemControllerGetAllAdminProblems("teste")
+        client.problem.problemControllerGetAllAdminProblems()
       ]);
 
       const subsData = Array.isArray(subsRes.data) ? subsRes.data : [subsRes.data] as SubmitResponseDTO[];

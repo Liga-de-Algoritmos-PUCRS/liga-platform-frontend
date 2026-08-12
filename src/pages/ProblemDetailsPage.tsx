@@ -23,7 +23,7 @@ export function ProblemDetailsPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROOT';
+  const isAdmin = user?.role === 'ADMIN';
 
   const [problem, setProblem] = useState<ProblemResponseDTO & { isFinished?: boolean } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
