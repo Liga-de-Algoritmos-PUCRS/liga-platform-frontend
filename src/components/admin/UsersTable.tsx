@@ -10,31 +10,18 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import client from "@/api/client";
 import { UserResponseDTO, UpdateUserDTO } from "@/api/sdk";
-import { UserInfoModal, UserInterface } from "@/components/ranking/UserInfoModal";
-
-const COURSES = [
-  { value: "SOFTWARE_ENGINEERING", label: "Engenharia de Software" },
-  { value: "DATA_SCIENCE", label: "Ciência de Dados" },
-  { value: "COMPUTING_SCIENCE", label: "Ciência da Computação" },
-  { value: "INFORMATION_SYSTEMS", label: "Sistemas de Informação" },
-  { value: "COMPUTING_ENGINEERING", label: "Engenharia da Computação" },
-];
-
-const SEMESTERS = [
-  { value: "FIRST", label: "1º Semestre" },
-  { value: "SECOND", label: "2º Semestre" },
-  { value: "THIRD", label: "3º Semestre" },
-  { value: "FOURTH", label: "4º Semestre" },
-  { value: "FIFTH", label: "5º Semestre" },
-  { value: "SIXTH", label: "6º Semestre" },
-  { value: "SEVENTH", label: "7º Semestre" },
-  { value: "EIGHTH", label: "8º Semestre" },
-  { value: "NINTH", label: "9º Semestre" },
-  { value: "TENTH", label: "10º Semestre" },
-  { value: "GRADUATED", label: "Formado" },
-];
+import { UserInfoModal } from "@/components/ranking/UserInfoModal";
+import {
+  COURSE_LABELS,
+  COURSE_OPTIONS,
+  SEMESTER_LABELS,
+  SEMESTER_OPTIONS,
+} from "@/lib/user-labels";
+import { useAuth } from "@/providers/AuthProvider";
 
 export function UsersTable() {
+  const { user: currentUser } = useAuth();
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const [editingUser, setEditingUser] = useState<UserResponseDTO | null>(null);
@@ -224,10 +211,10 @@ export function UsersTable() {
                       <td className="px-6 py-4">
                          <div className="flex flex-col truncate">
                           <span className="text-gray-300 text-xs truncate">
-                            {user.course ? COURSES.find(c => c.value === user.course)?.label || user.course : "Não informado"}
+                            {user.course ? COURSE_LABELS[user.course] || user.course : "Não informado"}
                           </span>
                           <span className="text-gray-500 text-[10px] font-mono uppercase">
-                            {user.semester ? SEMESTERS.find(s => s.value === user.semester)?.label || user.semester : "--"}
+                            {user.semester ? SEMESTER_LABELS[user.semester] || user.semester : "--"}
                           </span>
                         </div>
                       </td>
@@ -238,23 +225,28 @@ export function UsersTable() {
 
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => {
-                              setEditingUser(user);
-                              setEditFormData({
-                                name: user.name,
-                                course: user.course,
-                                semester: user.semester,
-                                avatarUrl: user.avatarUrl || undefined,
-                                bannerUrl: user.bannerUrl || undefined
-                              });
-                            }}
-                            className="p-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-md transition-colors border border-white/5"
-                            title="Editar Utilizador"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          
+                          {/* PATCH /user/:id só aceita o próprio dono, mesmo
+                              para ADMIN: mostrar o botão nas outras linhas era
+                              prometer uma ação que sempre volta 401. */}
+                          {user.id === currentUser?.id && (
+                            <button
+                              onClick={() => {
+                                setEditingUser(user);
+                                setEditFormData({
+                                  name: user.name,
+                                  course: user.course,
+                                  semester: user.semester,
+                                  avatarUrl: user.avatarUrl || undefined,
+                                  bannerUrl: user.bannerUrl || undefined
+                                });
+                              }}
+                              className="p-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-md transition-colors border border-white/5"
+                              title="Editar meus dados"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                          )}
+
                           <button 
                             onClick={() => setDeletingUser(user)}
                             className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-md transition-colors border border-red-500/20"
@@ -273,8 +265,8 @@ export function UsersTable() {
         </div>
       </CardContent>
 
-      <UserInfoModal 
-        user={selectedUser as UserInterface}
+      <UserInfoModal
+        user={selectedUser}
         isOpen={isInfoModalOpen} 
         onClose={() => setIsInfoModalOpen(false)} 
       />
@@ -305,7 +297,7 @@ export function UsersTable() {
                   className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                 >
                   <option value="" className="bg-[#0a0a0b] text-gray-400">Nenhum</option>
-                  {COURSES.map(course => (
+                  {COURSE_OPTIONS.map(course => (
                     <option key={course.value} value={course.value} className="bg-[#0a0a0b] text-white">
                       {course.label}
                     </option>
@@ -322,7 +314,7 @@ export function UsersTable() {
                   className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                 >
                   <option value="" className="bg-[#0a0a0b] text-gray-400">Nenhum</option>
-                  {SEMESTERS.map(sem => (
+                  {SEMESTER_OPTIONS.map(sem => (
                     <option key={sem.value} value={sem.value} className="bg-[#0a0a0b] text-white">
                       {sem.label}
                     </option>
