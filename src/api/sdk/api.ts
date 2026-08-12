@@ -823,23 +823,11 @@ export interface UserResponseDTO {
      */
     'name': string;
     /**
-     * User email
-     * @type {string}
-     * @memberof UserResponseDTO
-     */
-    'email': string;
-    /**
      * User creation date
      * @type {string}
      * @memberof UserResponseDTO
      */
     'createdAt': string;
-    /**
-     * User role
-     * @type {string}
-     * @memberof UserResponseDTO
-     */
-    'role': UserResponseDTORoleEnum;
     /**
      * User avatar URL
      * @type {string}
@@ -894,14 +882,20 @@ export interface UserResponseDTO {
      * @memberof UserResponseDTO
      */
     'problemsResolved'?: number;
+    /**
+     * User email
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'email': string;
+    /**
+     * User role
+     * @type {string}
+     * @memberof UserResponseDTO
+     */
+    'role': UserResponseDTORoleEnum;
 }
 
-export const UserResponseDTORoleEnum = {
-    User: 'USER',
-    Admin: 'ADMIN'
-} as const;
-
-export type UserResponseDTORoleEnum = typeof UserResponseDTORoleEnum[keyof typeof UserResponseDTORoleEnum];
 export const UserResponseDTOCourseEnum = {
     SoftwareEngineering: 'SOFTWARE_ENGINEERING',
     DataScience: 'DATA_SCIENCE',
@@ -926,6 +920,12 @@ export const UserResponseDTOSemesterEnum = {
 } as const;
 
 export type UserResponseDTOSemesterEnum = typeof UserResponseDTOSemesterEnum[keyof typeof UserResponseDTOSemesterEnum];
+export const UserResponseDTORoleEnum = {
+    User: 'USER',
+    Admin: 'ADMIN'
+} as const;
+
+export type UserResponseDTORoleEnum = typeof UserResponseDTORoleEnum[keyof typeof UserResponseDTORoleEnum];
 
 /**
  * 
@@ -1699,8 +1699,8 @@ export const ProblemsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * This endpoint retrieves a problem by its ID.
-         * @summary Get problem by ID
+         * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+         * @summary Get problem by ID (admin)
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1903,8 +1903,8 @@ export const ProblemsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint retrieves a problem by its ID.
-         * @summary Get problem by ID
+         * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+         * @summary Get problem by ID (admin)
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1997,8 +1997,8 @@ export const ProblemsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.problemControllerDeleteProblem(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint retrieves a problem by its ID.
-         * @summary Get problem by ID
+         * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+         * @summary Get problem by ID (admin)
          * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2080,8 +2080,8 @@ export class ProblemsApi extends BaseAPI {
     }
 
     /**
-     * This endpoint retrieves a problem by its ID.
-     * @summary Get problem by ID
+     * Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
+     * @summary Get problem by ID (admin)
      * @param {string} id 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3379,7 +3379,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to delete a submit
+         * Admin only. This endpoint allows you to delete a submit
          * @summary Delete Submit
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3413,7 +3413,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to get all submits
+         * Admin only. This endpoint allows you to get all submits
          * @summary Get All Submits
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3443,7 +3443,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to get a submit by its problem ID
+         * Admin only. This endpoint allows you to get a submit by its problem ID
          * @summary Get Submit by Problem ID
          * @param {string} problemId 
          * @param {*} [options] Override http request option.
@@ -3477,7 +3477,7 @@ export const SubmitApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This endpoint allows you to get a submit by its user ID
+         * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
          * @summary Get Submit by User ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -3534,7 +3534,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to delete a submit
+         * Admin only. This endpoint allows you to delete a submit
          * @summary Delete Submit
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3547,7 +3547,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to get all submits
+         * Admin only. This endpoint allows you to get all submits
          * @summary Get All Submits
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3559,7 +3559,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to get a submit by its problem ID
+         * Admin only. This endpoint allows you to get a submit by its problem ID
          * @summary Get Submit by Problem ID
          * @param {string} problemId 
          * @param {*} [options] Override http request option.
@@ -3572,7 +3572,7 @@ export const SubmitApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * This endpoint allows you to get a submit by its user ID
+         * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
          * @summary Get Submit by User ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -3605,7 +3605,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerCreateSubmit(createSubmitDTO, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to delete a submit
+         * Admin only. This endpoint allows you to delete a submit
          * @summary Delete Submit
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3615,7 +3615,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerDeleteSubmit(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to get all submits
+         * Admin only. This endpoint allows you to get all submits
          * @summary Get All Submits
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3624,7 +3624,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerGetAllSubmits(options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to get a submit by its problem ID
+         * Admin only. This endpoint allows you to get a submit by its problem ID
          * @summary Get Submit by Problem ID
          * @param {string} problemId 
          * @param {*} [options] Override http request option.
@@ -3634,7 +3634,7 @@ export const SubmitApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.submitControllerGetSubmitByProblemId(problemId, options).then((request) => request(axios, basePath));
         },
         /**
-         * This endpoint allows you to get a submit by its user ID
+         * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
          * @summary Get Submit by User ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -3666,7 +3666,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to delete a submit
+     * Admin only. This endpoint allows you to delete a submit
      * @summary Delete Submit
      * @param {string} id 
      * @param {*} [options] Override http request option.
@@ -3678,7 +3678,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to get all submits
+     * Admin only. This endpoint allows you to get all submits
      * @summary Get All Submits
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3689,7 +3689,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to get a submit by its problem ID
+     * Admin only. This endpoint allows you to get a submit by its problem ID
      * @summary Get Submit by Problem ID
      * @param {string} problemId 
      * @param {*} [options] Override http request option.
@@ -3701,7 +3701,7 @@ export class SubmitApi extends BaseAPI {
     }
 
     /**
-     * This endpoint allows you to get a submit by its user ID
+     * This endpoint allows you to get a submit by its user ID. Only the owner of the submissions or an admin can read them.
      * @summary Get Submit by User ID
      * @param {string} userId 
      * @param {*} [options] Override http request option.

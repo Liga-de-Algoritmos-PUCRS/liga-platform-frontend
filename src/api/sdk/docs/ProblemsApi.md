@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**problemControllerCreateProblem**](#problemcontrollercreateproblem) | **POST** /problems | Create a new problem|
 |[**problemControllerDeleteProblem**](#problemcontrollerdeleteproblem) | **DELETE** /problems/{id} | Delete a problem|
-|[**problemControllerGetAdminProblemById**](#problemcontrollergetadminproblembyid) | **GET** /problems/{id}/admin | Get problem by ID|
+|[**problemControllerGetAdminProblemById**](#problemcontrollergetadminproblembyid) | **GET** /problems/{id}/admin | Get problem by ID (admin)|
 |[**problemControllerGetAllAdminProblems**](#problemcontrollergetalladminproblems) | **GET** /problems/admin/all | List all problems (admin)|
 |[**problemControllerGetAllProblems**](#problemcontrollergetallproblems) | **GET** /problems | List all problems|
 |[**problemControllerGetProblemById**](#problemcontrollergetproblembyid) | **GET** /problems/{id} | Get problem by ID|
@@ -122,7 +122,7 @@ No authorization required
 # **problemControllerGetAdminProblemById**
 > ProblemResponseDTO problemControllerGetAdminProblemById()
 
-This endpoint retrieves a problem by its ID.
+Admin only. Retrieves a problem by its ID with the `answer` field filled in, which the public route blanks out.
 
 ### Example
 
@@ -168,6 +168,7 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | Problem retrieved successfully. |  -  |
 |**400** | Bad request. The input data is invalid or missing. |  -  |
+|**403** | Forbidden. This endpoint requires an admin account. |  -  |
 |**404** | Problem not found. The problem with the specified ID does not exist. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
@@ -214,6 +215,7 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | List of problems retrieved successfully. |  -  |
+|**403** | Forbidden. This endpoint requires an admin account. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
