@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import client from "@/api/client";
-import { ProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
+import { PublicProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import { useAuth } from "@/providers/AuthProvider";
 
 import {
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 
 export function ProblemsPage() {
-  const [, setSelectedProblem] = useState<ProblemResponseDTO | null>(null);
+  const [, setSelectedProblem] = useState<PublicProblemResponseDTO | null>(null);
   const { user, isAuthenticated } = useAuth();
   
   const [nameFilter, setNameFilter] = useState("");
@@ -40,7 +40,7 @@ export function ProblemsPage() {
     staleTime: 1000 * 60 * 2,
   });
 
-  const problems = useMemo(() => (problemsResponse?.data as ProblemResponseDTO[]) || [], [problemsResponse?.data]);
+  const problems = useMemo(() => (problemsResponse?.data as PublicProblemResponseDTO[]) || [], [problemsResponse?.data]);
   const isLoading = isLoadingProblems || (isAuthenticated && isLoadingSubmissions);
 
   const userFinishedIds = useMemo(() => {
@@ -117,7 +117,7 @@ export function ProblemsPage() {
                   <Terminal className="text-primary mt-0.5 shrink-0" size={20} />
                   <div>
                     <h4 className="font-bold text-white">Desafios de Código</h4>
-                    <p className="text-gray-400 mt-1 leading-relaxed">Explore nossa biblioteca de problemas. Eles variam em dificuldade (EASY, MEDIUM, HARD) e pontuação.</p>
+                    <p className="text-gray-400 mt-1 leading-relaxed">Explore nossa biblioteca de problemas. Eles variam em dificuldade (EASY, MEDIUM, HARD) e no quanto valem agora.</p>
                   </div>
                 </div>
                 <div className="flex gap-4 items-start">
@@ -130,8 +130,13 @@ export function ProblemsPage() {
                 <div className="flex gap-4 items-start">
                   <Trophy className="text-primary mt-0.5 shrink-0" size={20} />
                   <div>
-                    <h4 className="font-bold text-white">Pontuação e Ranking</h4>
-                    <p className="text-gray-400 mt-1 leading-relaxed">Resolva os algoritmos, submeta o seu código e acumule pontos para subir posições no ranking geral da plataforma.</p>
+                    <h4 className="font-bold text-white">Corrida por Pontos</h4>
+                    <p className="text-gray-400 mt-1 leading-relaxed">
+                      O número no card é quanto o problema vale <strong className="text-white">agora</strong>: quem resolver
+                      primeiro leva mais. A cada aluno que acerta, o problema passa a valer menos, até parar num valor
+                      mínimo. Você fica com a pontuação do momento em que acertou, e ela não muda depois.
+                      Errar não custa pontos — pode tentar quantas vezes precisar. Cada desafio conta uma vez só.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -241,11 +246,11 @@ export function ProblemsPage() {
                   <Trophy size={12} />
                   Mínimo de Pontos: <span className="text-primary">{minPoints}</span>
                 </div>
-                <input 
+                <input
                   type="range"
                   min="0"
-                  max="500"
-                  step="50"
+                  max="200"
+                  step="10"
                   value={minPoints}
                   onChange={(e) => setMinPoints(Number(e.target.value))}
                   className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"

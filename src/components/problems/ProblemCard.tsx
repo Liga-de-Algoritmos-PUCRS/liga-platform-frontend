@@ -2,13 +2,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Terminal, Star, CheckCircle2, Check } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { ProblemResponseDTO } from "@/api/sdk";
+import { PublicProblemResponseDTO } from "@/api/sdk";
 import { cn } from "@/lib/utils";
 
 interface ProblemCardProps {
-  problem: ProblemResponseDTO;
+  problem: PublicProblemResponseDTO;
   isFinished?: boolean;  
-  onClick?: (problem: ProblemResponseDTO) => void; 
+  onClick?: (problem: PublicProblemResponseDTO) => void; 
 }
 
 export function ProblemCard({ problem, isFinished, onClick }: ProblemCardProps) {
