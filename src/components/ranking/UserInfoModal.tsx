@@ -3,46 +3,26 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  Terminal, 
-  Trophy, 
-  Target, 
-  Layers, 
-  Mail, 
+import {
+  Terminal,
+  Trophy,
+  Target,
+  Layers,
+  Mail,
   CalendarDays,
   GraduationCap,
   Sparkles
 } from "lucide-react";
+import { PublicUserResponseDTO } from "@/api/sdk";
+import { COURSE_SHORT_LABELS, SEMESTER_SHORT_LABELS } from "@/lib/user-labels";
 
-const COURSE_LABELS: Record<string, string> = {
-  SOFTWARE_ENGINEERING: "Eng. Software",
-  DATA_SCIENCE: "Ciência de Dados",
-  COMPUTING_SCIENCE: "Ciência da Comp.",
-  INFORMATION_SYSTEMS: "Sist. Informação",
-  COMPUTING_ENGINEERING: "Eng. Computação",
-};
-
-const SEMESTER_LABELS: Record<string, string> = {
-  FIRST: "1º Sem", SECOND: "2º Sem", THIRD: "3º Sem", FOURTH: "4º Sem",
-  FIFTH: "5º Sem", SIXTH: "6º Sem", SEVENTH: "7º Sem", EIGHTH: "8º Sem",
-  NINTH: "9º Sem", TENTH: "10º Sem", GRADUATED: "Formado",
-};
-
-export interface UserInterface {
+// O mesmo modal é aberto pelo ranking e pela tela de integrantes (payload
+// público) e pelas telas de admin (payload completo). O `email` fica opcional
+// porque o back só entrega dados pessoais em rota admin ou para o próprio dono.
+export type UserInterface = Partial<PublicUserResponseDTO> & {
   name: string;
-  // As rotas de ranking e a listagem de membros nao devolvem email: o back so
-  // entrega dados pessoais em rota admin ou para o proprio usuario.
   email?: string;
-  createdAt?: string;
-  course?: string;
-  semester?: string;
-  bannerUrl?: string | null;
-  avatarUrl?: string | null;
-  monthlyPoints?: number;
-  allTimePoints?: number;
-  submissions?: number;
-  problemsResolved?: number;
-}
+};
 
 interface UserInfoModalProps {
   user: UserInterface | null;
@@ -89,13 +69,13 @@ export function UserInfoModal({ user, isOpen, onClose }: UserInfoModalProps) {
             {user.course && (
               <div className="px-2 sm:px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[9px] sm:text-[10px] font-bold text-primary flex items-center gap-1 shrink-0">
                 <GraduationCap size={10} className="text-primary" />
-                {COURSE_LABELS[user.course] || user.course}
+                {COURSE_SHORT_LABELS[user.course] || user.course}
               </div>
             )}
             {user.semester && (
               <div className="px-2 sm:px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1 shrink-0">
                 <Sparkles size={10} className="text-gray-400" />
-                {SEMESTER_LABELS[user.semester] || user.semester}
+                {SEMESTER_SHORT_LABELS[user.semester] || user.semester}
               </div>
             )}
           </div>
