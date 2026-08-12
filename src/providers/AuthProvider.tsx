@@ -106,7 +106,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           await refreshAccessToken()
         } catch (error) {
           if (isAuthError(error)) {
-            // refreshAccessToken já limpou a sessão e disparou o logout
+            // refreshAccessToken já limpou a sessão local pelo handler de
+            // não-autenticado; não chama o backend para não revogar os tokens
+            // dos outros dispositivos
             setLoading(false)
             return
           }
