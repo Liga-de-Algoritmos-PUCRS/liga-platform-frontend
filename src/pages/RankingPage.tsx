@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { RankingTable } from "@/components/ranking/RankingTable";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import { Button } from "@/components/ui/button";
@@ -8,69 +9,59 @@ import { PublicUserResponseDTO } from "@/api/sdk";
 import client from "@/api/client";
 import { toast } from "sonner"
 import { useAuth } from "@/providers/AuthProvider";
+import { queryKeys } from "@/lib/query-keys";
 
 export function RankingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+  const queryClient = useQueryClient();
+
   const isAdmin = user?.role === 'ADMIN';
 
   const [view, setView] = useState<"monthly" | "alltime">("monthly");
   const [selectedUser, setSelectedUser] = useState<PublicUserResponseDTO | null>(null);
-  
-  const [monthlyUsers, setMonthlyUsers] = useState<PublicUserResponseDTO[]>([]);
-  const [allTimeUsers, setAllTimeUsers] = useState<PublicUserResponseDTO[]>([]);
-  
-  const [isLoading, setIsLoading] = useState(true);
-  const [isResetting, setIsResetting] = useState(false);
 
-  const fetchRankings = useCallback(async () => {
-    setIsLoading(true);
+  const { data: monthlyResponse, isLoading: isLoadingMonthly } = useQuery({
+    queryKey: queryKeys.ranking('monthly'),
+    queryFn: () => client.user.userControllerGetMonthlyTopUsers(),
+  });
 
-    try {
-      const [monthlyResponse, allTimeResponse] = await Promise.all([
-        client.user.userControllerGetMonthlyTopUsers(),
-        client.user.userControllerGetTopUsers(),
-      ]);
+  const { data: allTimeResponse, isLoading: isLoadingAllTime } = useQuery({
+    queryKey: queryKeys.ranking('alltime'),
+    queryFn: () => client.user.userControllerGetTopUsers(),
+  });
 
-      setMonthlyUsers(monthlyResponse.data);
-      setAllTimeUsers(allTimeResponse.data);
-    } catch (error) {
-      console.error("Erro ao buscar dados do ranking:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const isLoading = isLoadingMonthly || isLoadingAllTime;
 
-  useEffect(() => {
-    fetchRankings();
-  }, [fetchRankings]);
+  const resetPointsMutation = useMutation({
+    mutationFn: () => client.user.userControllerResetUserPoints(),
+    onSuccess: () => {
+      toast.success("Pontuação mensal zerada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: queryKeys.ranking('monthly') });
+    },
+    onError: (error) => {
+      console.error("Erro ao zerar as pontuações:", error);
+      toast.error("Ocorreu um erro ao tentar zerar as pontuações.");
+    },
+  });
 
   const handleUserClick = (user: PublicUserResponseDTO) => {
     setSelectedUser(user);
   };
 
-  const handleResetPoints = async () => {
+  const handleResetPoints = () => {
     const confirmReset = window.confirm(
       "CUIDADO: Tem certeza que deseja zerar a pontuação mensal de TODOS os usuários da Liga? Essa ação é irreversível."
     );
-    
+
     if (!confirmReset) return;
 
-    try {
-      setIsResetting(true);
-      await client.user.userControllerResetUserPoints();
-      toast.success("Pontuação mensal zerada com sucesso!");
-      await fetchRankings();
-    } catch (error) {
-      console.error("Erro ao zerar as pontuações:", error);
-      toast.error("Ocorreu um erro ao tentar zerar as pontuações.");
-    } finally {
-      setIsResetting(false);
-    }
+    resetPointsMutation.mutate();
   };
 
-  const currentData = view === "monthly" ? monthlyUsers : allTimeUsers;
+  const isResetting = resetPointsMutation.isPending;
+
+  const currentData = (view === "monthly" ? monthlyResponse?.data : allTimeResponse?.data) || [];
 
   return (
     <div className="relative min-h-screen bg-background pt-24 pb-20 px-4 md:px-6 overflow-hidden">
