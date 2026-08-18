@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { Trophy, Code2, Target, Zap, CheckCircle2 } from "lucide-react"; 
+import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Trophy, Code2, Target, Zap, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import client from "@/api/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
@@ -9,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { 
-  UserResponseDTOCourseEnum, 
+import { queryKeys } from "@/lib/query-keys";
+import {
+  UserResponseDTOCourseEnum,
   UserResponseDTOSemesterEnum,
   UpdateUserDTO,
   SubmitResponseDTO,
@@ -44,10 +46,35 @@ export function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"info" | "progress">("info");
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
-  const [submits, setSubmits] = useState<SubmitResponseDTO[]>([]);
-  const [problemNames, setProblemNames] = useState<Record<string, string>>({});
-  const [isLoadingProgress, setIsLoadingProgress] = useState(false);
+
+  const { data: submitsResponse, isLoading: isLoadingSubmits } = useQuery({
+    queryKey: queryKeys.submissions(user?.id),
+    queryFn: () => client.submit.submitControllerGetSubmitByUserId(String(user?.id)),
+    enabled: !!user?.id && activeTab === "progress",
+  });
+
+  const { data: problemsResponse, isLoading: isLoadingProblems } = useQuery({
+    queryKey: queryKeys.problems,
+    queryFn: () => client.problem.problemControllerGetAllProblems(),
+    enabled: activeTab === "progress",
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const isLoadingProgress = isLoadingSubmits || isLoadingProblems;
+
+  const submits = useMemo(() => {
+    return [...((submitsResponse?.data as SubmitResponseDTO[]) || [])].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [submitsResponse?.data]);
+
+  const problemNames = useMemo(
+    () =>
+      Object.fromEntries(
+        ((problemsResponse?.data as ProblemResponseDTO[]) || []).map((p) => [p.id, p.title])
+      ),
+    [problemsResponse?.data]
+  );
 
   const [formData, setFormData] = useState<UpdateUserDTO>({
     name: user?.name || "",
@@ -65,34 +92,6 @@ export function ProfilePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
-
-  useEffect(() => {
-    const fetchProgressData = async () => {
-      if (!user?.id || activeTab !== "progress") return;
-      setIsLoadingProgress(true);
-      try {
-        const [submitsRes, problemsRes] = await Promise.all([
-          client.submit.submitControllerGetSubmitByUserId(user.id),
-          client.problem.problemControllerGetAllProblems()
-        ]);
-        const sortedSubmits = (submitsRes.data as SubmitResponseDTO[]).sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setSubmits(sortedSubmits);
-        const namesMap: Record<string, string> = {};
-        (problemsRes.data as ProblemResponseDTO[]).forEach((p) => {
-          namesMap[p.id] = p.title;
-        });
-        setProblemNames(namesMap);
-      } catch (error) {
-        console.error("Erro ao carregar dados de progresso:", error);
-        toast.error("Não foi possível carregar o seu progresso.");
-      } finally {
-        setIsLoadingProgress(false);
-      }
-    };
-    fetchProgressData();
-  }, [user?.id, activeTab]);
 
   const handleUpdateProfile = async () => {
     if (!user?.id) return;
