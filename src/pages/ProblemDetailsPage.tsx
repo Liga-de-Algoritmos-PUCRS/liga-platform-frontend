@@ -16,6 +16,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import client from "@/api/client";
 import { PublicProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import { CURRENT_VALUE_HINT } from "@/lib/problem-scoring";
+import { queryKeys } from "@/lib/query-keys";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw"; 
 import remarkGfm from "remark-gfm"; 
@@ -79,7 +80,7 @@ export function ProblemDetailsPage() {
 
   // Mesma chave da listagem de problemas: invalidar aqui tem de alcançar as duas telas.
   const { data: submissionsResponse } = useQuery({
-    queryKey: ['submissions', user?.id],
+    queryKey: queryKeys.submissions(user?.id),
     queryFn: () => client.submit.submitControllerGetSubmitByUserId(String(user?.id)),
     enabled: !!(isAuthenticated && user?.id),
   });
@@ -93,8 +94,8 @@ export function ProblemDetailsPage() {
 
   const invalidateAfterSubmit = () => {
     queryClient.invalidateQueries({ queryKey: ['problem', cleanId] });
-    queryClient.invalidateQueries({ queryKey: ['problems'] });
-    queryClient.invalidateQueries({ queryKey: ['submissions', user?.id] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.problems });
+    queryClient.invalidateQueries({ queryKey: queryKeys.submissions(user?.id) });
   };
 
   if (isLoading) {

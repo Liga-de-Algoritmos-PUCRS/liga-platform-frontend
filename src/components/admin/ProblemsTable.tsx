@@ -19,6 +19,7 @@ import {
   validateScoring,
   type ScoringErrors,
 } from "@/lib/problem-scoring";
+import { queryKeys } from "@/lib/query-keys";
 
 export function ProblemsTable() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +32,7 @@ export function ProblemsTable() {
   const [actionLoading, setActionLoading] = useState(false);
 
   const { data: response, isLoading: loading, refetch } = useQuery({
-    queryKey: ['adminProblems'],
+    queryKey: queryKeys.adminProblems,
     queryFn: () => client.problem.problemControllerGetAllAdminProblems(),
   });
 

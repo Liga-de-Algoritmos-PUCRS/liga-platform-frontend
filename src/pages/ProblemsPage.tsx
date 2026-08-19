@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import client from "@/api/client";
 import { PublicProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import { useAuth } from "@/providers/AuthProvider";
+import { queryKeys } from "@/lib/query-keys";
 
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
@@ -30,13 +31,13 @@ export function ProblemsPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   const { data: problemsResponse, isLoading: isLoadingProblems } = useQuery({
-    queryKey: ['problems'],
+    queryKey: queryKeys.problems,
     queryFn: () => client.problem.problemControllerGetAllProblems(),
-    staleTime: 1000 * 60 * 5, 
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: submissionsResponse, isLoading: isLoadingSubmissions } = useQuery({
-    queryKey: ['submissions', user?.id],
+    queryKey: queryKeys.submissions(user?.id),
     queryFn: () => client.submit.submitControllerGetSubmitByUserId(String(user?.id)),
     enabled: !!(isAuthenticated && user?.id),
     staleTime: 1000 * 60 * 2,
