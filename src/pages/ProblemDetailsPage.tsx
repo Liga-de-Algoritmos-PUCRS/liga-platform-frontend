@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import {
    Download, Send, FileText,
   Users, Trophy, Activity, CheckCircle2, ArrowLeft, Loader2, Eye, EyeOff,
-  XCircle, PartyPopper, CheckCircle, Hash, WifiOff
+  XCircle, PartyPopper, CheckCircle, Hash, WifiOff, X
 } from "lucide-react";
 import { Link, useParams, useNavigate } from "@tanstack/react-router";
 import { isAxiosError } from "axios";
@@ -18,9 +18,10 @@ import { PublicProblemResponseDTO, SubmitResponseDTO } from "@/api/sdk";
 import { CURRENT_VALUE_HINT } from "@/lib/problem-scoring";
 import { queryKeys } from "@/lib/query-keys";
 import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw"; 
-import remarkGfm from "remark-gfm"; 
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 /**
  * Por que o envio falhou — nunca por que a resposta está errada. Os três casos
@@ -60,6 +61,7 @@ export function ProblemDetailsPage() {
 
   const [userAnswer, setUserAnswer] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
+  const [isAnswerPanelOpen, setIsAnswerPanelOpen] = useState(false);
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -177,10 +179,11 @@ export function ProblemDetailsPage() {
   };
 
   return (
-    <div className="pt-16 bg-[#0a0a0b] text-white flex flex-col lg:flex-row h-screen overflow-hidden">
-      
-      <div className="flex-1 flex flex-col border-r border-white/5 overflow-hidden">
-        
+    <div className="pt-16 bg-[#0a0a0b] text-white min-h-screen overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col lg:flex-row">
+
+      <div className="flex-1 flex flex-col border-r border-white/5">
+
         <div className={cn("relative w-full overflow-hidden shrink-0", problem.bannerUrl ? "min-h-60" : "h-60")}>
           <Link to="/problemas" className="absolute top-6 left-6 z-30">
             <Button variant="ghost" size="icon" className="bg-black/50 hover:bg-black/80 rounded-full">
@@ -229,15 +232,15 @@ export function ProblemDetailsPage() {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col p-10 gap-8 overflow-hidden">
-          
+        <div className="flex flex-col p-10 gap-8">
+
           <div className="flex items-center gap-3 text-primary/80 border-b border-white/5 pb-4 shrink-0">
             <FileText size={20} />
             <h3 className="font-bold uppercase tracking-[0.2em] text-xs">Instruções do Desafio</h3>
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-4">
-            <div className="prose prose-invert max-w-none pb-10 
+          <div className="pr-4">
+            <div className="prose prose-invert max-w-none pb-10
               prose-headings:text-white prose-a:text-primary prose-strong:text-white
               prose-img:rounded-3xl prose-img:border prose-img:border-white/10 prose-img:shadow-2xl">
               <div className="text-lg text-gray-400 leading-relaxed font-medium">
@@ -265,7 +268,18 @@ export function ProblemDetailsPage() {
         </div>
       </div>
 
-      <div className="w-full lg:w-[400px] bg-white/[0.01] p-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar shrink-0 h-full">
+      <Sheet open={isAnswerPanelOpen} onOpenChange={setIsAnswerPanelOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed bottom-24 right-6 z-40 h-14 w-14 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90"
+          >
+            {isAnswerPanelOpen ? <X size={22} /> : <Send size={22} />}
+            <span className="sr-only">{isAnswerPanelOpen ? "Fechar painel de resposta" : "Abrir painel de resposta"}</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right" className="w-full sm:w-100 sm:max-w-100 bg-[#0a0a0b] border-white/5 p-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
         <div className="space-y-3">
           <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 ml-1">Recursos de Entrada</Label>
           <div className="p-4 rounded-[24px] bg-white/[0.03] border border-white/5 flex items-center justify-between group hover:border-primary/40 transition-all">
@@ -358,6 +372,8 @@ export function ProblemDetailsPage() {
             </div>
           )}
         </div>
+        </SheetContent>
+      </Sheet>
       </div>
 
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
