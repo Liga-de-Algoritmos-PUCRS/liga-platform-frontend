@@ -40,7 +40,7 @@ export function ProblemCard({ problem, isFinished, pointsEarned, onClick }: Prob
     <Card 
       onClick={handleCardClick}
       className={cn(
-        "group relative aspect-square flex flex-col cursor-pointer overflow-hidden border-white/10 bg-[#0a0a0b]/40 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 rounded-[32px]",
+        "group relative aspect-square flex flex-col cursor-pointer overflow-hidden border-white/10 bg-[#0a0a0b]/40 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 rounded-[32px] pt-0",
         isFinished && "border-emerald-500/30 shadow-lg shadow-emerald-500/5"
       )}
     >
