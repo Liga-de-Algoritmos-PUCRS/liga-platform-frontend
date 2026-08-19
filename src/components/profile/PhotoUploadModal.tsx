@@ -16,10 +16,35 @@ interface PhotoUploadModalProps {
   user: UserWithAccount;
 }
 
+const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg"];
+const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
+
 export function PhotoUploadModal({ isOpen, onClose, type, user }: PhotoUploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const { refetchUser } = useAuth();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    e.target.value = "";
+
+    if (!selected) {
+      setFile(null);
+      return;
+    }
+
+    if (!ALLOWED_MIME_TYPES.includes(selected.type)) {
+      toast.error("Formato inválido. Envie um arquivo PNG ou JPG.");
+      return;
+    }
+
+    if (selected.size > MAX_FILE_SIZE_BYTES) {
+      toast.error("Arquivo muito grande. O tamanho máximo é 2MB.");
+      return;
+    }
+
+    setFile(selected);
+  };
 
   const handleUpload = async () => {
     if (!file || !user) return;
@@ -27,11 +52,17 @@ export function PhotoUploadModal({ isOpen, onClose, type, user }: PhotoUploadMod
     setIsUploading(true);
     try {
       const response = await client.file.fileControllerCreate(file);
-      const imageUrl = response.data[0].fileUrl;
-      const updatePayload: UpdateUserDTO = type === "avatar" 
-        ? { avatarUrl: imageUrl } 
+      const imageUrl = response.data[0]?.fileUrl;
+
+      if (!imageUrl) {
+        toast.error("O upload não retornou um arquivo válido. Tente novamente.");
+        return;
+      }
+
+      const updatePayload: UpdateUserDTO = type === "avatar"
+        ? { avatarUrl: imageUrl }
         : { bannerUrl: imageUrl };
-      
+
       await client.user.userControllerUpdateUser(user.id, updatePayload);
 
       try {
@@ -68,10 +99,10 @@ export function PhotoUploadModal({ isOpen, onClose, type, user }: PhotoUploadMod
           >
             <input 
               id={`file-input-${type}`}
-              type="file" 
-              className="hidden" 
-              accept="image/*"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              type="file"
+              className="hidden"
+              accept={ALLOWED_MIME_TYPES.join(",")}
+              onChange={handleFileChange}
             />
             <UploadCloud className={cn("h-10 w-10 transition-colors", file ? 'text-primary' : 'text-gray-500')} />
             <div className="text-center">
