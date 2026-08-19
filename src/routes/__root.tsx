@@ -1,5 +1,4 @@
 import { createRootRouteWithContext, Outlet, useLocation } from '@tanstack/react-router'
-import { Toaster } from 'sonner'
 import { AuthContextType } from '@/providers/AuthProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
 import { Navbar } from '@/components/navbar'
@@ -22,22 +21,6 @@ function RootComponent() {
         <main className="flex-1 flex flex-col">
           <Outlet />
         </main>
-        <Toaster 
-          richColors 
-          position="bottom-right" 
-          toastOptions={{
-            style: {
-              borderRadius: 'var(--radius)',
-              fontFamily: 'var(--font-sans)',
-            },
-            classNames: {
-              toast: 'border border-border/20 shadow-xl',
-              title: 'font-semibold text-[15px] tracking-tight',
-              description: 'text-sm opacity-90',
-            }
-          }}
-        />
-
       </div>
     </ThemeProvider>
   )

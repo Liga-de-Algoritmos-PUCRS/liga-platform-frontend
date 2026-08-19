@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react"
+import { toast } from "sonner"
 import client, {
   setAccessToken,
   setUnauthenticatedHandler,
@@ -6,6 +7,7 @@ import client, {
   isAuthError,
   isTokenExpired,
 } from "@/api/client"
+import { router } from "@/router"
 import { LoginRequestDTO } from "@/api/sdk"
 import UserWithAccount from "@/types/user.types"
 
@@ -81,10 +83,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [fetchUserWithAccount, clearLocalSession])
 
   useEffect(() => {
-    // Dispara quando o refresh token é rejeitado pelo backend. Limpa só esta
+    // Dispara quando o refresh token é rejeitado pelo backend (sessão morta
+    // de verdade — convergência entre abas nunca chama isto). Limpa só esta
     // aba: um /auth/logout aqui derrubaria as outras abas e dispositivos.
     setUnauthenticatedHandler(() => {
       clearLocalSession()
+      toast.warning("Sessão expirada", {
+        description: "Entre novamente para continuar.",
+      })
+      router.navigate({ to: "/login" })
     })
 
     const initAuth = async () => {
