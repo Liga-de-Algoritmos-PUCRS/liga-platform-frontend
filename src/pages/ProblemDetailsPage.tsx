@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import {
    Download, Send, FileText,
   Users, Trophy, Activity, CheckCircle2, ArrowLeft, Loader2, Eye, EyeOff,
-  XCircle, PartyPopper, CheckCircle, Hash, WifiOff, X
+  XCircle, PartyPopper, CheckCircle, Hash, WifiOff
 } from "lucide-react";
 import { Link, useParams, useNavigate } from "@tanstack/react-router";
 import { isAxiosError } from "axios";
@@ -275,8 +275,8 @@ export function ProblemDetailsPage() {
             size="icon"
             className="fixed bottom-24 right-6 z-40 h-14 w-14 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90"
           >
-            {isAnswerPanelOpen ? <X size={22} /> : <Send size={22} />}
-            <span className="sr-only">{isAnswerPanelOpen ? "Fechar painel de resposta" : "Abrir painel de resposta"}</span>
+            <Send size={22} />
+            <span className="sr-only">Abrir painel de resposta</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="w-full sm:w-100 sm:max-w-100 bg-[#0a0a0b] border-white/5 p-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
