@@ -256,6 +256,62 @@ export interface LoginResponseDTO {
 /**
  * 
  * @export
+ * @interface MyAttendanceHistoryItemDto
+ */
+export interface MyAttendanceHistoryItemDto {
+    /**
+     * ID da chamada
+     * @type {string}
+     * @memberof MyAttendanceHistoryItemDto
+     */
+    'rollCallId': string;
+    /**
+     * Data da chamada no formato ISO 8601
+     * @type {string}
+     * @memberof MyAttendanceHistoryItemDto
+     */
+    'date': string;
+    /**
+     * Se o usuário esteve presente nessa chamada
+     * @type {boolean}
+     * @memberof MyAttendanceHistoryItemDto
+     */
+    'isPresent': boolean;
+}
+/**
+ * 
+ * @export
+ * @interface MyAttendancesResponseDto
+ */
+export interface MyAttendancesResponseDto {
+    /**
+     * Total de chamadas realizadas
+     * @type {number}
+     * @memberof MyAttendancesResponseDto
+     */
+    'totalClasses': number;
+    /**
+     * Total de presenças do usuário
+     * @type {number}
+     * @memberof MyAttendancesResponseDto
+     */
+    'totalAttendances': number;
+    /**
+     * Total de faltas do usuário
+     * @type {number}
+     * @memberof MyAttendancesResponseDto
+     */
+    'totalMisses': number;
+    /**
+     * Histórico de presenças por chamada
+     * @type {Array<MyAttendanceHistoryItemDto>}
+     * @memberof MyAttendancesResponseDto
+     */
+    'history': Array<MyAttendanceHistoryItemDto>;
+}
+/**
+ * 
+ * @export
  * @interface ProblemResponseDTO
  */
 export interface ProblemResponseDTO {
@@ -2791,7 +2847,7 @@ export const RollCallApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+         * Gera um QR Code com expiração de 30 segundos para a chamada informada. Acesso restrito a administradores.
          * @summary Gerar QR Code
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3020,7 +3076,7 @@ export const RollCallApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+         * Gera um QR Code com expiração de 30 segundos para a chamada informada. Acesso restrito a administradores.
          * @summary Gerar QR Code
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3038,7 +3094,7 @@ export const RollCallApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rollCallControllerGetMyAttendances(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async rollCallControllerGetMyAttendances(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MyAttendancesResponseDto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rollCallControllerGetMyAttendances(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['RollCallApi.rollCallControllerGetMyAttendances']?.[localVarOperationServerIndex]?.url;
@@ -3133,7 +3189,7 @@ export const RollCallApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.rollCallControllerFindOne(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+         * Gera um QR Code com expiração de 30 segundos para a chamada informada. Acesso restrito a administradores.
          * @summary Gerar QR Code
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -3148,7 +3204,7 @@ export const RollCallApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rollCallControllerGetMyAttendances(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        rollCallControllerGetMyAttendances(options?: RawAxiosRequestConfig): AxiosPromise<MyAttendancesResponseDto> {
             return localVarFp.rollCallControllerGetMyAttendances(options).then((request) => request(axios, basePath));
         },
         /**
@@ -3239,7 +3295,7 @@ export class RollCallApi extends BaseAPI {
     }
 
     /**
-     * Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+     * Gera um QR Code com expiração de 30 segundos para a chamada informada. Acesso restrito a administradores.
      * @summary Gerar QR Code
      * @param {string} id 
      * @param {*} [options] Override http request option.

@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import client from '@/api/client'
+import type { MyAttendancesResponseDto } from '@/api/sdk'
 import { QrScanner } from '@/components/QrScanner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -20,18 +21,9 @@ function UserChamadaComponent() {
 
   const { data: myAttendancesData, isLoading } = useQuery({
     queryKey: ['my-attendances'],
-    queryFn: async () => {
+    queryFn: async (): Promise<MyAttendancesResponseDto> => {
       const response = await client.rollCall.rollCallControllerGetMyAttendances()
-      return response.data as unknown as {
-        totalClasses: number
-        totalAttendances: number
-        totalMisses: number
-        history: {
-          rollCallId: string
-          date: string
-          isPresent: boolean
-        }[]
-      }
+      return response.data
     },
   })
 

@@ -230,7 +230,7 @@ No authorization required
 # **rollCallControllerGenerateQrCode**
 > rollCallControllerGenerateQrCode()
 
-Gera um QR Code com expiração de 15 segundos para a chamada informada. Acesso restrito a administradores.
+Gera um QR Code com expiração de 30 segundos para a chamada informada. Acesso restrito a administradores.
 
 ### Example
 
@@ -283,7 +283,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **rollCallControllerGetMyAttendances**
-> rollCallControllerGetMyAttendances()
+> MyAttendancesResponseDto rollCallControllerGetMyAttendances()
 
 Retorna o histórico de presenças do usuário autenticado.
 
@@ -307,7 +307,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-void (empty response body)
+**MyAttendancesResponseDto**
 
 ### Authorization
 
@@ -316,7 +316,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: application/json
 
 
 ### HTTP response details
