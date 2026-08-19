@@ -21,7 +21,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 /**
  * Por que o envio falhou — nunca por que a resposta está errada. Os três casos
@@ -280,6 +280,9 @@ export function ProblemDetailsPage() {
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="w-full sm:w-100 sm:max-w-100 bg-[#0a0a0b] border-white/5 p-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
+        <SheetHeader className="p-0">
+          <SheetTitle className="text-white">Painel de Resposta</SheetTitle>
+        </SheetHeader>
         <div className="space-y-3">
           <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 ml-1">Recursos de Entrada</Label>
           <div className="p-4 rounded-[24px] bg-white/[0.03] border border-white/5 flex items-center justify-between group hover:border-primary/40 transition-all">
