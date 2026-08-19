@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tokenId** | **string** | Token id | [default to undefined]
-**token** | **string** | Indicates if the token has 4 digits | [default to undefined]
+**token** | **string** | Indicates if the token has 6 digits | [default to undefined]
 **newPassword** | **string** | New password for the user | [default to undefined]
 
 ## Example

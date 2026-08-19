@@ -640,7 +640,7 @@ export interface ResetPasswordDTO {
      */
     'tokenId': string;
     /**
-     * Indicates if the token has 4 digits
+     * Indicates if the token has 6 digits
      * @type {string}
      * @memberof ResetPasswordDTO
      */
@@ -1141,7 +1141,7 @@ export interface ValidateResetPasswordDTO {
      */
     'tokenId': string;
     /**
-     * Indicates if the token has 4 digits
+     * Indicates if the token has 6 digits
      * @type {string}
      * @memberof ValidateResetPasswordDTO
      */
@@ -1160,7 +1160,7 @@ export interface ValidateSignupDTO {
      */
     'tokenId': string;
     /**
-     * Indicates if the token has 4 digits
+     * Indicates if the token has 6 digits
      * @type {string}
      * @memberof ValidateSignupDTO
      */
@@ -1205,7 +1205,7 @@ export interface ValidateSignupResponse {
 export const FileApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
+         * This endpoint allows you to upload a new files in the system and atributes to a user.       Limits: Up to 1 file(s) per upload, each up to 2 MB, mimetype in [image/jpeg, image/png, image/gif, image/webp].
          * @summary Upload a new files
          * @param {File} [files] 
          * @param {*} [options] Override http request option.
@@ -1392,7 +1392,7 @@ export const FileApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = FileApiAxiosParamCreator(configuration)
     return {
         /**
-         * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
+         * This endpoint allows you to upload a new files in the system and atributes to a user.       Limits: Up to 1 file(s) per upload, each up to 2 MB, mimetype in [image/jpeg, image/png, image/gif, image/webp].
          * @summary Upload a new files
          * @param {File} [files] 
          * @param {*} [options] Override http request option.
@@ -1467,7 +1467,7 @@ export const FileApiFactory = function (configuration?: Configuration, basePath?
     const localVarFp = FileApiFp(configuration)
     return {
         /**
-         * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
+         * This endpoint allows you to upload a new files in the system and atributes to a user.       Limits: Up to 1 file(s) per upload, each up to 2 MB, mimetype in [image/jpeg, image/png, image/gif, image/webp].
          * @summary Upload a new files
          * @param {File} [files] 
          * @param {*} [options] Override http request option.
@@ -1527,7 +1527,7 @@ export const FileApiFactory = function (configuration?: Configuration, basePath?
  */
 export class FileApi extends BaseAPI {
     /**
-     * This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
+     * This endpoint allows you to upload a new files in the system and atributes to a user.       Limits: Up to 1 file(s) per upload, each up to 2 MB, mimetype in [image/jpeg, image/png, image/gif, image/webp].
      * @summary Upload a new files
      * @param {File} [files] 
      * @param {*} [options] Override http request option.
