@@ -181,7 +181,7 @@ export function ProblemDetailsPage() {
       
       <div className="flex-1 flex flex-col border-r border-white/5 overflow-hidden">
         
-        <div className={cn("relative w-full overflow-hidden shrink-0", !problem.bannerUrl && "h-60")}>
+        <div className={cn("relative w-full overflow-hidden shrink-0", problem.bannerUrl ? "min-h-60" : "h-60")}>
           <Link to="/problemas" className="absolute top-6 left-6 z-30">
             <Button variant="ghost" size="icon" className="bg-black/50 hover:bg-black/80 rounded-full">
               <ArrowLeft size={20} />
