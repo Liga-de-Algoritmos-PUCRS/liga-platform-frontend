@@ -3,14 +3,17 @@ import { useState } from "react"
 import { Rocket, Trophy, Users, Code2 } from "lucide-react"
 
 import { SignupForm } from "@/components/signup/SignupForm"
-import { ValidateSignup } from "@/components/signup/ValidateSignup"
+import { ValidateSignup, type SignupCredentials } from "@/components/signup/ValidateSignup"
+import { SignupRequestResponseDTO } from "@/api/sdk"
 
 export default function SignupPage() {
   const [step, setStep] = useState<1 | 2>(1)
-  const [tokenId, setTokenId] = useState<string>("")
+  const [signupResponse, setSignupResponse] = useState<SignupRequestResponseDTO | null>(null)
+  const [credentials, setCredentials] = useState<SignupCredentials | null>(null)
 
-  const handleSignupSuccess = (id: string) => {
-    setTokenId(id)
+  const handleSignupSuccess = (response: SignupRequestResponseDTO, values: SignupCredentials) => {
+    setSignupResponse(response)
+    setCredentials(values)
     setStep(2)
   }
 
@@ -80,12 +83,14 @@ export default function SignupPage() {
                         </p>
                     </div>
 
-                    {step === 1 ? (
+                    {step === 1 || !signupResponse || !credentials ? (
                         <SignupForm onSuccess={handleSignupSuccess} />
                     ) : (
-                        <ValidateSignup 
-                            tokenId={tokenId} 
-                            onBack={() => setStep(1)} 
+                        <ValidateSignup
+                            tokenId={signupResponse.id}
+                            expiresAt={signupResponse.expiresAt}
+                            credentials={credentials}
+                            onBack={() => setStep(1)}
                         />
                     )}
                 </div>
