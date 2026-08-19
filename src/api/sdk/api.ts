@@ -26,6 +26,25 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AdjustUserPointsDTO
+ */
+export interface AdjustUserPointsDTO {
+    /**
+     * Amount to add to (or, if negative, subtract from) allTimePoints
+     * @type {number}
+     * @memberof AdjustUserPointsDTO
+     */
+    'allTimePointsDelta'?: number;
+    /**
+     * Amount to add to (or, if negative, subtract from) monthlyPoints
+     * @type {number}
+     * @memberof AdjustUserPointsDTO
+     */
+    'monthlyPointsDelta'?: number;
+}
+/**
+ * 
+ * @export
  * @interface AttendRollCallDto
  */
 export interface AttendRollCallDto {
@@ -3923,6 +3942,46 @@ export class SubmitApi extends BaseAPI {
 export const UserApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Admin only. Applies a delta (positive or negative) to allTimePoints and/or monthlyPoints of any user. Each field is clamped at 0.
+         * @summary Adjust a user\'s points
+         * @param {string} id 
+         * @param {AdjustUserPointsDTO} adjustUserPointsDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerAdjustUserPoints: async (id: string, adjustUserPointsDTO: AdjustUserPointsDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('userControllerAdjustUserPoints', 'id', id)
+            // verify required parameter 'adjustUserPointsDTO' is not null or undefined
+            assertParamExists('userControllerAdjustUserPoints', 'adjustUserPointsDTO', adjustUserPointsDTO)
+            const localVarPath = `/user/{id}/points`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(adjustUserPointsDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This endpoint allows you to delete a user from the system.
          * @summary Delete a user
          * @param {string} id 
@@ -4227,6 +4286,20 @@ export const UserApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = UserApiAxiosParamCreator(configuration)
     return {
         /**
+         * Admin only. Applies a delta (positive or negative) to allTimePoints and/or monthlyPoints of any user. Each field is clamped at 0.
+         * @summary Adjust a user\'s points
+         * @param {string} id 
+         * @param {AdjustUserPointsDTO} adjustUserPointsDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userControllerAdjustUserPoints(id: string, adjustUserPointsDTO: AdjustUserPointsDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponseDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userControllerAdjustUserPoints(id, adjustUserPointsDTO, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.userControllerAdjustUserPoints']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * This endpoint allows you to delete a user from the system.
          * @summary Delete a user
          * @param {string} id 
@@ -4350,6 +4423,17 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
     const localVarFp = UserApiFp(configuration)
     return {
         /**
+         * Admin only. Applies a delta (positive or negative) to allTimePoints and/or monthlyPoints of any user. Each field is clamped at 0.
+         * @summary Adjust a user\'s points
+         * @param {string} id 
+         * @param {AdjustUserPointsDTO} adjustUserPointsDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userControllerAdjustUserPoints(id: string, adjustUserPointsDTO: AdjustUserPointsDTO, options?: RawAxiosRequestConfig): AxiosPromise<UserResponseDTO> {
+            return localVarFp.userControllerAdjustUserPoints(id, adjustUserPointsDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
          * This endpoint allows you to delete a user from the system.
          * @summary Delete a user
          * @param {string} id 
@@ -4445,6 +4529,19 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
  * @extends {BaseAPI}
  */
 export class UserApi extends BaseAPI {
+    /**
+     * Admin only. Applies a delta (positive or negative) to allTimePoints and/or monthlyPoints of any user. Each field is clamped at 0.
+     * @summary Adjust a user\'s points
+     * @param {string} id 
+     * @param {AdjustUserPointsDTO} adjustUserPointsDTO 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userControllerAdjustUserPoints(id: string, adjustUserPointsDTO: AdjustUserPointsDTO, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).userControllerAdjustUserPoints(id, adjustUserPointsDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * This endpoint allows you to delete a user from the system.
      * @summary Delete a user

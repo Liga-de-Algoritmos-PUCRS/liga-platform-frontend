@@ -4,6 +4,7 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/AdjustUserPointsDTO.md
 docs/AttendRollCallDto.md
 docs/CreateProblemDTO.md
 docs/CreateRollCallDto.md
