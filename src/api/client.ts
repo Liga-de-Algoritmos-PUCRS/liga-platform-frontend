@@ -56,47 +56,85 @@ function clearSession() {
 
 let refreshPromise: Promise<string> | null = null
 
-// Single-flight: requisições concorrentes que tomaram 401 compartilham o mesmo
-// refresh — o backend rotaciona o token, então refreshes paralelos com o mesmo
-// cookie derrubariam a sessão.
+const REFRESH_LOCK_NAME = "auth-refresh"
+const REFRESH_TIMEOUT_MS = 10_000
+
+function hasWebLocks(): boolean {
+  return typeof navigator !== "undefined" && "locks" in navigator && !!navigator.locks
+}
+
+// Executa o refresh de verdade: chamada só depois de garantida a
+// serialização (lock entre abas quando suportado, single-flight por aba
+// sempre). `tokenBeforeRefresh` é o token com que o CHAMADOR entrou na fila —
+// usado para detectar, tanto antes quanto depois da chamada de rede, se outra
+// aba já renovou nesse meio-tempo.
+async function performRefresh(tokenBeforeRefresh: string): Promise<string> {
+  // Reler só agora (após adquirir o lock, se houver): se checasse antes de
+  // entrar na fila, duas abas leriam o mesmo valor "antigo" e chamariam a
+  // rede mesmo assim.
+  const alreadyRenewed = localStorage.getItem(TOKEN_STORAGE_KEY)
+  if (alreadyRenewed && alreadyRenewed !== tokenBeforeRefresh) {
+    setAccessToken(alreadyRenewed)
+    return alreadyRenewed
+  }
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), REFRESH_TIMEOUT_MS)
+
+  try {
+    const res = await rawAxios.post("/auth/refresh", undefined, { signal: controller.signal })
+    const { accessToken: newAccess } = res.data
+
+    setAccessToken(newAccess)
+    localStorage.setItem(TOKEN_STORAGE_KEY, newAccess)
+    return newAccess as string
+  } catch (err) {
+    // Só rejeição real do refresh token encerra a sessão; erro de
+    // rede/5xx/timeout não desloga.
+    if (isAuthError(err)) {
+      const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
+
+      // Outra aba renovou enquanto esta esperava a resposta. Como o backend
+      // rotaciona o refresh token, o 401 aqui só significa que perdemos a
+      // corrida — não que a sessão morreu. Adota o token da outra aba: sem
+      // isso, o clearSession() apagaria do localStorage o token que ela
+      // acabou de gravar e o evento `storage` derrubaria todas as abas.
+      if (storedToken && storedToken !== tokenBeforeRefresh) {
+        setAccessToken(storedToken)
+        return storedToken
+      }
+
+      clearSession()
+    }
+    throw err
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+// Single-flight por aba: requisições concorrentes que tomaram 401 na mesma
+// aba compartilham o mesmo refresh. Entre abas do mesmo navegador, o Web Lock
+// em performRefresh garante que só uma efetivamente chama a rede; sem suporte
+// a navigator.locks, cai de volta no single-flight por aba de sempre.
 export function refreshAccessToken(): Promise<string> {
   if (!refreshPromise) {
-    // O single-flight é por aba. Guardamos o token com que ESTA aba entrou na
-    // corrida para saber, num 401, se outra aba renovou nesse meio-tempo.
     const tokenBeforeRefresh = accessToken
 
-    refreshPromise = rawAxios
-      .post("/auth/refresh")
-      .then(res => {
-        const { accessToken: newAccess } = res.data
+    // `LockGrantedCallback<T>` nos tipos do DOM não faz Awaited<T>: como o
+    // callback retorna Promise<string>, o tipo inferido de request() vira
+    // Promise<Promise<string>> — que a Promise nativa de fato achata em
+    // runtime (resolver com um thenable segue o thenable). O cast corrige só
+    // o tipo, não o comportamento.
+    const attempt = hasWebLocks()
+      ? (navigator.locks.request(
+          REFRESH_LOCK_NAME,
+          () => performRefresh(tokenBeforeRefresh)
+        ) as unknown as Promise<string>)
+      : performRefresh(tokenBeforeRefresh)
 
-        setAccessToken(newAccess)
-        localStorage.setItem(TOKEN_STORAGE_KEY, newAccess)
-        return newAccess as string
-      })
-      .catch(err => {
-        // Só rejeição real do refresh token encerra a sessão; erro de
-        // rede/5xx não desloga.
-        if (isAuthError(err)) {
-          const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
-
-          // Outra aba renovou enquanto esta esperava a resposta. Como o backend
-          // rotaciona o refresh token, o 401 aqui só significa que perdemos a
-          // corrida — não que a sessão morreu. Adota o token da outra aba: sem
-          // isso, o clearSession() apagaria do localStorage o token que ela
-          // acabou de gravar e o evento `storage` derrubaria todas as abas.
-          if (storedToken && storedToken !== tokenBeforeRefresh) {
-            setAccessToken(storedToken)
-            return storedToken
-          }
-
-          clearSession()
-        }
-        throw err
-      })
-      .finally(() => {
-        refreshPromise = null
-      })
+    refreshPromise = attempt.finally(() => {
+      refreshPromise = null
+    })
   }
   return refreshPromise
 }

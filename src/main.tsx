@@ -1,19 +1,13 @@
 import ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
+import { RouterProvider } from '@tanstack/react-router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from 'sonner'
 import { useAuth, AuthProvider } from './providers/AuthProvider'
 import { ThemeProvider } from '@/providers/ThemeProvider'
-import { routeTree } from './routeTree.gen'
+import { router } from './router'
 import './index.css'
 
 const queryClient = new QueryClient()
-
-const router = createRouter({
-  routeTree,
-  context: {
-    auth: undefined!, 
-  },
-})
 
 export function InnerApp() {
   const auth = useAuth()
@@ -32,11 +26,30 @@ export function InnerApp() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"> 
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <AuthProvider>
             <InnerApp />
         </AuthProvider>
-      </ThemeProvider> 
+        {/* Montado fora do RouterProvider/loading gate: um toast disparado
+            durante o initAuth() (antes do router montar) precisa de um
+            Toaster já inscrito para não ser descartado (sonner não repassa
+            toasts publicados antes da inscrição a quem assina depois). */}
+        <Toaster
+          richColors
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              borderRadius: 'var(--radius)',
+              fontFamily: 'var(--font-sans)',
+            },
+            classNames: {
+              toast: 'border border-border/20 shadow-xl',
+              title: 'font-semibold text-[15px] tracking-tight',
+              description: 'text-sm opacity-90',
+            }
+          }}
+        />
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }
