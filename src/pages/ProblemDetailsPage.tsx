@@ -193,7 +193,7 @@ export function ProblemDetailsPage() {
 
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-purple-900/20 to-transparent z-0" />
           {problem.bannerUrl && (
-            <img src={problem.bannerUrl} alt={problem.title} className="w-full h-auto max-h-80 lg:max-h-125 object-cover mix-blend-overlay opacity-90" />
+            <img src={problem.bannerUrl} alt={problem.title} className="relative w-full h-auto max-h-80 lg:max-h-125 object-cover mix-blend-overlay opacity-90" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-transparent to-transparent z-10" />
           

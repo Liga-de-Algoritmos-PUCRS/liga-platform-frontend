@@ -55,11 +55,11 @@ export function ProblemCard({ problem, isFinished, pointsEarned, onClick }: Prob
         )}
 
         {problem.bannerUrl ? (
-          <img src={problem.bannerUrl} alt={problem.title} className="h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-110" />
+          <img src={problem.bannerUrl} alt={problem.title} className="relative h-full w-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-110" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center opacity-10"><Terminal size={64} /></div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/40 to-transparent z-10" />
+        <div className="absolute inset-x-0 bottom-0 top-auto h-1/3 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/20 to-transparent z-10" />
         
         <div className="absolute top-5 right-6 flex items-center gap-1.5 z-20">
           <Badge className={cn("px-2.5 py-0.5 font-bold text-[9px] tracking-widest uppercase rounded-lg border shadow-lg", difficultyStyles)}>
