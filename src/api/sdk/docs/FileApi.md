@@ -13,7 +13,7 @@ All URIs are relative to *http://localhost*
 # **fileControllerCreate**
 > Array<FileReponseDTO> fileControllerCreate()
 
-This endpoint allows you to upload a new files in the system and atributes to a user.        Limits: Up to 10 files per upload, and each file can have up to 100 MB.
+This endpoint allows you to upload a new files in the system and atributes to a user.       Limits: Up to 1 file(s) per upload, each up to 2 MB, mimetype in [image/jpeg, image/png, image/gif, image/webp].
 
 ### Example
 
@@ -58,8 +58,8 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**201** | Files successfully uploaded. |  -  |
-|**400** | Bad request. The input data is invalid or missing. |  -  |
-|**413** | File size exceeds the maximum size allowed or the quantity of files to be uploaded exceeded: Maximum file sie: 100 | Allowed files quantity: 10 |  -  |
+|**400** | Bad request. The input data is invalid or missing, or the file mimetype is not in [image/jpeg, image/png, image/gif, image/webp]. |  -  |
+|**413** | File size exceeds the maximum size allowed or the quantity of files to be uploaded exceeded: Maximum file sie: 2 | Allowed files quantity: 1 |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

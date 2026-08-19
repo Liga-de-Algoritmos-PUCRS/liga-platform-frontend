@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Loader2, Mail, KeyRound, Lock, ArrowLeft } from "lucide-react"
+import { Loader2, Mail, KeyRound, Lock, ArrowLeft, RotateCw } from "lucide-react"
 import { toast } from "sonner"
 
 import client from "@/api/client"
@@ -21,6 +21,10 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
+import { useCountdown, formatCountdown } from "@/hooks/use-countdown"
+
+const OTP_LENGTH = 6
+const RESEND_COOLDOWN_SECONDS = 30
 
 const emailSchema = z.object({
   email: z.string().email("Insira um email válido"),
@@ -49,9 +53,16 @@ type Step = "EMAIL" | "OTP" | "NEW_PASSWORD"
 export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModalProps) {
   const [step, setStep] = useState<Step>("EMAIL")
   const [isLoading, setIsLoading] = useState(false)
+  const [isResending, setIsResending] = useState(false)
   const [tokenId, setTokenId] = useState("")
   const [otp, setOtp] = useState("")
   const [email, setEmail] = useState("")
+  const [expiresAtMs, setExpiresAtMs] = useState<number | null>(null)
+  const [resendAvailableAt, setResendAvailableAt] = useState<number | null>(null)
+
+  const secondsUntilExpiry = useCountdown(expiresAtMs)
+  const isOtpExpired = expiresAtMs !== null && secondsUntilExpiry === 0
+  const resendCooldown = useCountdown(resendAvailableAt)
 
   const emailForm = useForm<z.infer<typeof emailSchema>>({
     resolver: zodResolver(emailSchema),
@@ -61,15 +72,22 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     resolver: zodResolver(passwordSchema),
   })
 
+  const startOtpWindow = (newTokenId: string, newExpiresAt: string) => {
+    setTokenId(newTokenId)
+    setExpiresAtMs(new Date(newExpiresAt).getTime())
+    setResendAvailableAt(Date.now() + RESEND_COOLDOWN_SECONDS * 1000)
+    setOtp("")
+  }
+
   const handleRequestReset = async (data: z.infer<typeof emailSchema>) => {
     setIsLoading(true)
     try {
       const response = await client.resetPassword.resetPasswordControllerRequestResetPassword({
         email: data.email,
       })
-      
+
       if (response.data.id) {
-        setTokenId(response.data.id)
+        startOtpWindow(response.data.id, response.data.expiresAt)
         setEmail(data.email)
         setStep("OTP")
         toast.success("Código enviado!", { description: "Verifique sua caixa de entrada." })
@@ -82,19 +100,39 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     }
   }
 
+  const handleResendOtp = async () => {
+    setIsResending(true)
+    try {
+      const response = await client.resetPassword.resetPasswordControllerRequestResetPassword({
+        email,
+      })
+
+      if (response.data.id) {
+        startOtpWindow(response.data.id, response.data.expiresAt)
+        toast.success("Novo código enviado!", { description: "O código anterior deixou de ser válido." })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Erro ao reenviar código", { description: "Tente novamente em instantes." })
+    } finally {
+      setIsResending(false)
+    }
+  }
+
   const handleVerifyOtp = async () => {
-    if (otp.length < 4) return
+    if (otp.length < OTP_LENGTH || isOtpExpired) return
     setIsLoading(true)
     try {
       await client.resetPassword.resetPasswordControllerValidateResetPassword({
         tokenId: tokenId,
         token: otp,
       })
-      
+
       setStep("NEW_PASSWORD")
       toast.success("Código validado!")
     } catch (error) {
       console.error(error)
+      setOtp("")
       toast.error("Código inválido", { description: "Tente novamente." })
     } finally {
       setIsLoading(false)
@@ -125,6 +163,8 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     setTimeout(() => {
       setStep("EMAIL")
       setOtp("")
+      setExpiresAtMs(null)
+      setResendAvailableAt(null)
       emailForm.reset()
       passwordForm.reset()
     }, 300)
@@ -137,7 +177,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
           <DialogTitle className="text-foreground">Recuperar Senha</DialogTitle>
           <DialogDescription className="text-muted-foreground">
             {step === "EMAIL" && "Insira seu email para receber o código de recuperação."}
-            {step === "OTP" && `Enviamos um código de 4 dígitos para ${email}.`}
+            {step === "OTP" && `Enviamos um código de 6 dígitos para ${email}.`}
             {step === "NEW_PASSWORD" && "Crie uma nova senha segura para sua conta."}
           </DialogDescription>
         </DialogHeader>
@@ -174,27 +214,48 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
 
           {step === "OTP" && (
             <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-right-4">
-              <InputOTP maxLength={4} value={otp} onChange={setOtp}>
+              <InputOTP maxLength={OTP_LENGTH} value={otp} onChange={setOtp} disabled={isOtpExpired}>
                 <InputOTPGroup className="gap-2">
                   <InputOTPSlot index={0} className="h-12 w-12 text-lg border-input bg-background text-foreground shadow-sm" />
                   <InputOTPSlot index={1} className="h-12 w-12 text-lg border-input bg-background text-foreground shadow-sm" />
                   <InputOTPSlot index={2} className="h-12 w-12 text-lg border-input bg-background text-foreground shadow-sm" />
                   <InputOTPSlot index={3} className="h-12 w-12 text-lg border-input bg-background text-foreground shadow-sm" />
+                  <InputOTPSlot index={4} className="h-12 w-12 text-lg border-input bg-background text-foreground shadow-sm" />
+                  <InputOTPSlot index={5} className="h-12 w-12 text-lg border-input bg-background text-foreground shadow-sm" />
                 </InputOTPGroup>
               </InputOTP>
-              
+
+              <p className="text-xs text-muted-foreground -mt-3">
+                {isOtpExpired
+                  ? "Código expirado. Solicite um novo código."
+                  : `Código expira em ${formatCountdown(secondsUntilExpiry)}`}
+              </p>
+
               <div className="w-full space-y-2">
-                <Button 
-                  onClick={handleVerifyOtp} 
-                  className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm transition-all cursor-pointer" 
-                  disabled={isLoading || otp.length < 4}
+                <Button
+                  onClick={handleVerifyOtp}
+                  className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm transition-all cursor-pointer"
+                  disabled={isLoading || otp.length < OTP_LENGTH || isOtpExpired}
                 >
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Verificar Código"}
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full h-11 text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer" 
-                  onClick={() => setStep("EMAIL")} 
+                <Button
+                  variant="outline"
+                  className="w-full h-11 cursor-pointer"
+                  onClick={handleResendOtp}
+                  disabled={isResending || resendCooldown > 0}
+                >
+                  {isResending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <RotateCw className="mr-2 h-4 w-4" />
+                  )}
+                  {resendCooldown > 0 ? `Reenviar código (${resendCooldown}s)` : "Reenviar código"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full h-11 text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+                  onClick={() => setStep("EMAIL")}
                   disabled={isLoading}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" /> Voltar

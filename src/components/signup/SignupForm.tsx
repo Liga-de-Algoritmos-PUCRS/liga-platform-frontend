@@ -9,6 +9,7 @@ import client from "@/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { SignupRequestResponseDTO } from "@/api/sdk"
 
 const formSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
@@ -25,9 +26,9 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export function SignupForm({ onSuccess }: { onSuccess: (tokenId: string) => void }) {
+export function SignupForm({ onSuccess }: { onSuccess: (response: SignupRequestResponseDTO, credentials: FormValues) => void }) {
   const navigate = useNavigate()
-  
+
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: "", email: "", password: "" },
@@ -40,7 +41,7 @@ export function SignupForm({ onSuccess }: { onSuccess: (tokenId: string) => void
         toast.success("Conta criada com sucesso!", {
             description: "Enviamos um código para o seu email."
         })
-        onSuccess(data.id)
+        onSuccess(data, values)
       }
     } catch (error) {
       console.log(error)
