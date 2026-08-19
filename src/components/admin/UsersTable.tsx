@@ -18,6 +18,7 @@ import {
   SEMESTER_OPTIONS,
 } from "@/lib/user-labels";
 import { useAuth } from "@/providers/AuthProvider";
+import { queryKeys } from "@/lib/query-keys";
 
 export function UsersTable() {
   const { user: currentUser } = useAuth();
@@ -36,7 +37,7 @@ export function UsersTable() {
 
   // React Query para buscar usuários
   const { data: response, isLoading: loading, refetch } = useQuery({
-    queryKey: ['adminUsers'],
+    queryKey: queryKeys.adminUsers,
     queryFn: () => client.user.userControllerGetAllUsers()
   });
 

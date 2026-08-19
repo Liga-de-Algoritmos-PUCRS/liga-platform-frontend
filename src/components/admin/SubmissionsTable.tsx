@@ -415,7 +415,7 @@ export function SubmissionsTable() {
             </p>
             <p className="text-sm text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
               {deletingSubmission?.isFinished
-                ? `Esta submissão está resolvida: devolve ${deletingSubmission?.pointsEarned} pontos ao aluno e sobe o valor corrente do problema.`
+                ? `Esta submissão está resolvida: retira ${deletingSubmission?.pointsEarned} pontos do aluno e sobe o valor corrente do problema.`
                 : "Esta submissão está pendente: não mexe em pontuação nenhuma."}
             </p>
             <DialogFooter>
