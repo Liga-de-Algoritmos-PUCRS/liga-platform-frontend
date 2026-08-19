@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { RefreshCcw, Edit2, Trash2, Shield, User as UserIcon, AlertTriangle, Search, ImageOff } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { RefreshCcw, Edit2, Trash2, Shield, User as UserIcon, AlertTriangle, Search, ImageOff, Coins } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import client from "@/api/client";
-import { UserResponseDTO, UpdateUserDTO } from "@/api/sdk";
+import { UserResponseDTO, UpdateUserDTO, AdjustUserPointsDTO } from "@/api/sdk";
 import { UserInfoModal } from "@/components/ranking/UserInfoModal";
 import {
   COURSE_LABELS,
@@ -27,13 +27,17 @@ export function UsersTable() {
 
   const [editingUser, setEditingUser] = useState<UserResponseDTO | null>(null);
   const [deletingUser, setDeletingUser] = useState<UserResponseDTO | null>(null);
-  
+  const [adjustingUser, setAdjustingUser] = useState<UserResponseDTO | null>(null);
+
   const [selectedUser, setSelectedUser] = useState<UserResponseDTO | null>(null);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
-  
+
   const [editFormData, setEditFormData] = useState<UpdateUserDTO>({});
   const [deletePassword, setDeletePassword] = useState("");
+  const [adjustFormData, setAdjustFormData] = useState<AdjustUserPointsDTO>({});
   const [actionLoading, setActionLoading] = useState(false);
+
+  const queryClient = useQueryClient();
 
   // React Query para buscar usuários
   const { data: response, isLoading: loading, refetch } = useQuery({
@@ -107,6 +111,46 @@ export function UsersTable() {
       toast.success("Usuário deletado com sucesso!");
     } catch {
       toast.error("Erro ao deletar o usuário!");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleAdjustPoints = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adjustingUser) return;
+
+    const { allTimePointsDelta, monthlyPointsDelta } = adjustFormData;
+
+    if (allTimePointsDelta === undefined && monthlyPointsDelta === undefined) {
+      toast.error("Preencha pelo menos um dos campos de pontos.");
+      return;
+    }
+    if (
+      (allTimePointsDelta !== undefined && !Number.isInteger(allTimePointsDelta)) ||
+      (monthlyPointsDelta !== undefined && !Number.isInteger(monthlyPointsDelta))
+    ) {
+      toast.error("Os deltas de pontos precisam ser números inteiros.");
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await client.user.userControllerAdjustUserPoints(adjustingUser.id, {
+        allTimePointsDelta,
+        monthlyPointsDelta,
+      });
+
+      setAdjustingUser(null);
+      setAdjustFormData({});
+      await refetch();
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
+      queryClient.invalidateQueries({ queryKey: queryKeys.ranking('monthly') });
+      queryClient.invalidateQueries({ queryKey: queryKeys.ranking('alltime') });
+      toast.success("Pontuação ajustada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao ajustar pontos:", error);
+      toast.error("Erro ao ajustar a pontuação!");
     } finally {
       setActionLoading(false);
     }
@@ -248,7 +292,18 @@ export function UsersTable() {
                             </button>
                           )}
 
-                          <button 
+                          <button
+                            onClick={() => {
+                              setAdjustingUser(user);
+                              setAdjustFormData({});
+                            }}
+                            className="p-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 rounded-md transition-colors border border-amber-500/20"
+                            title="Ajustar Pontos"
+                          >
+                            <Coins size={16} />
+                          </button>
+
+                          <button
                             onClick={() => setDeletingUser(user)}
                             className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-md transition-colors border border-red-500/20"
                             title="Eliminar Utilizador"
@@ -357,6 +412,84 @@ export function UsersTable() {
               </Button>
               <Button type="submit" disabled={actionLoading} className="bg-primary text-white hover:bg-primary/90">
                 {actionLoading ? "A guardar..." : "Guardar Alterações"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!adjustingUser} onOpenChange={(open) => !open && setAdjustingUser(null)}>
+        <DialogContent className="bg-[#0a0a0b] border-white/10 text-white sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Coins size={20} className="text-amber-400" />
+              Ajustar Pontos
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleAdjustPoints} className="space-y-4 py-2">
+            <p className="text-sm text-gray-400">
+              Ajustando a pontuação de <strong className="text-white">{adjustingUser?.name}</strong>. Informe um delta (positivo ou negativo) para pelo menos um dos campos.
+            </p>
+
+            <div className="space-y-2">
+              <Label htmlFor="allTimePointsDelta" className="text-gray-400">Delta de Pontos (Total)</Label>
+              <Input
+                id="allTimePointsDelta"
+                type="number"
+                step={1}
+                placeholder="ex: 20 ou -15"
+                value={adjustFormData.allTimePointsDelta ?? ""}
+                onChange={(e) =>
+                  setAdjustFormData({
+                    ...adjustFormData,
+                    allTimePointsDelta: e.target.value === "" ? undefined : Number(e.target.value),
+                  })
+                }
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"
+              />
+              {adjustFormData.allTimePointsDelta !== undefined && adjustingUser && (
+                <p className="text-xs text-gray-500">
+                  {adjustingUser.allTimePoints ?? 0} → {" "}
+                  <span className="text-primary font-semibold">
+                    {Math.max(0, (adjustingUser.allTimePoints ?? 0) + adjustFormData.allTimePointsDelta)}
+                  </span>
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="monthlyPointsDelta" className="text-gray-400">Delta de Pontos (Mês)</Label>
+              <Input
+                id="monthlyPointsDelta"
+                type="number"
+                step={1}
+                placeholder="ex: 20 ou -15"
+                value={adjustFormData.monthlyPointsDelta ?? ""}
+                onChange={(e) =>
+                  setAdjustFormData({
+                    ...adjustFormData,
+                    monthlyPointsDelta: e.target.value === "" ? undefined : Number(e.target.value),
+                  })
+                }
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-primary"
+              />
+              {adjustFormData.monthlyPointsDelta !== undefined && adjustingUser && (
+                <p className="text-xs text-gray-500">
+                  {adjustingUser.monthlyPoints ?? 0} → {" "}
+                  <span className="text-primary font-semibold">
+                    {Math.max(0, (adjustingUser.monthlyPoints ?? 0) + adjustFormData.monthlyPointsDelta)}
+                  </span>
+                </p>
+              )}
+            </div>
+
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="ghost" onClick={() => setAdjustingUser(null)} className="hover:bg-white/10 text-gray-300">
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={actionLoading} className="bg-primary text-white hover:bg-primary/90">
+                {actionLoading ? "A ajustar..." : "Confirmar Ajuste"}
               </Button>
             </DialogFooter>
           </form>
