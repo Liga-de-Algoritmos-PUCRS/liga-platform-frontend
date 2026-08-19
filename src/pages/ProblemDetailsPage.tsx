@@ -181,16 +181,16 @@ export function ProblemDetailsPage() {
       
       <div className="flex-1 flex flex-col border-r border-white/5 overflow-hidden">
         
-        <div className="relative h-60 w-full overflow-hidden shrink-0">
+        <div className={cn("relative w-full overflow-hidden shrink-0", !problem.bannerUrl && "h-60")}>
           <Link to="/problemas" className="absolute top-6 left-6 z-30">
             <Button variant="ghost" size="icon" className="bg-black/50 hover:bg-black/80 rounded-full">
               <ArrowLeft size={20} />
             </Button>
           </Link>
-          
+
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-purple-900/20 to-transparent z-0" />
           {problem.bannerUrl && (
-            <img src={problem.bannerUrl} alt={problem.title} className="h-full w-full object-cover mix-blend-overlay opacity-90" />
+            <img src={problem.bannerUrl} alt={problem.title} className="w-full h-auto max-h-80 lg:max-h-125 object-cover mix-blend-overlay opacity-90" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-transparent to-transparent z-10" />
           
