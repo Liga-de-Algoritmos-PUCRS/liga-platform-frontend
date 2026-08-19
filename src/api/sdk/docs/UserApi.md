@@ -4,6 +4,7 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
+|[**userControllerAdjustUserPoints**](#usercontrolleradjustuserpoints) | **PATCH** /user/{id}/points | Adjust a user\&#39;s points|
 |[**userControllerDeleteUser**](#usercontrollerdeleteuser) | **DELETE** /user/{id} | Delete a user|
 |[**userControllerGetAllUsers**](#usercontrollergetallusers) | **GET** /user | List all users|
 |[**userControllerGetMe**](#usercontrollergetme) | **GET** /user/me/{id} | Get a user|
@@ -13,6 +14,65 @@ All URIs are relative to *http://localhost*
 |[**userControllerGetUserById**](#usercontrollergetuserbyid) | **GET** /user/{id} | Get a user by ID|
 |[**userControllerResetUserPoints**](#usercontrollerresetuserpoints) | **POST** /user/reset-points | Reset user points|
 |[**userControllerUpdateUser**](#usercontrollerupdateuser) | **PATCH** /user/{id} | Update an existing user|
+
+# **userControllerAdjustUserPoints**
+> UserResponseDTO userControllerAdjustUserPoints(adjustUserPointsDTO)
+
+Admin only. Applies a delta (positive or negative) to allTimePoints and/or monthlyPoints of any user. Each field is clamped at 0.
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration,
+    AdjustUserPointsDTO
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+let id: string; // (default to undefined)
+let adjustUserPointsDTO: AdjustUserPointsDTO; //
+
+const { status, data } = await apiInstance.userControllerAdjustUserPoints(
+    id,
+    adjustUserPointsDTO
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **adjustUserPointsDTO** | **AdjustUserPointsDTO**|  | |
+| **id** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**UserResponseDTO**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | User points adjusted successfully. |  -  |
+|**400** | Bad request. Neither allTimePointsDelta nor monthlyPointsDelta was provided. |  -  |
+|**403** | Forbidden. Only admins can adjust user points. |  -  |
+|**404** | User not found. The user with the specified ID does not exist. |  -  |
+|**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userControllerDeleteUser**
 > userControllerDeleteUser(deleteUserDTO)
