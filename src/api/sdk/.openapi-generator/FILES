@@ -14,6 +14,8 @@ docs/FileReponseDTO.md
 docs/LoginApi.md
 docs/LoginRequestDTO.md
 docs/LoginResponseDTO.md
+docs/MyAttendanceHistoryItemDto.md
+docs/MyAttendancesResponseDto.md
 docs/ProblemResponseDTO.md
 docs/ProblemsApi.md
 docs/PublicProblemResponseDTO.md
