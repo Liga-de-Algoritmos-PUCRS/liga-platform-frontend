@@ -56,7 +56,7 @@ No authorization required
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | Reset password token created successfully. |  -  |
+|**200** | Always 200, whether or not the email has an account, to avoid leaking which emails are registered. |  -  |
 |**401** | Unauthorized. The provided credentials are invalid. |  -  |
 |**500** | Internal server error. An unexpected error occurred while processing the request. |  -  |
 

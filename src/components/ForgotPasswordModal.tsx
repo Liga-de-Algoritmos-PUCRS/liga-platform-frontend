@@ -21,17 +21,21 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { useCountdown, formatCountdown } from "@/hooks/use-countdown"
+import { useCountdown, formatCountdown, countdownWindowMs } from "@/hooks/use-countdown"
+import { otpErrorDescription, isCodeRejection } from "@/lib/otp-messages"
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN_SECONDS = 30
+// Espelha o RESET_TOKEN_EXPIRES_IN_SECONDS do back; so entra em cena se o
+// `expiresInSeconds` da resposta faltar.
+const RESET_CODE_FALLBACK_SECONDS = 15 * 60
 
 const emailSchema = z.object({
   email: z.string().email("Insira um email válido"),
 })
 
 const passwordSchema = z.object({
-  password: z.string().min(6, "A senha deve ter no mínimo 8 caracteres")
+  password: z.string()
     .min(9, "A senha deve ter mais de 8 caracteres.")
     .regex(/[A-Z]/, "Deve conter letra maiúscula.")
     .regex(/[a-z]/, "Deve conter letra minúscula.")
@@ -54,8 +58,8 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
   const [step, setStep] = useState<Step>("EMAIL")
   const [isLoading, setIsLoading] = useState(false)
   const [isResending, setIsResending] = useState(false)
-  const [tokenId, setTokenId] = useState("")
   const [otp, setOtp] = useState("")
+  const [otpFailures, setOtpFailures] = useState(0)
   const [email, setEmail] = useState("")
   const [expiresAtMs, setExpiresAtMs] = useState<number | null>(null)
   const [resendAvailableAt, setResendAvailableAt] = useState<number | null>(null)
@@ -72,11 +76,12 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     resolver: zodResolver(passwordSchema),
   })
 
-  const startOtpWindow = (newTokenId: string, newExpiresAt: string) => {
-    setTokenId(newTokenId)
-    setExpiresAtMs(new Date(newExpiresAt).getTime())
-    setResendAvailableAt(Date.now() + RESEND_COOLDOWN_SECONDS * 1000)
+  const startOtpWindow = (expiresInSeconds: number) => {
+    const startedAt = Date.now()
+    setExpiresAtMs(startedAt + countdownWindowMs(expiresInSeconds, RESET_CODE_FALLBACK_SECONDS))
+    setResendAvailableAt(startedAt + RESEND_COOLDOWN_SECONDS * 1000)
     setOtp("")
+    setOtpFailures(0)
   }
 
   const handleRequestReset = async (data: z.infer<typeof emailSchema>) => {
@@ -86,12 +91,12 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
         email: data.email,
       })
 
-      if (response.data.id) {
-        startOtpWindow(response.data.id, response.data.expiresAt)
-        setEmail(data.email)
-        setStep("OTP")
-        toast.success("Código enviado!", { description: "Verifique sua caixa de entrada." })
-      }
+      startOtpWindow(response.data.expiresInSeconds)
+      setEmail(data.email)
+      setStep("OTP")
+      toast.success("Se este e-mail estiver cadastrado, enviamos um código.", {
+        description: "Verifique sua caixa de entrada.",
+      })
     } catch (error) {
       console.error(error)
       toast.error("Erro ao solicitar recuperação", { description: "Verifique o email e tente novamente." })
@@ -107,10 +112,10 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
         email,
       })
 
-      if (response.data.id) {
-        startOtpWindow(response.data.id, response.data.expiresAt)
-        toast.success("Novo código enviado!", { description: "O código anterior deixou de ser válido." })
-      }
+      startOtpWindow(response.data.expiresInSeconds)
+      toast.success("Se este e-mail estiver cadastrado, enviamos um novo código.", {
+        description: "Qualquer código anterior deixou de ser válido.",
+      })
     } catch (error) {
       console.error(error)
       toast.error("Erro ao reenviar código", { description: "Tente novamente em instantes." })
@@ -124,7 +129,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     setIsLoading(true)
     try {
       await client.resetPassword.resetPasswordControllerValidateResetPassword({
-        tokenId: tokenId,
+        email,
         token: otp,
       })
 
@@ -132,8 +137,16 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
       toast.success("Código validado!")
     } catch (error) {
       console.error(error)
+      if (!isCodeRejection(error)) {
+        toast.error("Não foi possível verificar o código", {
+          description: "Verifique sua conexão e tente novamente.",
+        })
+        return
+      }
+      const failures = otpFailures + 1
+      setOtpFailures(failures)
       setOtp("")
-      toast.error("Código inválido", { description: "Tente novamente." })
+      toast.error("Código inválido", { description: otpErrorDescription(failures) })
     } finally {
       setIsLoading(false)
     }
@@ -143,7 +156,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     setIsLoading(true)
     try {
       await client.resetPassword.resetPasswordControllerResetPassword({
-        tokenId: tokenId,
+        email,
         token: otp,
         newPassword: data.password,
       })
@@ -152,7 +165,11 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
       handleClose()
     } catch (error) {
       console.error(error)
-      toast.error("Erro ao alterar senha")
+      toast.error("Erro ao alterar senha", {
+        description: isCodeRejection(error)
+          ? "O código pode ter expirado. Volte e peça um novo."
+          : "Verifique sua conexão e tente novamente.",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -163,6 +180,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     setTimeout(() => {
       setStep("EMAIL")
       setOtp("")
+      setOtpFailures(0)
       setExpiresAtMs(null)
       setResendAvailableAt(null)
       emailForm.reset()
@@ -177,7 +195,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
           <DialogTitle className="text-foreground">Recuperar Senha</DialogTitle>
           <DialogDescription className="text-muted-foreground">
             {step === "EMAIL" && "Insira seu email para receber o código de recuperação."}
-            {step === "OTP" && `Enviamos um código de 6 dígitos para ${email}.`}
+            {step === "OTP" && `Se ${email} tiver uma conta, enviamos um código de 6 dígitos.`}
             {step === "NEW_PASSWORD" && "Crie uma nova senha segura para sua conta."}
           </DialogDescription>
         </DialogHeader>
@@ -310,6 +328,20 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
                 disabled={isLoading}
               >
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Redefinir Senha"}
+              </Button>
+
+              {/* Sem isto o passo e um beco sem saida: se o codigo expirar ou
+                  esgotar as tentativas entre a validacao e o envio da senha, o
+                  back recusa e a unica saida seria fechar o modal e recomecar.
+                  Voltar devolve o acesso ao "Reenviar codigo". */}
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full h-11 text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+                onClick={() => setStep("OTP")}
+                disabled={isLoading}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
             </form>
           )}
