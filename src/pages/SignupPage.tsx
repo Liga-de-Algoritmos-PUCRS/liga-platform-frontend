@@ -3,7 +3,12 @@ import { useState } from "react"
 import { Rocket, Trophy, Users, Code2 } from "lucide-react"
 
 import { SignupForm } from "@/components/signup/SignupForm"
-import { ValidateSignup, type SignupCredentials } from "@/components/signup/ValidateSignup"
+import {
+  ValidateSignup,
+  SIGNUP_CODE_FALLBACK_SECONDS,
+  type SignupCredentials,
+} from "@/components/signup/ValidateSignup"
+import { countdownWindowMs } from "@/hooks/use-countdown"
 
 export default function SignupPage() {
   const [step, setStep] = useState<1 | 2>(1)
@@ -11,7 +16,7 @@ export default function SignupPage() {
   const [credentials, setCredentials] = useState<SignupCredentials | null>(null)
 
   const handleSignupSuccess = (expiresInSeconds: number, values: SignupCredentials) => {
-    setExpiresAtMs(Date.now() + expiresInSeconds * 1000)
+    setExpiresAtMs(Date.now() + countdownWindowMs(expiresInSeconds, SIGNUP_CODE_FALLBACK_SECONDS))
     setCredentials(values)
     setStep(2)
   }

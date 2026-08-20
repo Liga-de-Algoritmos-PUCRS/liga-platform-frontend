@@ -21,11 +21,14 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { useCountdown, formatCountdown } from "@/hooks/use-countdown"
+import { useCountdown, formatCountdown, countdownWindowMs } from "@/hooks/use-countdown"
 import { otpErrorDescription } from "@/lib/otp-messages"
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN_SECONDS = 30
+// Espelha o RESET_TOKEN_EXPIRES_IN_SECONDS do back; so entra em cena se o
+// `expiresInSeconds` da resposta faltar.
+const RESET_CODE_FALLBACK_SECONDS = 15 * 60
 
 const emailSchema = z.object({
   email: z.string().email("Insira um email válido"),
@@ -75,7 +78,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
 
   const startOtpWindow = (expiresInSeconds: number) => {
     const startedAt = Date.now()
-    setExpiresAtMs(startedAt + expiresInSeconds * 1000)
+    setExpiresAtMs(startedAt + countdownWindowMs(expiresInSeconds, RESET_CODE_FALLBACK_SECONDS))
     setResendAvailableAt(startedAt + RESEND_COOLDOWN_SECONDS * 1000)
     setOtp("")
     setOtpFailures(0)

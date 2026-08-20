@@ -10,11 +10,14 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { useCountdown, formatCountdown } from "@/hooks/use-countdown"
+import { useCountdown, formatCountdown, countdownWindowMs } from "@/hooks/use-countdown"
 import { otpErrorDescription } from "@/lib/otp-messages"
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN_SECONDS = 30
+// Espelha o SIGNUP_TOKEN_EXPIRES_IN_SECONDS do back; so entra em cena se o
+// `expiresInSeconds` da resposta faltar.
+export const SIGNUP_CODE_FALLBACK_SECONDS = 10 * 60
 
 export interface SignupCredentials {
   name: string
@@ -73,7 +76,7 @@ export function ValidateSignup({ expiresAtMs: initialExpiresAtMs, credentials, o
     try {
       const { data } = await client.signup.signupControllerValidateSignup(credentials)
       const resentAt = Date.now()
-      setExpiresAtMs(resentAt + data.expiresInSeconds * 1000)
+      setExpiresAtMs(resentAt + countdownWindowMs(data.expiresInSeconds, SIGNUP_CODE_FALLBACK_SECONDS))
       setResendAvailableAt(resentAt + RESEND_COOLDOWN_SECONDS * 1000)
       setOtp("")
       setOtpFailures(0)
