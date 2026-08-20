@@ -11,7 +11,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useCountdown, formatCountdown, countdownWindowMs } from "@/hooks/use-countdown"
-import { otpErrorDescription } from "@/lib/otp-messages"
+import { otpErrorDescription, isCodeRejection } from "@/lib/otp-messages"
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN_SECONDS = 30
@@ -60,6 +60,12 @@ export function ValidateSignup({ expiresAtMs: initialExpiresAtMs, credentials, o
       navigate({ to: "/login" })
     } catch (err) {
       console.error(err)
+      if (!isCodeRejection(err)) {
+        toast.error("Não foi possível verificar o código", {
+          description: "Verifique a sua ligação e tente novamente.",
+        })
+        return
+      }
       const failures = otpFailures + 1
       setOtpFailures(failures)
       setOtp("")

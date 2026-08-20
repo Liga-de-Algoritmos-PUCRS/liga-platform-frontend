@@ -22,7 +22,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useCountdown, formatCountdown, countdownWindowMs } from "@/hooks/use-countdown"
-import { otpErrorDescription } from "@/lib/otp-messages"
+import { otpErrorDescription, isCodeRejection } from "@/lib/otp-messages"
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN_SECONDS = 30
@@ -137,6 +137,12 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
       toast.success("Código validado!")
     } catch (error) {
       console.error(error)
+      if (!isCodeRejection(error)) {
+        toast.error("Não foi possível verificar o código", {
+          description: "Verifique sua conexão e tente novamente.",
+        })
+        return
+      }
       const failures = otpFailures + 1
       setOtpFailures(failures)
       setOtp("")
@@ -159,7 +165,11 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
       handleClose()
     } catch (error) {
       console.error(error)
-      toast.error("Erro ao alterar senha")
+      toast.error("Erro ao alterar senha", {
+        description: isCodeRejection(error)
+          ? "O código pode ter expirado. Volte e peça um novo."
+          : "Verifique sua conexão e tente novamente.",
+      })
     } finally {
       setIsLoading(false)
     }
