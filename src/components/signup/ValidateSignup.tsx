@@ -11,6 +11,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useCountdown, formatCountdown } from "@/hooks/use-countdown"
+import { otpErrorDescription } from "@/lib/otp-messages"
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN_SECONDS = 30
@@ -22,18 +23,17 @@ export interface SignupCredentials {
 }
 
 interface ValidateSignupProps {
-  tokenId: string
-  expiresAt: string
+  expiresAtMs: number
   credentials: SignupCredentials
   onBack: () => void
 }
 
-export function ValidateSignup({ tokenId: initialTokenId, expiresAt: initialExpiresAt, credentials, onBack }: ValidateSignupProps) {
+export function ValidateSignup({ expiresAtMs: initialExpiresAtMs, credentials, onBack }: ValidateSignupProps) {
   const [otp, setOtp] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isResending, setIsResending] = useState(false)
-  const [tokenId, setTokenId] = useState(initialTokenId)
-  const [expiresAtMs, setExpiresAtMs] = useState(() => new Date(initialExpiresAt).getTime())
+  const [otpFailures, setOtpFailures] = useState(0)
+  const [expiresAtMs, setExpiresAtMs] = useState(initialExpiresAtMs)
   const [resendAvailableAt, setResendAvailableAt] = useState(() => Date.now() + RESEND_COOLDOWN_SECONDS * 1000)
   const navigate = useNavigate()
 
@@ -47,7 +47,7 @@ export function ValidateSignup({ tokenId: initialTokenId, expiresAt: initialExpi
     setIsLoading(true)
     try {
       await client.signup.signupControllerValidateToken({
-        tokenId: tokenId,
+        email: credentials.email,
         token: otp,
       })
 
@@ -57,9 +57,11 @@ export function ValidateSignup({ tokenId: initialTokenId, expiresAt: initialExpi
       navigate({ to: "/login" })
     } catch (err) {
       console.error(err)
+      const failures = otpFailures + 1
+      setOtpFailures(failures)
       setOtp("")
       toast.error("Código inválido", {
-        description: "O código inserido está incorreto. Tente novamente.",
+        description: otpErrorDescription(failures),
       })
     } finally {
       setIsLoading(false)
@@ -70,11 +72,14 @@ export function ValidateSignup({ tokenId: initialTokenId, expiresAt: initialExpi
     setIsResending(true)
     try {
       const { data } = await client.signup.signupControllerValidateSignup(credentials)
-      setTokenId(data.id)
-      setExpiresAtMs(new Date(data.expiresAt).getTime())
-      setResendAvailableAt(Date.now() + RESEND_COOLDOWN_SECONDS * 1000)
+      const resentAt = Date.now()
+      setExpiresAtMs(resentAt + data.expiresInSeconds * 1000)
+      setResendAvailableAt(resentAt + RESEND_COOLDOWN_SECONDS * 1000)
       setOtp("")
-      toast.success("Novo código enviado!", { description: "O código anterior deixou de ser válido." })
+      setOtpFailures(0)
+      toast.success("Se este e-mail estiver disponível, enviamos um novo código.", {
+        description: "Qualquer código anterior deixou de ser válido.",
+      })
     } catch (err) {
       console.error(err)
       toast.error("Erro ao reenviar código", { description: "Tente novamente em instantes." })
@@ -93,7 +98,7 @@ export function ValidateSignup({ tokenId: initialTokenId, expiresAt: initialExpi
         </div>
         <h2 className="text-xl font-semibold">Verifique o seu email</h2>
         <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-          Enviámos um código de 6 dígitos para o seu email. Insira-o abaixo para continuar.
+          Se {credentials.email} estiver disponível, enviámos um código de 6 dígitos. Insira-o abaixo para continuar.
         </p>
       </div>
 

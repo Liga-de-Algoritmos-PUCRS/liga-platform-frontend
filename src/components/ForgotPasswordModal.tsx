@@ -22,6 +22,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useCountdown, formatCountdown } from "@/hooks/use-countdown"
+import { otpErrorDescription } from "@/lib/otp-messages"
 
 const OTP_LENGTH = 6
 const RESEND_COOLDOWN_SECONDS = 30
@@ -54,8 +55,8 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
   const [step, setStep] = useState<Step>("EMAIL")
   const [isLoading, setIsLoading] = useState(false)
   const [isResending, setIsResending] = useState(false)
-  const [tokenId, setTokenId] = useState("")
   const [otp, setOtp] = useState("")
+  const [otpFailures, setOtpFailures] = useState(0)
   const [email, setEmail] = useState("")
   const [expiresAtMs, setExpiresAtMs] = useState<number | null>(null)
   const [resendAvailableAt, setResendAvailableAt] = useState<number | null>(null)
@@ -72,11 +73,12 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     resolver: zodResolver(passwordSchema),
   })
 
-  const startOtpWindow = (newTokenId: string, newExpiresAt: string) => {
-    setTokenId(newTokenId)
-    setExpiresAtMs(new Date(newExpiresAt).getTime())
-    setResendAvailableAt(Date.now() + RESEND_COOLDOWN_SECONDS * 1000)
+  const startOtpWindow = (expiresInSeconds: number) => {
+    const startedAt = Date.now()
+    setExpiresAtMs(startedAt + expiresInSeconds * 1000)
+    setResendAvailableAt(startedAt + RESEND_COOLDOWN_SECONDS * 1000)
     setOtp("")
+    setOtpFailures(0)
   }
 
   const handleRequestReset = async (data: z.infer<typeof emailSchema>) => {
@@ -86,12 +88,12 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
         email: data.email,
       })
 
-      if (response.data.id) {
-        startOtpWindow(response.data.id, response.data.expiresAt)
-        setEmail(data.email)
-        setStep("OTP")
-        toast.success("Código enviado!", { description: "Verifique sua caixa de entrada." })
-      }
+      startOtpWindow(response.data.expiresInSeconds)
+      setEmail(data.email)
+      setStep("OTP")
+      toast.success("Se este e-mail estiver cadastrado, enviamos um código.", {
+        description: "Verifique sua caixa de entrada.",
+      })
     } catch (error) {
       console.error(error)
       toast.error("Erro ao solicitar recuperação", { description: "Verifique o email e tente novamente." })
@@ -107,10 +109,10 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
         email,
       })
 
-      if (response.data.id) {
-        startOtpWindow(response.data.id, response.data.expiresAt)
-        toast.success("Novo código enviado!", { description: "O código anterior deixou de ser válido." })
-      }
+      startOtpWindow(response.data.expiresInSeconds)
+      toast.success("Se este e-mail estiver cadastrado, enviamos um novo código.", {
+        description: "Qualquer código anterior deixou de ser válido.",
+      })
     } catch (error) {
       console.error(error)
       toast.error("Erro ao reenviar código", { description: "Tente novamente em instantes." })
@@ -124,7 +126,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     setIsLoading(true)
     try {
       await client.resetPassword.resetPasswordControllerValidateResetPassword({
-        tokenId: tokenId,
+        email,
         token: otp,
       })
 
@@ -132,8 +134,10 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
       toast.success("Código validado!")
     } catch (error) {
       console.error(error)
+      const failures = otpFailures + 1
+      setOtpFailures(failures)
       setOtp("")
-      toast.error("Código inválido", { description: "Tente novamente." })
+      toast.error("Código inválido", { description: otpErrorDescription(failures) })
     } finally {
       setIsLoading(false)
     }
@@ -143,7 +147,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     setIsLoading(true)
     try {
       await client.resetPassword.resetPasswordControllerResetPassword({
-        tokenId: tokenId,
+        email,
         token: otp,
         newPassword: data.password,
       })
@@ -163,6 +167,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
     setTimeout(() => {
       setStep("EMAIL")
       setOtp("")
+      setOtpFailures(0)
       setExpiresAtMs(null)
       setResendAvailableAt(null)
       emailForm.reset()
@@ -177,7 +182,7 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
           <DialogTitle className="text-foreground">Recuperar Senha</DialogTitle>
           <DialogDescription className="text-muted-foreground">
             {step === "EMAIL" && "Insira seu email para receber o código de recuperação."}
-            {step === "OTP" && `Enviamos um código de 6 dígitos para ${email}.`}
+            {step === "OTP" && `Se ${email} tiver uma conta, enviamos um código de 6 dígitos.`}
             {step === "NEW_PASSWORD" && "Crie uma nova senha segura para sua conta."}
           </DialogDescription>
         </DialogHeader>

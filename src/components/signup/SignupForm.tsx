@@ -9,7 +9,6 @@ import client from "@/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { SignupRequestResponseDTO } from "@/api/sdk"
 
 const formSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres."),
@@ -17,7 +16,7 @@ const formSchema = z.object({
     .email("Endereço de email inválido.")
     .regex(/^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\.)?pucrs\.br$/i, "Deve ser um email acadêmico PUCRS"),
   password: z.string()
-    .min(8, "A senha deve ter no mínimo 8 caracteres.")
+    .min(9, "A senha deve ter mais de 8 caracteres.")
     .regex(/[A-Z]/, "Deve conter letra maiúscula.")
     .regex(/[a-z]/, "Deve conter letra minúscula.")
     .regex(/\d/, "Deve conter um número.")
@@ -26,7 +25,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export function SignupForm({ onSuccess }: { onSuccess: (response: SignupRequestResponseDTO, credentials: FormValues) => void }) {
+export function SignupForm({ onSuccess }: { onSuccess: (expiresInSeconds: number, credentials: FormValues) => void }) {
   const navigate = useNavigate()
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
@@ -37,12 +36,10 @@ export function SignupForm({ onSuccess }: { onSuccess: (response: SignupRequestR
   async function onSubmit(values: FormValues) {
     try {
       const { data } = await client.signup.signupControllerValidateSignup(values)
-      if (data.id) {
-        toast.success("Conta criada com sucesso!", {
-            description: "Enviamos um código para o seu email."
-        })
-        onSuccess(data, values)
-      }
+      toast.success("Se este e-mail estiver disponível, enviamos um código.", {
+          description: "Verifique a sua caixa de entrada."
+      })
+      onSuccess(data.expiresInSeconds, values)
     } catch (error) {
       console.log(error)
       toast.error("Erro ao criar conta", { 
