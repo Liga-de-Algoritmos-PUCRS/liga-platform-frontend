@@ -35,7 +35,7 @@ const emailSchema = z.object({
 })
 
 const passwordSchema = z.object({
-  password: z.string().min(6, "A senha deve ter no mínimo 8 caracteres")
+  password: z.string()
     .min(9, "A senha deve ter mais de 8 caracteres.")
     .regex(/[A-Z]/, "Deve conter letra maiúscula.")
     .regex(/[a-z]/, "Deve conter letra minúscula.")
@@ -328,6 +328,20 @@ export function ForgotPasswordModal({ isOpen, onOpenChange }: ForgotPasswordModa
                 disabled={isLoading}
               >
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Redefinir Senha"}
+              </Button>
+
+              {/* Sem isto o passo e um beco sem saida: se o codigo expirar ou
+                  esgotar as tentativas entre a validacao e o envio da senha, o
+                  back recusa e a unica saida seria fechar o modal e recomecar.
+                  Voltar devolve o acesso ao "Reenviar codigo". */}
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full h-11 text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+                onClick={() => setStep("OTP")}
+                disabled={isLoading}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
               </Button>
             </form>
           )}
