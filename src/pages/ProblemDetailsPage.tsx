@@ -272,7 +272,7 @@ export function ProblemDetailsPage() {
         <SheetTrigger asChild>
           <Button
             variant="ghost"
-            className="fixed bottom-24 right-6 z-40 h-14 px-5 gap-2 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 font-bold"
+            className="fixed bottom-24 right-6 z-40 h-14 px-5 has-[>svg]:px-5 gap-2 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 font-bold"
           >
             <Send size={20} />
             Responder
