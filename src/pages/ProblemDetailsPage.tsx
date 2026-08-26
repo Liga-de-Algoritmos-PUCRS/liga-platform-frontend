@@ -272,16 +272,15 @@ export function ProblemDetailsPage() {
         <SheetTrigger asChild>
           <Button
             variant="ghost"
-            size="icon"
-            className="fixed bottom-24 right-6 z-40 h-14 w-14 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90"
+            className="fixed bottom-24 right-6 z-40 h-14 px-5 gap-2 rounded-full bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 font-bold"
           >
-            <Send size={22} />
-            <span className="sr-only">Abrir painel de resposta</span>
+            <Send size={20} />
+            Responder
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="w-full sm:w-100 sm:max-w-100 bg-[#0a0a0b] border-white/5 p-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
         <SheetHeader className="p-0">
-          <SheetTitle className="text-white">Painel de Resposta</SheetTitle>
+          <SheetTitle className="text-white">Baixe o input e envie sua resposta</SheetTitle>
         </SheetHeader>
         <div className="space-y-3">
           <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-gray-500 ml-1">Recursos de Entrada</Label>
