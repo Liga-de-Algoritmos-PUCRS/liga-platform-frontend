@@ -653,11 +653,17 @@ export interface ReportBugServiceDTO {
  */
 export interface ResetPasswordDTO {
     /**
-     * Token id
+     * User email
      * @type {string}
      * @memberof ResetPasswordDTO
      */
-    'tokenId': string;
+    'email'?: string;
+    /**
+     * Token id. Deprecated: kept only for backwards compatibility, prefer email.
+     * @type {string}
+     * @memberof ResetPasswordDTO
+     */
+    'tokenId'?: string;
     /**
      * Indicates if the token has 6 digits
      * @type {string}
@@ -691,23 +697,17 @@ export interface ResetPasswordRequestDTO {
  */
 export interface ResetPasswordRequestResponseDTO {
     /**
-     * Reset Password Token ID
+     * Public confirmation message. Identical whether the email has an account or not.
      * @type {string}
      * @memberof ResetPasswordRequestResponseDTO
      */
-    'id': string;
+    'message': string;
     /**
-     * Token expiration date and time
-     * @type {string}
+     * How long the code is valid for, in seconds.
+     * @type {number}
      * @memberof ResetPasswordRequestResponseDTO
      */
-    'expiresAt': string;
-    /**
-     * Indicates whether the token has been revoked
-     * @type {boolean}
-     * @memberof ResetPasswordRequestResponseDTO
-     */
-    'isRevoked': boolean;
+    'expiresInSeconds': number;
 }
 /**
  * 
@@ -779,23 +779,17 @@ export interface SignupRequestDTO {
  */
 export interface SignupRequestResponseDTO {
     /**
-     * Signup Token ID
+     * Public confirmation message. Identical whether the email already has an account or not.
      * @type {string}
      * @memberof SignupRequestResponseDTO
      */
-    'id': string;
+    'message': string;
     /**
-     * Token expiration date and time
-     * @type {string}
+     * How long the code is valid for, in seconds.
+     * @type {number}
      * @memberof SignupRequestResponseDTO
      */
-    'expiresAt': string;
-    /**
-     * Indicates whether the token has been revoked
-     * @type {boolean}
-     * @memberof SignupRequestResponseDTO
-     */
-    'isRevoked': boolean;
+    'expiresInSeconds': number;
 }
 /**
  * 
@@ -1154,11 +1148,17 @@ export type UserResponseDTORoleEnum = typeof UserResponseDTORoleEnum[keyof typeo
  */
 export interface ValidateResetPasswordDTO {
     /**
-     * Token id
+     * User email
      * @type {string}
      * @memberof ValidateResetPasswordDTO
      */
-    'tokenId': string;
+    'email'?: string;
+    /**
+     * Token id. Deprecated: kept only for backwards compatibility, prefer email.
+     * @type {string}
+     * @memberof ValidateResetPasswordDTO
+     */
+    'tokenId'?: string;
     /**
      * Indicates if the token has 6 digits
      * @type {string}
@@ -1173,11 +1173,17 @@ export interface ValidateResetPasswordDTO {
  */
 export interface ValidateSignupDTO {
     /**
-     * Token id
+     * User email
      * @type {string}
      * @memberof ValidateSignupDTO
      */
-    'tokenId': string;
+    'email'?: string;
+    /**
+     * Token id. Deprecated: kept only for backwards compatibility, prefer email.
+     * @type {string}
+     * @memberof ValidateSignupDTO
+     */
+    'tokenId'?: string;
     /**
      * Indicates if the token has 6 digits
      * @type {string}

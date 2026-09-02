@@ -5,7 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**tokenId** | **string** | Token id | [default to undefined]
+**email** | **string** | User email | [optional] [default to undefined]
+**tokenId** | **string** | Token id. Deprecated: kept only for backwards compatibility, prefer email. | [optional] [default to undefined]
 **token** | **string** | Indicates if the token has 6 digits | [default to undefined]
 
 ## Example
@@ -14,6 +15,7 @@ Name | Type | Description | Notes
 import { ValidateResetPasswordDTO } from './api';
 
 const instance: ValidateResetPasswordDTO = {
+    email,
     tokenId,
     token,
 };

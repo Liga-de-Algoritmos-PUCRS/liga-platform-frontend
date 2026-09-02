@@ -3,16 +3,20 @@ import { useState } from "react"
 import { Rocket, Trophy, Users, Code2 } from "lucide-react"
 
 import { SignupForm } from "@/components/signup/SignupForm"
-import { ValidateSignup, type SignupCredentials } from "@/components/signup/ValidateSignup"
-import { SignupRequestResponseDTO } from "@/api/sdk"
+import {
+  ValidateSignup,
+  SIGNUP_CODE_FALLBACK_SECONDS,
+  type SignupCredentials,
+} from "@/components/signup/ValidateSignup"
+import { countdownWindowMs } from "@/hooks/use-countdown"
 
 export default function SignupPage() {
   const [step, setStep] = useState<1 | 2>(1)
-  const [signupResponse, setSignupResponse] = useState<SignupRequestResponseDTO | null>(null)
+  const [expiresAtMs, setExpiresAtMs] = useState<number | null>(null)
   const [credentials, setCredentials] = useState<SignupCredentials | null>(null)
 
-  const handleSignupSuccess = (response: SignupRequestResponseDTO, values: SignupCredentials) => {
-    setSignupResponse(response)
+  const handleSignupSuccess = (expiresInSeconds: number, values: SignupCredentials) => {
+    setExpiresAtMs(Date.now() + countdownWindowMs(expiresInSeconds, SIGNUP_CODE_FALLBACK_SECONDS))
     setCredentials(values)
     setStep(2)
   }
@@ -83,12 +87,11 @@ export default function SignupPage() {
                         </p>
                     </div>
 
-                    {step === 1 || !signupResponse || !credentials ? (
+                    {step === 1 || expiresAtMs === null || !credentials ? (
                         <SignupForm onSuccess={handleSignupSuccess} />
                     ) : (
                         <ValidateSignup
-                            tokenId={signupResponse.id}
-                            expiresAt={signupResponse.expiresAt}
+                            expiresAtMs={expiresAtMs}
                             credentials={credentials}
                             onBack={() => setStep(1)}
                         />
