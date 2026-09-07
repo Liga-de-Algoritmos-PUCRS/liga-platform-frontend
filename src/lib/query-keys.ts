@@ -1,5 +1,6 @@
 export const queryKeys = {
   problems: ['problems'] as const,
+  problem: (id?: string) => ['problem', id] as const,
   adminProblems: ['adminProblems'] as const,
   adminUsers: ['adminUsers'] as const,
   submissions: (userId?: string) => ['submissions', userId] as const,

@@ -50,7 +50,7 @@ const SUBMIT_FAILURE_MESSAGE: Record<SubmitFailure, string> = {
 export function ProblemDetailsPage() {
   const { problemId } = useParams({ strict: false });
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refetchUser } = useAuth();
   
   const isAdmin = user?.role === 'ADMIN';
 
@@ -72,7 +72,7 @@ export function ProblemDetailsPage() {
   // O admin recebe um superconjunto do payload público, então a mesma variável
   // serve às duas rotas sem cast.
   const { data: problemResponse, isLoading } = useQuery({
-    queryKey: ['problem', cleanId, isAdmin],
+    queryKey: [...queryKeys.problem(cleanId), isAdmin],
     queryFn: (): Promise<{ data: PublicProblemResponseDTO }> =>
       isAdmin
         ? client.problem.problemControllerGetAdminProblemById(String(cleanId))
@@ -95,7 +95,7 @@ export function ProblemDetailsPage() {
   const isFinished = !!userSubmission;
 
   const invalidateAfterSubmit = () => {
-    queryClient.invalidateQueries({ queryKey: ['problem', cleanId] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.problem(cleanId) });
     queryClient.invalidateQueries({ queryKey: queryKeys.problems });
     queryClient.invalidateQueries({ queryKey: queryKeys.submissions(user?.id) });
   };
@@ -159,6 +159,15 @@ export function ProblemDetailsPage() {
         setShowSuccessModal(true);
         setUserAnswer("");
         invalidateAfterSubmit();
+        try {
+          await refetchUser();
+          queryClient.invalidateQueries({ queryKey: queryKeys.ranking('monthly') });
+          queryClient.invalidateQueries({ queryKey: queryKeys.ranking('alltime') });
+        } catch (refreshError) {
+          // A resposta já foi aceita e pontuada — uma falha aqui é só o perfil/ranking
+          // ficando com cache velho, não um erro de envio. Não deve abrir o modal de falha.
+          console.error("Erro ao atualizar perfil/ranking após acerto:", refreshError);
+        }
       } else {
         setShowErrorModal(true);
       }

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCcw, Edit2, Trash2, Eye, EyeOff, AlertTriangle, Search, FileCode2, Star, Pin, PinOff, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -29,40 +29,53 @@ export function ProblemsTable() {
   const [editFormData, setEditFormData] = useState<UpdateProblemDTO>({});
   const [scoringErrors, setScoringErrors] = useState<ScoringErrors>({});
   const [restartingProblem, setRestartingProblem] = useState<ProblemResponseDTO | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const { data: response, isLoading: loading, refetch } = useQuery({
     queryKey: queryKeys.adminProblems,
     queryFn: () => client.problem.problemControllerGetAllAdminProblems(),
   });
 
-  const problems = useMemo(() => {
-    if (!response?.data) return [];
-    return [...response.data].sort((a, b) => {
-      if (a.fixed && !b.fixed) return -1;
-      if (!a.fixed && b.fixed) return 1;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-  }, [response?.data]);
+  const invalidateProblemQueries = (id?: string) => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.adminProblems });
+    queryClient.invalidateQueries({ queryKey: queryKeys.problems });
+    if (id) queryClient.invalidateQueries({ queryKey: queryKeys.problem(id) });
+  };
+
+  const problemsData = response?.data;
+  const problems = useMemo(
+    () =>
+      problemsData
+        ? [...problemsData].sort((a, b) => {
+            if (a.fixed && !b.fixed) return -1;
+            if (!a.fixed && b.fixed) return 1;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          })
+        : [],
+    [problemsData]
+  );
 
   const filteredProblems = problems.filter((problem) => 
     problem.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDeleteProblem = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!deletingProblem) return;
-    setActionLoading(true);
-    try {
-      await client.problem.problemControllerDeleteProblem(deletingProblem.id);
+  const deleteMutation = useMutation({
+    mutationFn: (problemId: string) => client.problem.problemControllerDeleteProblem(problemId),
+    onSuccess: (_data, problemId) => {
       setDeletingProblem(null);
       toast.success("Problema eliminado com sucesso!");
-      await refetch(); // Recarrega os dados através do React Query
-    } catch {
+      invalidateProblemQueries(problemId);
+    },
+    onError: () => {
       toast.error("Falha ao eliminar problema.");
-    } finally {
-      setActionLoading(false);
-    }
+    },
+  });
+
+  const handleDeleteProblem = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!deletingProblem) return;
+    deleteMutation.mutate(deletingProblem.id);
   };
 
   // O valor corrente (`points`) não é editável no formulário: só o botão
@@ -76,7 +89,20 @@ export function ProblemsTable() {
     decrement: editFormData.decrement ?? editingProblem?.decrement ?? DEFAULT_DECREMENT,
   };
 
-  const handleUpdateProblem = async (e: React.FormEvent) => {
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateProblemDTO }) =>
+      client.problem.problemControllerUpdateProblem(id, payload),
+    onSuccess: (_data, { id }) => {
+      setEditingProblem(null);
+      toast.success("Problema atualizado com sucesso!");
+      invalidateProblemQueries(id);
+    },
+    onError: () => {
+      toast.error("Falha ao atualizar problema.");
+    },
+  });
+
+  const handleUpdateProblem = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProblem) return;
 
@@ -84,72 +110,71 @@ export function ProblemsTable() {
     setScoringErrors(errors);
     if (hasScoringErrors(errors)) return;
 
-    setActionLoading(true);
-    try {
-      const payload: UpdateProblemDTO = {
-        title: editFormData.title,
-        description: editFormData.description,
-        difficulty: editFormData.difficulty,
-        answer: editFormData.answer,
-        input: editFormData.input,
-        initialPoints: editScoring.initialPoints,
-        floorPoints: editScoring.floorPoints,
-        decrement: editScoring.decrement
-      };
-      if (editFormData.bannerUrl === "") payload.bannerUrl = "";
+    const payload: UpdateProblemDTO = {
+      title: editFormData.title,
+      description: editFormData.description,
+      difficulty: editFormData.difficulty,
+      answer: editFormData.answer,
+      input: editFormData.input,
+      initialPoints: editScoring.initialPoints,
+      floorPoints: editScoring.floorPoints,
+      decrement: editScoring.decrement
+    };
+    if (editFormData.bannerUrl === "") payload.bannerUrl = "";
 
-      await client.problem.problemControllerUpdateProblem(editingProblem.id, payload);
-      setEditingProblem(null);
-      toast.success("Problema atualizado com sucesso!");
-      await refetch(); // Recarrega os dados através do React Query
-    } catch {
-      toast.error("Falha ao atualizar problema.");
-    } finally {
-      setActionLoading(false);
-    }
+    updateMutation.mutate({ id: editingProblem.id, payload });
   };
 
-  const handleRestartRace = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!restartingProblem) return;
-    setActionLoading(true);
-    try {
-      await client.problem.problemControllerUpdateProblem(restartingProblem.id, {
-        points: restartingProblem.initialPoints
-      });
+  const restartMutation = useMutation({
+    mutationFn: ({ id, initialPoints }: { id: string; initialPoints?: number }) =>
+      client.problem.problemControllerUpdateProblem(id, { points: initialPoints }),
+    onSuccess: (_data, { id }) => {
       setRestartingProblem(null);
       setEditingProblem(null);
       toast.success("Corrida reiniciada: o problema voltou ao valor inicial.");
-      await refetch();
-    } catch {
+      invalidateProblemQueries(id);
+    },
+    onError: () => {
       toast.error("Falha ao reiniciar a corrida.");
-    } finally {
-      setActionLoading(false);
-    }
+    },
+  });
+
+  const handleRestartRace = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!restartingProblem) return;
+    restartMutation.mutate({ id: restartingProblem.id, initialPoints: restartingProblem.initialPoints });
   };
 
-  const handleToggleArchive = async (problem: ProblemResponseDTO) => {
-    try {
-      await client.problem.problemControllerUpdateProblem(problem.id, {
-        archived: !problem.archived
-      });
+  const archiveMutation = useMutation({
+    mutationFn: (problem: ProblemResponseDTO) =>
+      client.problem.problemControllerUpdateProblem(problem.id, { archived: !problem.archived }),
+    onSuccess: (_data, problem) => {
       toast.success(problem.archived ? "Problema desarquivado!" : "Problema arquivado!");
-      await refetch();
-    } catch {
+      invalidateProblemQueries(problem.id);
+    },
+    onError: () => {
       toast.error("Falha ao atualizar o estado de arquivo.");
-    }
+    },
+  });
+
+  const handleToggleArchive = (problem: ProblemResponseDTO) => {
+    archiveMutation.mutate(problem);
   };
 
-  const handleTogglePin = async (problem: ProblemResponseDTO) => {
-    try {
-      await client.problem.problemControllerUpdateProblem(problem.id, {
-        fixed: !problem.fixed
-      });
+  const pinMutation = useMutation({
+    mutationFn: (problem: ProblemResponseDTO) =>
+      client.problem.problemControllerUpdateProblem(problem.id, { fixed: !problem.fixed }),
+    onSuccess: (_data, problem) => {
       toast.success(problem.fixed ? "Problema desafixado!" : "Problema fixado no topo!");
-      await refetch();
-    } catch {
+      invalidateProblemQueries(problem.id);
+    },
+    onError: () => {
       toast.error("Falha ao fixar/desafixar o problema.");
-    }
+    },
+  });
+
+  const handleTogglePin = (problem: ProblemResponseDTO) => {
+    pinMutation.mutate(problem);
   };
 
   return (
@@ -292,7 +317,14 @@ export function ProblemsTable() {
         </div>
       </CardContent>
 
-      <CreateProblemModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSuccess={() => refetch()} />
+      <CreateProblemModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.adminProblems });
+          queryClient.invalidateQueries({ queryKey: queryKeys.problems });
+        }}
+      />
 
      <Dialog open={!!editingProblem} onOpenChange={(open) => !open && setEditingProblem(null)}>
         <DialogContent className="bg-[#0a0a0b] border-white/10 text-white sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -412,7 +444,7 @@ export function ProblemsTable() {
 
             <DialogFooter className="pt-4 border-t border-white/10 mt-6">
               <Button type="button" variant="ghost" onClick={() => setEditingProblem(null)}>Cancelar</Button>
-              <Button type="submit" disabled={actionLoading} className="bg-primary">{actionLoading ? "A guardar..." : "Guardar Alterações"}</Button>
+              <Button type="submit" disabled={updateMutation.isPending} className="bg-primary">{updateMutation.isPending ? "A guardar..." : "Guardar Alterações"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -430,7 +462,7 @@ export function ProblemsTable() {
             </p>
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={() => setRestartingProblem(null)}>Cancelar</Button>
-              <Button type="submit" disabled={actionLoading} className="bg-amber-600 hover:bg-amber-500">{actionLoading ? "A reiniciar..." : "Sim, Reiniciar"}</Button>
+              <Button type="submit" disabled={restartMutation.isPending} className="bg-amber-600 hover:bg-amber-500">{restartMutation.isPending ? "A reiniciar..." : "Sim, Reiniciar"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -441,7 +473,7 @@ export function ProblemsTable() {
           <DialogHeader><DialogTitle className="text-red-500 flex items-center gap-2"><AlertTriangle size={20} /> Eliminar Problema</DialogTitle></DialogHeader>
           <form onSubmit={handleDeleteProblem} className="space-y-4 py-2">
             <p className="text-sm text-gray-400">Pretende eliminar <strong>{deletingProblem?.title}</strong>? Esta ação é irreversível.</p>
-            <DialogFooter><Button type="button" variant="ghost" onClick={() => setDeletingProblem(null)}>Cancelar</Button><Button type="submit" disabled={actionLoading} className="bg-red-500">{actionLoading ? "A eliminar..." : "Sim, Eliminar"}</Button></DialogFooter>
+            <DialogFooter><Button type="button" variant="ghost" onClick={() => setDeletingProblem(null)}>Cancelar</Button><Button type="submit" disabled={deleteMutation.isPending} className="bg-red-500">{deleteMutation.isPending ? "A eliminar..." : "Sim, Eliminar"}</Button></DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
