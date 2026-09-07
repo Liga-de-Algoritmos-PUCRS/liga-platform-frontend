@@ -159,9 +159,15 @@ export function ProblemDetailsPage() {
         setShowSuccessModal(true);
         setUserAnswer("");
         invalidateAfterSubmit();
-        await refetchUser();
-        queryClient.invalidateQueries({ queryKey: queryKeys.ranking('monthly') });
-        queryClient.invalidateQueries({ queryKey: queryKeys.ranking('alltime') });
+        try {
+          await refetchUser();
+          queryClient.invalidateQueries({ queryKey: queryKeys.ranking('monthly') });
+          queryClient.invalidateQueries({ queryKey: queryKeys.ranking('alltime') });
+        } catch (refreshError) {
+          // A resposta já foi aceita e pontuada — uma falha aqui é só o perfil/ranking
+          // ficando com cache velho, não um erro de envio. Não deve abrir o modal de falha.
+          console.error("Erro ao atualizar perfil/ranking após acerto:", refreshError);
+        }
       } else {
         setShowErrorModal(true);
       }
